@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtecteedRoute/ProtectedRoute";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
@@ -11,14 +12,7 @@ function App() {
           path="/search"
           element={
             <ProtectedRoute>
-              <div className="min-h-screen bg-white flex items-center justify-center">
-                <div className="text-center">
-                  <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                    검색 페이지
-                  </h1>
-                  <p className="text-gray-600">준비 중입니다</p>
-                </div>
-              </div>
+              <HomePage />
             </ProtectedRoute>
           }
         />
