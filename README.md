@@ -114,6 +114,7 @@ src/
 - `DELETE /favorites/:applicationNumber` - 관심특허 삭제
 
 > 상세한 API 명세는 백엔드 레포지토리 참고
+> (https://github.com/Douzone-Keycom-Internship-woohyun-2025/Docs/blob/main/specs/TechLens_API_specificationsV1.0.md)
 
 ## 👨‍💻 개발 가이드
 
@@ -229,9 +230,10 @@ VITE_API_TIMEOUT=10000
 
 ## 🔗 관련 저장소
 
-- **백엔드**: [techlens-backend](https://github.com/YOUR_ORG/techlens-backend)
+- **백엔드**: https://github.com/Douzone-Keycom-Internship-woohyun-2025/Backend
 
 ---
 
 **마지막 업데이트**: 2025년 11월
+
 
