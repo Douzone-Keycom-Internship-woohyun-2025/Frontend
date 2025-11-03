@@ -158,7 +158,7 @@ npm run format    # Prettier 포맷팅
 - **Staging**: develop 브랜치 변경 시
 - **Production**: main 브랜치 변경 시
 
-**배포 URL (staging)**: https://frontend-mnitgzfvt-woohyun-sims-projects.vercel.app/login
+**배포 URL (staging)**: [https://frontend-mnitgzfvt-woohyun-sims-projects.vercel.app/login](https://staging-frontend-techlens.vercel.app/login)
 
 **배포 URL (production)**: [https://techlens-frontend.vercel.app](https://frontend-woohyun-sims-projects.vercel.app/)
 
@@ -238,6 +238,7 @@ VITE_API_TIMEOUT=10000
 ---
 
 **마지막 업데이트**: 2025년 11월
+
 
 
 
