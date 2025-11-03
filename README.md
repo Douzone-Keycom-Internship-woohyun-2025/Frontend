@@ -2,7 +2,6 @@
 
 특허 검색 및 분석 플랫폼의 **프론트엔드** 저장소입니다. React + TypeScript 기반으로 특허 검색, 분석, 관심특허 관리 기능을 제공합니다.
 
-> **📌 주의**: 이 저장소는 **프론트엔드만** 포함합니다. 백엔드 API는 별도 저장소에서 관리됩니다.
 
 ## 📋 프로젝트 개요
 
@@ -15,7 +14,7 @@
 
 ```
 TechLens 프로젝트
-├── techlens-backend (별도 레포)    ← 백엔드 API
+├── techlens-backend (별도 레포)    ← 백엔드
 │   ├── Node.js + Express
 │   ├── KIPRIS API 연동
 │   └── MySQL 데이터베이스
@@ -82,55 +81,6 @@ src/
 └── main.tsx
 ```
 
-## 📦 설치 및 실행
-
-### 사전 요구사항
-
-```
-Node.js 18 이상
-npm 또는 yarn
-```
-
-### 1단계: 저장소 클론
-
-```bash
-git clone https://github.com/YOUR_ORG/techlens-frontend.git
-cd techlens-frontend
-```
-
-### 2단계: 의존성 설치
-
-```bash
-npm install
-```
-
-### 3단계: 환경 변수 설정
-
-```bash
-cp .env.example .env.local
-```
-
-`.env.local` 내용:
-
-```env
-VITE_API_URL=http://localhost:3000/api/v1
-VITE_API_TIMEOUT=10000
-```
-
-### 4단계: 개발 서버 실행
-
-```bash
-npm run dev
-```
-
-브라우저에서 `http://localhost:5173` 접속
-
-### 프로덕션 빌드
-
-```bash
-npm run build
-npm run preview
-```
 
 ## 🔗 백엔드 API
 
@@ -207,8 +157,59 @@ npm run format    # Prettier 포맷팅
 - **Staging**: develop 브랜치 변경 시
 - **Production**: main 브랜치 변경 시
 
-**배포 URL**: https://techlens-frontend.vercel.app
+**배포 URL**: [https://techlens-frontend.vercel.app](https://frontend-woohyun-sims-projects.vercel.app/)
+---
 
+## 📦 설치 및 실행
+
+### 사전 요구사항
+
+```
+Node.js 18 이상
+npm 또는 yarn
+```
+
+### 1단계: 저장소 클론
+
+```bash
+git clone https://github.com/YOUR_ORG/techlens-frontend.git
+cd techlens-frontend
+```
+
+### 2단계: 의존성 설치
+
+```bash
+npm install
+```
+
+### 3단계: 환경 변수 설정
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.local` 내용:
+
+```env
+VITE_API_URL=http://localhost:3000/api/v1
+VITE_API_TIMEOUT=10000
+```
+
+### 4단계: 개발 서버 실행
+
+```bash
+npm run dev
+```
+
+브라우저에서 `http://localhost:5173` 접속
+
+### 프로덕션 빌드
+
+```bash
+npm run build
+npm run preview
+```
+---
 ### 환경 변수 (Vercel)
 
 ```
@@ -233,3 +234,4 @@ VITE_API_TIMEOUT=10000
 ---
 
 **마지막 업데이트**: 2025년 11월
+
