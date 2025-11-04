@@ -17,7 +17,7 @@ export default function Sidebar({ userEmail, onLogout }: SidebarProps) {
     {
       path: "/patent-search",
       icon: "ri-search-line",
-      label: "특허목록",
+      label: "특허검색",
     },
     {
       path: "/summary",

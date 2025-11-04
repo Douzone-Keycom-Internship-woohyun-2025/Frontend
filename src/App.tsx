@@ -3,6 +3,7 @@ import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtecteedRoute/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import HelpPage from "./pages/HelpPage";
+import PatentSearchPage from "./pages/PatentSearchPage";
 
 function App() {
   return (
@@ -25,6 +26,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        <Route
+          path="/patent-search"
+          element={
+            <ProtectedRoute>
+              <PatentSearchPage />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
