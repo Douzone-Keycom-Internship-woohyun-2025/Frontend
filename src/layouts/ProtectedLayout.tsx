@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar/sidebar";
+import Sidebar from "../components/Sidebar/Sidebar";
 import { useAuthStore } from "../store/authStore";
 
 interface ProtectedLayoutProps {
