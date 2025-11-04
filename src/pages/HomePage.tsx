@@ -1,9 +1,10 @@
 import { Link } from "react-router-dom";
+import ProtectedLayout from "../layouts/ProtectedLayout";
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-6xl mx-auto px-6 py-12">
+    <ProtectedLayout>
+      <div className="max-w-6xl mx-auto px-6 py-12 ml-64">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             <span className="text-blue-600">T</span>ech
@@ -108,6 +109,6 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-    </div>
+    </ProtectedLayout>
   );
 }
