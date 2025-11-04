@@ -9,7 +9,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     login();
-    navigate("/search");
+    navigate("/");
   };
 
   return (
