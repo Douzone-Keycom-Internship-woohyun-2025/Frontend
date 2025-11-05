@@ -13,7 +13,7 @@ export default function BasicSearch({ onSearch }: BasicSearchProps) {
     <SearchForm
       onSearch={onSearch}
       title="기본 검색"
-      enablePresets={false} // 프리셋 기능은 비활성화
+      enablePresets={true}
       storageKey="patentPresets"
     />
   );
