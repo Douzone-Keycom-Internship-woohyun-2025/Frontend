@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { PatentListItem, PatentDetail } from "../../types/patent";
 import { getStatusColor } from "../../utils/statusColor";
 import { formatDate } from "../../utils/dateFormat";
-import { generateDummyDetail } from "../../data/generateDummyDetail"; // ← 추가
+import { generateDummyDetail } from "../../data/generateDummyDetail";
 import PatentDetailModal from "./PatentDetailModal";
 
 interface PatentListProps {
@@ -32,10 +32,22 @@ export default function PatentList({
     useState<PatentDetail | null>(null);
 
   const itemsPerPage = 20;
+
+  // ===== 정렬 로직 =====
+  const sortedPatents = [...patents].sort((a, b) => {
+    const dateA = new Date(a.filingDate).getTime();
+    const dateB = new Date(b.filingDate).getTime();
+
+    if (sortOrder === "asc") {
+      return dateA - dateB;
+    } else {
+      return dateB - dateA;
+    }
+  });
+
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-
-  const displayPatents = patents.slice(startIndex, endIndex);
+  const displayPatents = sortedPatents.slice(startIndex, endIndex);
   const totalCount = patents.length;
 
   // ===== 페이지 그룹 계산 =====
@@ -66,6 +78,13 @@ export default function PatentList({
       patent.filingDate
     );
     setSelectedPatentDetail(detail);
+  };
+
+  // ===== 정렬 변경 핸들러 =====
+  const handleSortChange = () => {
+    const newOrder = sortOrder === "asc" ? "desc" : "asc";
+    onSortChange(newOrder);
+    onPageChange(1);
   };
 
   // ===== 조기 반환 =====
@@ -121,9 +140,7 @@ export default function PatentList({
                   <div className="flex items-center space-x-2">
                     <span>출원일</span>
                     <button
-                      onClick={() =>
-                        onSortChange(sortOrder === "asc" ? "desc" : "asc")
-                      }
+                      onClick={handleSortChange}
                       className="p-1 rounded hover:bg-gray-200 transition-colors duration-200 cursor-pointer"
                       title={
                         sortOrder === "desc" ? "오름차순 정렬" : "내림차순 정렬"
@@ -226,24 +243,22 @@ export default function PatentList({
             </div>
 
             <div className="flex items-center space-x-2">
-              {/* 처음 */}
+              {/* 처음 («) */}
               <button
                 onClick={() => onPageChange(1)}
                 disabled={currentPage === 1}
-                className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50"
+                className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50 cursor-pointer"
                 title="첫 페이지"
               >
                 «
               </button>
 
-              {/* 이전 그룹 */}
+              {/* 이전 페이지 (‹) */}
               <button
-                onClick={() =>
-                  onPageChange(Math.max(1, groupStart - groupSize))
-                }
-                disabled={groupStart === 1}
-                className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50"
-                title="이전 그룹"
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50 cursor-pointer"
+                title="이전 페이지"
               >
                 ‹
               </button>
@@ -253,7 +268,7 @@ export default function PatentList({
                 <button
                   key={pageNum}
                   onClick={() => onPageChange(pageNum)}
-                  className={`px-3 py-2 text-sm font-medium rounded ${
+                  className={`px-3 py-2 text-sm font-medium rounded cursor-pointer ${
                     pageNum === currentPage
                       ? "bg-blue-600 text-white"
                       : "border text-gray-700 hover:bg-gray-50"
@@ -263,21 +278,21 @@ export default function PatentList({
                 </button>
               ))}
 
-              {/* 다음 그룹 */}
+              {/* 다음 페이지 (›) */}
               <button
-                onClick={() => onPageChange(Math.min(totalPages, groupEnd + 1))}
-                disabled={groupEnd >= totalPages}
-                className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50"
-                title="다음 그룹"
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50 cursor-pointer"
+                title="다음 페이지"
               >
                 ›
               </button>
 
-              {/* 마지막 */}
+              {/* 마지막 (») */}
               <button
                 onClick={() => onPageChange(totalPages)}
                 disabled={currentPage === totalPages}
-                className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50"
+                className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50 cursor-pointer"
                 title="마지막 페이지"
               >
                 »
