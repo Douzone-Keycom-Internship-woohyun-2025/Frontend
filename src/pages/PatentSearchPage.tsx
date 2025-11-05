@@ -4,12 +4,14 @@ import { dummyPatentListResponse } from "../data/dummyPatentListResponse";
 import ProtectedLayout from "../layouts/ProtectedLayout";
 import BasicSearch from "../components/PatentSearch/BasicSearch";
 import AdvancedSearch from "../components/PatentSearch/AdvancedSearch";
+import PatentList from "../components/Patent/PatentList";
 
 export default function PatentSearchPage() {
   const [activeTab, setActiveTab] = useState<"basic" | "advanced">("basic");
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState(dummyPatentListResponse);
-
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
+  const [currentPage, setCurrentPage] = useState(1);
   const [favorites, setFavorites] = useState<number[]>(() => {
     const saved = localStorage.getItem("patent-favorites");
     return saved ? JSON.parse(saved) : [];
@@ -22,6 +24,7 @@ export default function PatentSearchPage() {
   }) => {
     console.log("기본 검색:", params);
     setIsLoading(true);
+    setCurrentPage(1);
 
     setTimeout(() => {
       setResults(dummyPatentListResponse);
@@ -38,6 +41,7 @@ export default function PatentSearchPage() {
   }) => {
     console.log("상세 검색:", params);
     setIsLoading(true);
+    setCurrentPage(1);
 
     setTimeout(() => {
       setResults(dummyPatentListResponse);
@@ -47,6 +51,17 @@ export default function PatentSearchPage() {
 
   const handleAdvancedReset = () => {
     console.log("상세 검색 초기화됨");
+  };
+
+  const handleSortChange = (order: "asc" | "desc") => {
+    setSortOrder(order);
+    setCurrentPage(1);
+    console.log("정렬 순서:", order);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    console.log("페이지 변경:", page);
   };
 
   const handleToggleFavorite = (patentId: number) => {
@@ -107,7 +122,7 @@ export default function PatentSearchPage() {
             </div>
           </div>
 
-          {/* 검색 폼 (선택된 탭에 따라 다르게 표시) */}
+          {/* 검색 폼 */}
           <div className="mb-8">
             {activeTab === "basic" ? (
               <BasicSearch onSearch={handleBasicSearch} />
@@ -119,14 +134,9 @@ export default function PatentSearchPage() {
             )}
           </div>
 
-          {/* 검색 결과 영역 (나중에 PatentList 추가) */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-            {isLoading ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
-                <p className="text-gray-600">검색 중...</p>
-              </div>
-            ) : results.patents.length === 0 ? (
+          {/* 검색 결과 */}
+          {results.patents.length === 0 ? (
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
               <div className="flex flex-col items-center justify-center py-12">
                 <i className="ri-search-line text-5xl text-gray-400 mb-4"></i>
                 <h3 className="text-lg font-medium text-gray-900 mb-2">
@@ -134,53 +144,20 @@ export default function PatentSearchPage() {
                 </h3>
                 <p className="text-gray-600">다른 검색 조건으로 시도해보세요</p>
               </div>
-            ) : (
-              <div>
-                {/* 여기에 PatentList 컴포넌트가 들어갈 자리 */}
-                <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <p className="text-blue-800">
-                    📋 검색 결과: {results.patents.length}건
-                  </p>
-                  <p className="text-sm text-blue-600 mt-2">
-                    (PatentList 테이블이 여기에 표시됩니다)
-                  </p>
-                </div>
-
-                {/* 임시 결과 표시 (테스트용) */}
-                <div className="mt-6 space-y-2">
-                  {results.patents.slice(0, 3).map((patent) => (
-                    <div
-                      key={patent.applicationNumber}
-                      className="p-4 border border-gray-200 rounded-lg hover:bg-gray-50"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <h3 className="font-medium text-gray-900">
-                            {patent.title}
-                          </h3>
-                          <p className="text-sm text-gray-500 mt-1">
-                            {patent.applicant} • {patent.filingDate}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() =>
-                            handleToggleFavorite(patent.applicationNumber)
-                          }
-                          className={`text-2xl ${
-                            favorites.includes(patent.applicationNumber)
-                              ? "text-red-500"
-                              : "text-gray-300 hover:text-red-400"
-                          }`}
-                        >
-                          ★
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
+          ) : (
+            <PatentList
+              patents={results.patents}
+              loading={isLoading}
+              favorites={favorites}
+              onToggleFavorite={handleToggleFavorite}
+              sortOrder={sortOrder}
+              onSortChange={handleSortChange}
+              currentPage={currentPage}
+              totalPages={Math.ceil(results.total / 20)}
+              onPageChange={handlePageChange}
+            />
+          )}
         </main>
       </div>
     </ProtectedLayout>
