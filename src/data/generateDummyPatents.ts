@@ -10,18 +10,20 @@ const companies = [
   "한화시스템",
   "롯데정보통신",
 ];
-const ipcCodes = [
-  "G06F",
-  "H04L",
-  "H04W",
-  "H01L",
-  "A61B",
-  "B60W",
-  "G06T",
-  "G06N",
-  "F16H",
-  "H04B",
+
+const ipcCodeWithField = [
+  { code: "G06F", field: "컴퓨터" },
+  { code: "H04L", field: "통신" },
+  { code: "H04W", field: "무선통신" },
+  { code: "H01L", field: "반도체" },
+  { code: "A61B", field: "의료" },
+  { code: "B60W", field: "자동차" },
+  { code: "G06T", field: "이미지처리" },
+  { code: "G06N", field: "인공지능" },
+  { code: "F16H", field: "기계" },
+  { code: "H04B", field: "음향" },
 ];
+
 const titles = [
   "개선된 SSD 신뢰성",
   "통신 시스템 방법",
@@ -34,6 +36,7 @@ const titles = [
   "멀티모달 인식",
   "엣지 AI 최적화",
 ];
+
 const statuses: PatentStatus[] = [
   "published",
   "registered",
@@ -56,20 +59,23 @@ export function generateDummyPatentListResponse(
   const patents = Array.from({ length: count }).map((_, i) => {
     const appNo = base + i + 1;
     const company = pick(companies);
-    const ipc = pick(ipcCodes);
+    const ipcObj = pick(ipcCodeWithField);
     const title = pick(titles);
     const status = pick(statuses);
     const year = 2024 + rand(2);
+
     return {
       applicationNumber: appNo,
       title: `${title} ${i + 1}`,
       applicant: company,
       filingDate: randomDate(year),
-      ipcCode: ipc,
+      ipcCode: ipcObj.code,
+      ipcCodeField: ipcObj.field,
       status,
       isFavorite: Math.random() < 0.2,
     };
   });
+
   return {
     total: count,
     page: 1,
