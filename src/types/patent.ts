@@ -13,6 +13,7 @@ export interface PatentListItem {
   applicant: string;
   filingDate: string;
   ipcCode: string;
+  ipcCodeField: string; // ← DB에서 이미 매핑된 분야명 (예: "컴퓨터")
   status: PatentStatus;
   isFavorite: boolean;
 }
@@ -35,8 +36,10 @@ export interface PatentDetail {
   publicationNumber?: number | null;
   registerDate?: string | null;
   registerNumber?: number | null;
-  ipcMain: string;
-  ipcAll: string[];
+  ipcMain: string; // "G06F"
+  ipcMainField: string; // "컴퓨터" (← DB에서 이미 매핑)
+  ipcAll: string[]; // ["G06F", "H04L"]
+  ipcAllFields: string[]; // ["컴퓨터", "통신"] (← DB에서 이미 매핑)
   status: PatentStatus;
   abstract: string;
   bigDrawing?: string | null;
