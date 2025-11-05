@@ -6,9 +6,19 @@ import BasicSearch from "../components/PatentSearch/BasicSearch";
 import AdvancedSearch from "../components/PatentSearch/AdvancedSearch";
 import PatentList from "../components/Patent/PatentList";
 
+type FiltersState = {
+  applicant: string;
+  patentName: string;
+  companyName: string;
+  startDate: string;
+  endDate: string;
+  status: PatentStatus | "";
+};
+
 export default function PatentSearchPage() {
   const [activeTab, setActiveTab] = useState<"basic" | "advanced">("basic");
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
   const [favorites, setFavorites] = useState<number[]>(() => {
@@ -16,124 +26,133 @@ export default function PatentSearchPage() {
     return saved ? JSON.parse(saved) : [];
   });
 
-  // ===== 필터링 상태 =====
-  const [filters, setFilters] = useState({
+  const [filters, setFilters] = useState<FiltersState>({
     applicant: "",
     patentName: "",
     companyName: "",
     startDate: "",
     endDate: "",
-    status: "" as PatentStatus | "",
+    status: "",
   });
 
-  // ===== 필터링 로직 =====
-  const getFilteredPatents = (): PatentListItem[] => {
+  const [results, setResults] = useState<PatentListItem[]>([]);
+
+  // 🔹 실제 필터링 함수
+  const filterPatents = async (
+    params: FiltersState
+  ): Promise<PatentListItem[]> => {
+    // 실제 API 호출처럼 흉내 (fetch 대체)
+    await new Promise((resolve) => setTimeout(resolve, 400));
+
     let filtered = [...dummyPatentListResponse.patents];
 
-    // 기본 검색 - 회사명 + 날짜
-    if (activeTab === "basic") {
-      if (filters.applicant.trim()) {
-        const app = filters.applicant.toLowerCase();
-        filtered = filtered.filter((p) =>
-          p.applicant.toLowerCase().includes(app)
-        );
-      }
-
-      if (filters.startDate) {
-        const startTime = new Date(filters.startDate).getTime();
-        filtered = filtered.filter(
-          (p) => new Date(p.filingDate).getTime() >= startTime
-        );
-      }
-
-      if (filters.endDate) {
-        const endTime = new Date(filters.endDate).getTime();
-        filtered = filtered.filter(
-          (p) => new Date(p.filingDate).getTime() <= endTime
-        );
-      }
+    if (params.applicant.trim()) {
+      const app = params.applicant.toLowerCase();
+      filtered = filtered.filter((p) =>
+        p.applicant.toLowerCase().includes(app)
+      );
+    }
+    if (params.patentName.trim()) {
+      const name = params.patentName.toLowerCase();
+      filtered = filtered.filter((p) => p.title.toLowerCase().includes(name));
+    }
+    if (params.companyName.trim()) {
+      const company = params.companyName.toLowerCase();
+      filtered = filtered.filter((p) =>
+        p.applicant.toLowerCase().includes(company)
+      );
+    }
+    if (params.startDate) {
+      const start = new Date(params.startDate).getTime();
+      filtered = filtered.filter(
+        (p) => new Date(p.filingDate).getTime() >= start
+      );
+    }
+    if (params.endDate) {
+      const end = new Date(params.endDate).getTime();
+      filtered = filtered.filter(
+        (p) => new Date(p.filingDate).getTime() <= end
+      );
+    }
+    if (params.status) {
+      filtered = filtered.filter((p) => p.status === params.status);
     }
 
-    // 상세 검색
-    if (activeTab === "advanced") {
-      if (filters.patentName.trim()) {
-        const name = filters.patentName.toLowerCase();
-        filtered = filtered.filter((p) => p.title.toLowerCase().includes(name));
-      }
-
-      if (filters.companyName.trim()) {
-        const company = filters.companyName.toLowerCase();
-        filtered = filtered.filter((p) =>
-          p.applicant.toLowerCase().includes(company)
-        );
-      }
-
-      if (filters.startDate) {
-        const startTime = new Date(filters.startDate).getTime();
-        filtered = filtered.filter(
-          (p) => new Date(p.filingDate).getTime() >= startTime
-        );
-      }
-
-      if (filters.endDate) {
-        const endTime = new Date(filters.endDate).getTime();
-        filtered = filtered.filter(
-          (p) => new Date(p.filingDate).getTime() <= endTime
-        );
-      }
-
-      if (filters.status) {
-        filtered = filtered.filter((p) => p.status === filters.status);
-      }
-    }
+    // 정렬 적용 (실무 느낌)
+    filtered.sort((a, b) => {
+      const timeA = new Date(a.filingDate).getTime();
+      const timeB = new Date(b.filingDate).getTime();
+      return sortOrder === "asc" ? timeA - timeB : timeB - timeA;
+    });
 
     return filtered;
   };
 
-  const filteredPatents = getFilteredPatents();
-  const totalResults = filteredPatents.length;
-
-  // ===== 기본 검색 핸들러 =====
-  const handleBasicSearch = (params: {
+  // 🔹 기본 검색 (async 스타일)
+  const handleBasicSearch = async (params: {
     applicant: string;
     startDate: string;
     endDate: string;
   }) => {
-    setFilters({
-      applicant: params.applicant,
-      patentName: "",
-      companyName: "",
-      startDate: params.startDate,
-      endDate: params.endDate,
-      status: "",
-    });
-    setCurrentPage(1);
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 300);
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const newFilters: FiltersState = {
+        applicant: params.applicant,
+        patentName: "",
+        companyName: "",
+        startDate: params.startDate,
+        endDate: params.endDate,
+        status: "",
+      };
+      setFilters(newFilters);
+
+      const filtered = await filterPatents(newFilters);
+      setResults(filtered);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error(err);
+      setError("검색 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // ===== 상세 검색 핸들러 =====
-  const handleAdvancedSearch = (params: {
+  // 🔹 상세 검색 (async 스타일)
+  const handleAdvancedSearch = async (params: {
     patentName?: string;
     companyName?: string;
     startDate?: string;
     endDate?: string;
     status?: PatentStatus;
   }) => {
-    setFilters({
-      applicant: "",
-      patentName: params.patentName || "",
-      companyName: params.companyName || "",
-      startDate: params.startDate || "",
-      endDate: params.endDate || "",
-      status: params.status || "",
-    });
-    setCurrentPage(1);
-    setIsLoading(true);
-    setTimeout(() => setIsLoading(false), 300);
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      const newFilters: FiltersState = {
+        applicant: "",
+        patentName: params.patentName || "",
+        companyName: params.companyName || "",
+        startDate: params.startDate || "",
+        endDate: params.endDate || "",
+        status: params.status || "",
+      };
+      setFilters(newFilters);
+
+      const filtered = await filterPatents(newFilters);
+      setResults(filtered);
+      setCurrentPage(1);
+    } catch (err) {
+      console.error(err);
+      setError("상세 검색 중 오류가 발생했습니다.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  // ===== 상세 검색 초기화 =====
+  // 🔹 초기화
   const handleAdvancedReset = () => {
     setFilters({
       applicant: "",
@@ -143,27 +162,69 @@ export default function PatentSearchPage() {
       endDate: "",
       status: "",
     });
+    setResults([]);
     setCurrentPage(1);
   };
 
-  const handleSortChange = (order: "asc" | "desc") => {
+  // 🔹 정렬
+  const handleSortChange = async (order: "asc" | "desc") => {
     setSortOrder(order);
-    setCurrentPage(1);
+    setIsLoading(true);
+    const sorted = await filterPatents(filters);
+    setResults(sorted);
+    setIsLoading(false);
   };
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
-
+  // 🔹 즐겨찾기
   const handleToggleFavorite = (patentId: number) => {
     const newFav = favorites.includes(patentId)
       ? favorites.filter((id) => id !== patentId)
       : [...favorites, patentId];
-
     setFavorites(newFav);
     localStorage.setItem("patent-favorites", JSON.stringify(newFav));
   };
 
+  // 🔹 페이지 이동
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  // ===== 로딩 / 에러 화면 =====
+  if (isLoading) {
+    return (
+      <ProtectedLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="flex flex-col items-center">
+            <div className="animate-spin h-10 w-10 border-4 border-blue-500 border-t-transparent rounded-full mb-4"></div>
+            <p className="text-gray-600 text-sm">검색 중입니다...</p>
+          </div>
+        </div>
+      </ProtectedLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <ProtectedLayout>
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="bg-white shadow-md p-8 rounded-lg text-center">
+            <h3 className="text-lg font-semibold text-red-600 mb-2">
+              검색 실패
+            </h3>
+            <p className="text-gray-700 mb-4">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </ProtectedLayout>
+    );
+  }
+
+  // ===== 정상 UI =====
   return (
     <ProtectedLayout>
       <div className="min-h-screen bg-gray-50 ml-64">
@@ -179,7 +240,7 @@ export default function PatentSearchPage() {
               </div>
               <div className="flex items-center space-x-4">
                 <span className="text-sm text-gray-500">
-                  총 {totalResults}건의 특허
+                  총 {results.length}건의 특허
                 </span>
               </div>
             </div>
@@ -232,7 +293,7 @@ export default function PatentSearchPage() {
           </div>
 
           {/* 검색 결과 */}
-          {filteredPatents.length === 0 ? (
+          {results.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
               <div className="flex flex-col items-center justify-center py-12">
                 <i className="ri-search-line text-5xl text-gray-400 mb-4"></i>
@@ -244,14 +305,14 @@ export default function PatentSearchPage() {
             </div>
           ) : (
             <PatentList
-              patents={filteredPatents}
+              patents={results}
               loading={isLoading}
               favorites={favorites}
               onToggleFavorite={handleToggleFavorite}
               sortOrder={sortOrder}
               onSortChange={handleSortChange}
               currentPage={currentPage}
-              totalPages={Math.ceil(filteredPatents.length / 20)}
+              totalPages={Math.ceil(results.length / 20)}
               onPageChange={handlePageChange}
             />
           )}

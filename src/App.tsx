@@ -6,6 +6,7 @@ import HelpPage from "./pages/HelpPage";
 import PatentSearchPage from "./pages/PatentSearchPage";
 import SummaryPage from "./pages/SummaryPage";
 import FavoritesPage from "./pages/FavoritesPage";
+import PresetManagementPage from "./pages/PresetManagementPage";
 
 function App() {
   return (
@@ -41,6 +42,14 @@ function App() {
           element={
             <ProtectedRoute>
               <FavoritesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/preset-management"
+          element={
+            <ProtectedRoute>
+              <PresetManagementPage />
             </ProtectedRoute>
           }
         />
