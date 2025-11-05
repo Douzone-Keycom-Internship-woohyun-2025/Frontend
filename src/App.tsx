@@ -5,6 +5,7 @@ import HomePage from "./pages/HomePage";
 import HelpPage from "./pages/HelpPage";
 import PatentSearchPage from "./pages/PatentSearchPage";
 import SummaryPage from "./pages/SummaryPage";
+import FavoritesPage from "./pages/FavoritesPage";
 
 function App() {
   return (
@@ -32,6 +33,14 @@ function App() {
           element={
             <ProtectedRoute>
               <SummaryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/favorites"
+          element={
+            <ProtectedRoute>
+              <FavoritesPage />
             </ProtectedRoute>
           }
         />
