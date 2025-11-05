@@ -34,28 +34,23 @@ export default function PatentList({
   const itemsPerPage = 20;
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
+  const displayPatents = patents.slice(startIndex, endIndex);
   const totalCount = patents.length;
 
-  // ===== 페이지 번호 생성 =====
-  const getPageNumbers = () => {
-    const maxVisible = 5;
-    const pages = [];
-
-    let start = Math.max(1, currentPage - Math.floor(maxVisible / 2));
-    const end = Math.min(totalPages, start + maxVisible - 1);
-
-    if (end - start + 1 < maxVisible) {
-      start = Math.max(1, end - maxVisible + 1);
-    }
-
-    for (let i = start; i <= end; i++) {
-      pages.push(i);
-    }
-
-    return pages;
+  const groupSize = 5;
+  const getPageGroup = () => {
+    const groupIndex = Math.ceil(currentPage / groupSize);
+    const groupStart = (groupIndex - 1) * groupSize + 1;
+    const groupEnd = Math.min(totalPages, groupStart + groupSize - 1);
+    return { groupStart, groupEnd, groupIndex };
   };
 
-  const pageNumbers = getPageNumbers();
+  const { groupStart, groupEnd } = getPageGroup();
+
+  const pageNumbers = Array.from(
+    { length: groupEnd - groupStart + 1 },
+    (_, i) => groupStart + i
+  );
 
   // ===== 조기 반환 =====
   if (loading) {
@@ -140,7 +135,7 @@ export default function PatentList({
           </thead>
 
           <tbody className="bg-white divide-y divide-gray-200">
-            {patents.map((patent) => {
+            {displayPatents.map((patent) => {
               const ipcInfo = getIPCField(patent.ipcCode);
 
               return (
@@ -167,9 +162,7 @@ export default function PatentList({
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span
-                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                        patent.status
-                      )}`}
+                      className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(patent.status)}`}
                     >
                       {patent.status}
                     </span>
@@ -207,7 +200,7 @@ export default function PatentList({
         </table>
       </div>
 
-      {/* 페이지네이션 */}
+      {/* 페이지네이션 (그룹 이동) */}
       <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-500">
@@ -216,38 +209,72 @@ export default function PatentList({
           </div>
 
           <div className="flex items-center space-x-2">
+            {/* 처음(«) */}
             <button
-              onClick={() => onPageChange(currentPage - 1)}
+              onClick={() => onPageChange(1)}
               disabled={currentPage === 1}
-              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50"
+              title="첫 페이지"
             >
-              이전
+              «
             </button>
 
+            {/* 이전 그룹(‹) */}
+            <button
+              onClick={() => onPageChange(Math.max(1, groupStart - groupSize))}
+              disabled={groupStart === 1}
+              className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50"
+              title="이전 그룹"
+            >
+              ‹
+            </button>
+
+            {/* 현재 그룹 페이지들 */}
             {pageNumbers.map((pageNum) => (
               <button
                 key={pageNum}
                 onClick={() => onPageChange(pageNum)}
-                className={`px-3 py-2 text-sm font-medium rounded-md cursor-pointer ${
+                className={`px-3 py-2 text-sm font-medium rounded ${
                   pageNum === currentPage
                     ? "bg-blue-600 text-white"
-                    : "text-gray-700 bg-white border border-gray-300 hover:bg-gray-50"
+                    : "border text-gray-700 hover:bg-gray-50"
                 }`}
               >
                 {pageNum}
               </button>
             ))}
 
+            {/* 다음 그룹(›) */}
             <button
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              onClick={() => onPageChange(Math.min(totalPages, groupEnd + 1))}
+              disabled={groupEnd >= totalPages}
+              className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50"
+              title="다음 그룹"
             >
-              다음
+              ›
+            </button>
+
+            {/* 마지막(») */}
+            <button
+              onClick={() => onPageChange(totalPages)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-2 text-sm font-medium border rounded disabled:opacity-50"
+              title="마지막 페이지"
+            >
+              »
             </button>
           </div>
         </div>
       </div>
+
+      {/* 상세보기 모달 (비활성화)
+      {selectedPatent && (
+        <PatentDetailModal
+          patent={selectedPatent}
+          isOpen={!!selectedPatent}
+          onClose={() => setSelectedPatent(null)}
+        />
+      )} */}
     </div>
   );
 }
