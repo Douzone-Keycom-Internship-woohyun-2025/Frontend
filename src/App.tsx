@@ -4,6 +4,7 @@ import ProtectedRoute from "./components/ProtecteedRoute/ProtectedRoute";
 import HomePage from "./pages/HomePage";
 import HelpPage from "./pages/HelpPage";
 import PatentSearchPage from "./pages/PatentSearchPage";
+import SummaryPage from "./pages/SummaryPage";
 
 function App() {
   return (
@@ -19,19 +20,26 @@ function App() {
           }
         />
         <Route
-          path="/help"
-          element={
-            <ProtectedRoute>
-              <HelpPage />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
           path="/patent-search"
           element={
             <ProtectedRoute>
               <PatentSearchPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/summary"
+          element={
+            <ProtectedRoute>
+              <SummaryPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/help"
+          element={
+            <ProtectedRoute>
+              <HelpPage />
             </ProtectedRoute>
           }
         />
