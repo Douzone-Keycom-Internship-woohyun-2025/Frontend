@@ -1,16 +1,9 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import ProtectedLayout from "../layouts/ProtectedLayout";
-
-export interface SearchPreset {
-  id: string;
-  name: string;
-  applicant: string;
-  startDate: string;
-  endDate: string;
-  createdAt: string;
-  description?: string;
-}
+import type { SearchPreset } from "../types/preset";
+import PresetCard from "../components/Preset/PresetCard";
+import PresetModal from "../components/Preset/PresetModal";
 
 export default function PresetManagementPage() {
   const navigate = useNavigate();
@@ -107,10 +100,10 @@ export default function PresetManagementPage() {
 
   return (
     <ProtectedLayout>
-      <div className="min-h-screen bg-gray-50 ml-64">
+      <div className="min-h-screen bg-gray-50">
         {/* 헤더 */}
         <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+          <div className="px-8 py-6 flex justify-between items-center">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">프리셋 관리</h1>
               <p className="mt-2 text-gray-600">
@@ -127,7 +120,7 @@ export default function PresetManagementPage() {
         </header>
 
         {/* 메인 */}
-        <main className="max-w-7xl mx-auto px-6 py-8">
+        <main className="px-8 py-8">
           {presets.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-12 text-center">
               <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
@@ -147,154 +140,29 @@ export default function PresetManagementPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {presets.map((preset) => (
-                <div
+                <PresetCard
                   key={preset.id}
-                  className="bg-white rounded-lg shadow hover:shadow-md p-6 transition-all"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {preset.name}
-                      </h3>
-                      {preset.description && (
-                        <p className="text-sm text-gray-600">
-                          {preset.description}
-                        </p>
-                      )}
-                    </div>
-                    <div className="flex space-x-2">
-                      <button
-                        onClick={() => handleOpenModal(preset)}
-                        className="text-gray-400 hover:text-gray-600"
-                        title="편집"
-                      >
-                        <i className="ri-edit-line"></i>
-                      </button>
-                      <button
-                        onClick={() => handleDeletePreset(preset.id)}
-                        className="text-gray-400 hover:text-red-600"
-                        title="삭제"
-                      >
-                        <i className="ri-delete-bin-line"></i>
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="text-sm text-gray-600 space-y-1 mb-4">
-                    <div>
-                      <strong>회사:</strong> {preset.applicant}
-                    </div>
-                    {preset.startDate && (
-                      <div>
-                        <strong>시작일:</strong> {preset.startDate}
-                      </div>
-                    )}
-                    {preset.endDate && (
-                      <div>
-                        <strong>종료일:</strong> {preset.endDate}
-                      </div>
-                    )}
-                    <div className="text-gray-500 text-xs">
-                      생성일: {new Date(preset.createdAt).toLocaleDateString()}
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => handleUsePreset(preset)}
-                    className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center"
-                  >
-                    <i className="ri-search-line mr-2"></i>이 프리셋으로
-                    분석하기
-                  </button>
-                </div>
+                  preset={preset}
+                  onEdit={handleOpenModal}
+                  onDelete={handleDeletePreset}
+                  onUse={handleUsePreset}
+                />
               ))}
             </div>
           )}
+
+          {/* 모달 */}
+          <PresetModal
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            onSave={handleSavePreset}
+            formData={formData}
+            setFormData={setFormData}
+            editingPreset={editingPreset}
+          />
         </main>
-
-        {/* 모달 */}
-        {isModalOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-              <div className="flex justify-between mb-4">
-                <h2 className="text-xl font-semibold">
-                  {editingPreset ? "프리셋 편집" : "새 프리셋 만들기"}
-                </h2>
-                <button
-                  onClick={handleCloseModal}
-                  className="text-gray-400 hover:text-gray-600"
-                >
-                  <i className="ri-close-line text-xl"></i>
-                </button>
-              </div>
-
-              {/* 입력 폼 */}
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, name: e.target.value }))
-                  }
-                  placeholder="프리셋명"
-                  className="w-full border rounded-lg px-3 py-2"
-                />
-                <input
-                  type="text"
-                  value={formData.applicant}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, applicant: e.target.value }))
-                  }
-                  placeholder="회사명"
-                  className="w-full border rounded-lg px-3 py-2"
-                />
-                <div className="grid grid-cols-2 gap-4">
-                  <input
-                    type="date"
-                    value={formData.startDate}
-                    onChange={(e) =>
-                      setFormData((p) => ({ ...p, startDate: e.target.value }))
-                    }
-                    className="border rounded-lg px-3 py-2"
-                  />
-                  <input
-                    type="date"
-                    value={formData.endDate}
-                    onChange={(e) =>
-                      setFormData((p) => ({ ...p, endDate: e.target.value }))
-                    }
-                    className="border rounded-lg px-3 py-2"
-                  />
-                </div>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData((p) => ({ ...p, description: e.target.value }))
-                  }
-                  placeholder="설명 (선택사항)"
-                  className="w-full border rounded-lg px-3 py-2 resize-none"
-                />
-              </div>
-
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={handleCloseModal}
-                  className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
-                >
-                  취소
-                </button>
-                <button
-                  onClick={handleSavePreset}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                >
-                  {editingPreset ? "수정" : "저장"}
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     </ProtectedLayout>
   );
