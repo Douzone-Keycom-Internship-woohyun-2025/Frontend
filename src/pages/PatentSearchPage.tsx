@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import ProtectedLayout from "../layouts/ProtectedLayout";
 import BasicSearch from "../components/PatentSearch/BasicSearch";
 import AdvancedSearch from "../components/PatentSearch/AdvancedSearch";
-import PatentList from "../components/Patent/PatentList";
+import PatentList from "../components/Patent/PatentListComponent/PatentList";
 import { usePatentSearch } from "../hooks/usePatentSearch";
 import { useFavorites } from "../hooks/useFavorites";
 import type { PatentStatus } from "../types/patent";

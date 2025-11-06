@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { dummyPatentListResponse } from "../data/dummyPatentListResponse";
 import ProtectedLayout from "../layouts/ProtectedLayout";
-import PatentList from "../components/Patent/PatentList";
+import PatentList from "../components/Patent/PatentListComponent/PatentList";
 import type { PatentListItem } from "../types/patent";
 
 export default function FavoritesPage() {
