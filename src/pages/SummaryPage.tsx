@@ -80,7 +80,6 @@ export default function SummaryPage() {
           <div className="bg-white rounded-lg shadow p-8 mb-8">
             <SearchForm
               enablePresets
-              storageKey="searchPresets"
               title="요약분석"
               loading={isLoading}
               onSearch={handleSearch}
