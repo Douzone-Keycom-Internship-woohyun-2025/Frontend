@@ -4,7 +4,6 @@ import { statusLabel } from "../../utils/statusLabel";
 import RecentPatentCard from "./RecentPatentCard";
 import NoData from "../common/NoData";
 
-// Chart.js
 import {
   Chart as ChartJS,
   ArcElement,
@@ -26,6 +25,12 @@ ChartJS.register(
   BarElement,
   Title
 );
+
+const renderSection = (
+  condition: boolean,
+  content: React.ReactNode,
+  message: string
+) => (condition ? content : <NoData message={message} />);
 
 export default function SummaryDashboard({
   data,
@@ -124,7 +129,7 @@ export default function SummaryDashboard({
         label: "출원 건수",
         data: recentMonths.map((m) => m.count),
         backgroundColor: monthlyBarColors,
-        hoverBackgroundColor: monthlyBarColors, // ← 호버해도 동일 색
+        hoverBackgroundColor: monthlyBarColors,
         borderRadius: 6,
       },
     ],
@@ -156,7 +161,6 @@ export default function SummaryDashboard({
 
   return (
     <div className="space-y-6">
-      {/* 📊 주요 지표 카드 */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {[
           {
@@ -201,7 +205,6 @@ export default function SummaryDashboard({
         ))}
       </div>
 
-      {/* 🧩 IPC 코드별 기술분야 분포 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
           상위 5개 IPC 코드별 기술분야 분포
@@ -209,7 +212,8 @@ export default function SummaryDashboard({
         <p className="text-sm text-gray-500 mb-6">
           특허 출원 상위 5개 IPC 코드를 기준으로 기술 분야 비율을 표시합니다.
         </p>
-        {ipcData.length > 0 && totalPatents > 0 ? (
+        {renderSection(
+          ipcData.length > 0 && totalPatents > 0,
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="h-72 relative flex justify-center items-center">
               <Pie
@@ -249,20 +253,19 @@ export default function SummaryDashboard({
                 </div>
               ))}
             </div>
-          </div>
-        ) : (
-          <NoData message="IPC 코드 데이터가 없습니다." />
+          </div>,
+          "IPC 코드 데이터가 없습니다."
         )}
       </div>
 
-      {/* 📈 월별 출원 동향 + 🍩 등록 상태별 분포 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 월별 출원 동향 */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
             월별 특허 출원 동향
           </h3>
-          {monthlyData.length > 0 ? (
+          {renderSection(
+            monthlyData.length > 0,
             <div className="h-72 relative">
               <Bar
                 data={monthlyChartData}
@@ -274,7 +277,7 @@ export default function SummaryDashboard({
                   interaction: { mode: "nearest", intersect: false },
                   responsive: true,
                   maintainAspectRatio: false,
-                  hover: { mode: undefined }, // 시각적 hover 스타일 비활성화
+                  hover: { mode: undefined },
                   scales: {
                     x: {
                       grid: { display: false },
@@ -287,18 +290,17 @@ export default function SummaryDashboard({
                   },
                 }}
               />
-            </div>
-          ) : (
-            <NoData message="월별 출원 데이터가 없습니다." />
+            </div>,
+            "월별 출원 데이터가 없습니다."
           )}
         </div>
 
-        {/* 등록 상태별 분포 (중앙 텍스트는 오버레이로 표시) */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
             등록 상태별 분포
           </h3>
-          {statusData.length > 0 ? (
+          {renderSection(
+            statusData.length > 0,
             <div className="h-72 relative flex items-center justify-center">
               <Doughnut
                 data={statusChartData}
@@ -309,7 +311,6 @@ export default function SummaryDashboard({
                   maintainAspectRatio: false,
                 }}
               />
-              {/* 중앙 오버레이 텍스트: 플러그인 대신 확실한 방식 */}
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <div className="text-xs text-gray-500 mb-1">등록률</div>
@@ -318,14 +319,12 @@ export default function SummaryDashboard({
                   </div>
                 </div>
               </div>
-            </div>
-          ) : (
-            <NoData message="등록 상태 데이터가 없습니다." />
+            </div>,
+            "등록 상태 데이터가 없습니다."
           )}
         </div>
       </div>
 
-      {/* 🧾 최근 주요 특허 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-gray-900">
@@ -338,14 +337,14 @@ export default function SummaryDashboard({
             검색된 특허 보기
           </button>
         </div>
-        {data.recentPatents.length > 0 ? (
+        {renderSection(
+          data.recentPatents.length > 0,
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {data.recentPatents.slice(0, 3).map((patent, index) => (
               <RecentPatentCard key={index} patent={patent} />
             ))}
-          </div>
-        ) : (
-          <NoData message="최근 특허 데이터가 없습니다." />
+          </div>,
+          "최근 특허 데이터가 없습니다."
         )}
       </div>
     </div>
