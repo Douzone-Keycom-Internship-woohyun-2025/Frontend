@@ -1,52 +1,28 @@
 import type { SummaryData } from "../../types/summary";
-import { getStatusColor } from "../../utils/statusColor";
 import { useNavigate } from "react-router-dom";
+import { statusLabel } from "../../utils/statusLabel";
+import RecentPatentCard from "./RecentPatentCard";
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+} from "chart.js";
+import { Pie, Doughnut, Bar } from "react-chartjs-2";
 
-type RecentPatent = {
-  applicationNumber: string;
-  inventionTitle: string;
-  applicantName: string;
-  applicationDate: string;
-  ipcCode: string;
-  registerStatus: string;
-  isFavorite: boolean;
-};
-
-const RecentPatentCard = ({ patent }: { patent: RecentPatent }) => {
-  return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow duration-200">
-      <div className="flex items-start justify-between mb-3">
-        <h4 className="text-sm font-semibold text-gray-900 line-clamp-2 flex-1">
-          {patent.inventionTitle}
-        </h4>
-        <span
-          className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-2 ${getStatusColor(
-            patent.registerStatus
-          )}`}
-        >
-          {patent.registerStatus}
-        </span>
-      </div>
-
-      <div className="space-y-2 text-xs text-gray-600">
-        <div className="flex items-center">
-          <i className="ri-building-line w-3 h-3 flex items-center justify-center mr-2"></i>
-          <span>{patent.applicantName}</span>
-        </div>
-        <div className="flex items-center">
-          <i className="ri-calendar-line w-3 h-3 flex items-center justify-center mr-2"></i>
-          <span>{patent.applicationDate}</span>
-        </div>
-        {patent.ipcCode && (
-          <div className="flex items-center">
-            <i className="ri-code-line w-3 h-3 flex items-center justify-center mr-2"></i>
-            <span>{patent.ipcCode}</span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
+ChartJS.register(
+  ArcElement,
+  Tooltip,
+  Legend,
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title
+);
 
 export default function SummaryDashboard({
   data,
@@ -92,16 +68,58 @@ export default function SummaryDashboard({
   const topIpcCodes = [...data.ipcDistribution]
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
-  const top5Total = topIpcCodes.reduce((sum, item) => sum + item.count, 0);
-
   const recentMonths = data.monthlyTrend.slice(-6);
 
-  const statusColors: Record<string, string> = {
-    등록: "#10B981",
-    심사중: "#F59E0B",
-    출원: "#3B82F6",
-    거절: "#EF4444",
-    포기: "#6B7280",
+  // Chart.js 데이터셋 구성
+  const ipcChartData = {
+    labels: topIpcCodes.map(
+      (item) => `${item.ipcCode} (${getIpcTechName(item.ipcCode)})`
+    ),
+    datasets: [
+      {
+        data: topIpcCodes.map((item) => item.count),
+        backgroundColor: [
+          "#3B82F6",
+          "#10B981",
+          "#F59E0B",
+          "#EF4444",
+          "#8B5CF6",
+        ],
+        borderWidth: 1,
+      },
+    ],
+  };
+
+  const monthlyChartData = {
+    labels: recentMonths.map((m) => m.month),
+    datasets: [
+      {
+        label: "출원 건수",
+        data: recentMonths.map((m) => m.count),
+        backgroundColor: "rgba(37, 99, 235, 0.6)",
+        borderRadius: 6,
+      },
+    ],
+  };
+
+  const statusChartData = {
+    labels: data.statusDistribution.map(
+      (s) => statusLabel[s.status as keyof typeof statusLabel] || s.status
+    ),
+    datasets: [
+      {
+        data: data.statusDistribution.map((s) => s.count),
+        backgroundColor: [
+          "#3B82F6",
+          "#10B981",
+          "#F59E0B",
+          "#EF4444",
+          "#6B7280",
+          "#8B5CF6",
+        ],
+        borderWidth: 0,
+      },
+    ],
   };
 
   return (
@@ -156,129 +174,81 @@ export default function SummaryDashboard({
         <h3 className="text-lg font-semibold text-gray-900 mb-6">
           IPC 코드별 기술분야 분포
         </h3>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <div className="flex items-center justify-center">
-            <div className="relative w-64 h-64">
-              <svg
-                viewBox="0 0 200 200"
-                className="w-full h-full transform -rotate-90"
-              >
-                {topIpcCodes.map((item, index) => {
-                  const percentage = (item.count / top5Total) * 100;
-                  const angle = (percentage / 100) * 360;
-                  const startAngle = topIpcCodes
-                    .slice(0, index)
-                    .reduce(
-                      (sum, prev) => sum + (prev.count / top5Total) * 360,
-                      0
-                    );
-
-                  const x1 = 100 + 80 * Math.cos((startAngle * Math.PI) / 180);
-                  const y1 = 100 + 80 * Math.sin((startAngle * Math.PI) / 180);
-                  const x2 =
-                    100 + 80 * Math.cos(((startAngle + angle) * Math.PI) / 180);
-                  const y2 =
-                    100 + 80 * Math.sin(((startAngle + angle) * Math.PI) / 180);
-
-                  const largeArcFlag = angle > 180 ? 1 : 0;
-                  const colors = [
-                    "#3B82F6",
-                    "#10B981",
-                    "#F59E0B",
-                    "#EF4444",
-                    "#8B5CF6",
-                  ];
-
-                  return (
-                    <path
-                      key={item.ipcCode}
-                      d={`M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
-                      fill={colors[index]}
-                      className="hover:opacity-80 transition-opacity duration-200"
-                    />
-                  );
-                })}
-              </svg>
-            </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="h-72 flex justify-center items-center">
+            <Pie
+              data={ipcChartData}
+              options={{
+                plugins: {
+                  legend: { position: "bottom" },
+                  tooltip: { enabled: true },
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+            />
           </div>
-
-          <div className="space-y-4">
-            {topIpcCodes.map((item, index) => {
-              const percentage = ((item.count / top5Total) * 100).toFixed(1);
-              const colors = [
-                "#3B82F6",
-                "#10B981",
-                "#F59E0B",
-                "#EF4444",
-                "#8B5CF6",
-              ];
-
-              return (
-                <div
-                  key={item.ipcCode}
-                  className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className="w-4 h-4 rounded-full"
-                      style={{ backgroundColor: colors[index] }}
-                    />
-                    <div>
-                      <div className="font-medium text-gray-900">
-                        {item.ipcCode}
-                      </div>
-                      <div className="text-sm text-gray-600">
-                        {getIpcTechName(item.ipcCode)}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <div className="font-semibold text-gray-900">
-                      {item.count}건
-                    </div>
-                    <div className="text-sm text-gray-600">{percentage}%</div>
-                  </div>
+          <div className="flex flex-col justify-center space-y-3">
+            {topIpcCodes.map((item, index) => (
+              <div
+                key={item.ipcCode}
+                className="flex justify-between bg-gray-50 px-4 py-2 rounded-lg"
+              >
+                <div className="flex items-center space-x-2">
+                  <div
+                    className="w-3 h-3 rounded-full"
+                    style={{
+                      backgroundColor: ipcChartData.datasets[0].backgroundColor[
+                        index
+                      ] as string,
+                    }}
+                  />
+                  <span className="text-gray-800 font-medium">
+                    {item.ipcCode}
+                  </span>
                 </div>
-              );
-            })}
+                <span className="text-gray-600 text-sm">
+                  {item.count}건 (
+                  {((item.count / data.statistics.totalPatents) * 100).toFixed(
+                    1
+                  )}
+                  %)
+                </span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* 월별 특허 출원 동향 + 등록 상태별 분포 */}
+      {/* 월별 출원 동향 + 상태별 분포 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* 월별 특허 출원 동향 */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
             월별 특허 출원 동향
           </h3>
-          <div className="h-64">
-            <div className="flex items-end justify-between h-48 space-x-2 mb-4">
-              {recentMonths.map((item, index) => {
-                const maxValue = Math.max(...recentMonths.map((m) => m.count));
-                const height = (item.count / maxValue) * 100;
-
-                return (
-                  <div
-                    key={index}
-                    className="flex-1 flex flex-col items-center"
-                  >
-                    <div
-                      className="w-full bg-blue-500 rounded-t-md transition-all duration-300 hover:bg-blue-600 cursor-pointer"
-                      style={{ height: `${height}%` }}
-                      title={`${item.month}: ${item.count}건`}
-                    ></div>
-                    <div className="mt-2 text-xs text-gray-600 text-center">
-                      {item.month}
-                    </div>
-                    <div className="text-xs font-medium text-gray-900">
-                      {item.count}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
+          <div className="h-72">
+            <Bar
+              data={monthlyChartData}
+              options={{
+                plugins: {
+                  legend: { display: false },
+                  tooltip: { enabled: true },
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                  x: {
+                    grid: { display: false },
+                    ticks: { color: "#4B5563" },
+                  },
+                  y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0, color: "#4B5563" },
+                  },
+                },
+              }}
+            />
           </div>
         </div>
 
@@ -287,72 +257,19 @@ export default function SummaryDashboard({
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
             등록 상태별 분포
           </h3>
-          <div className="flex items-center justify-center">
-            <div className="relative w-48 h-48">
-              <svg
-                viewBox="0 0 200 200"
-                className="w-full h-full transform -rotate-90"
-              >
-                {data.statusDistribution.map((item, index) => {
-                  const total = data.statusDistribution.reduce(
-                    (sum, s) => sum + s.count,
-                    0
-                  );
-                  const percentage = (item.count / total) * 100;
-                  const angle = (percentage / 100) * 360;
-                  const startAngle = data.statusDistribution
-                    .slice(0, index)
-                    .reduce((sum, s) => sum + (s.count / total) * 360, 0);
-
-                  const x1 = 100 + 80 * Math.cos((startAngle * Math.PI) / 180);
-                  const y1 = 100 + 80 * Math.sin((startAngle * Math.PI) / 180);
-                  const x2 =
-                    100 + 80 * Math.cos(((startAngle + angle) * Math.PI) / 180);
-                  const y2 =
-                    100 + 80 * Math.sin(((startAngle + angle) * Math.PI) / 180);
-
-                  const largeArcFlag = angle > 180 ? 1 : 0;
-
-                  return (
-                    <path
-                      key={item.status}
-                      d={`M 100 100 L ${x1} ${y1} A 80 80 0 ${largeArcFlag} 1 ${x2} ${y2} Z`}
-                      fill={statusColors[item.status]}
-                      className="hover:opacity-80 transition-opacity duration-200"
-                    />
-                  );
-                })}
-              </svg>
-            </div>
-          </div>
-          <div className="mt-6 space-y-2">
-            {data.statusDistribution.map((item) => {
-              const total = data.statusDistribution.reduce(
-                (sum, s) => sum + s.count,
-                0
-              );
-              const percentage = ((item.count / total) * 100).toFixed(1);
-              return (
-                <div
-                  key={item.status}
-                  className="flex items-center justify-between"
-                >
-                  <div className="flex items-center space-x-2">
-                    <div
-                      className="w-3 h-3 rounded-full"
-                      style={{ backgroundColor: statusColors[item.status] }}
-                    ></div>
-                    <span className="text-sm text-gray-700">{item.status}</span>
-                  </div>
-                  <div className="text-sm">
-                    <span className="font-medium text-gray-900">
-                      {item.count}건
-                    </span>
-                    <span className="text-gray-600 ml-1">({percentage}%)</span>
-                  </div>
-                </div>
-              );
-            })}
+          <div className="h-72 flex justify-center items-center">
+            <Doughnut
+              data={statusChartData}
+              options={{
+                plugins: {
+                  legend: { position: "bottom" },
+                  tooltip: { enabled: true },
+                },
+                cutout: "70%",
+                responsive: true,
+                maintainAspectRatio: false,
+              }}
+            />
           </div>
         </div>
       </div>
