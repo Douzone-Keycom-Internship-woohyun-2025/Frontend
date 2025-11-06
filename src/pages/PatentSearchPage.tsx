@@ -253,7 +253,7 @@ export default function PatentSearchPage() {
   // ===== 정상 UI =====
   return (
     <ProtectedLayout>
-      <div className="min-h-screen bg-gray-50 ml-64">
+      <div className="min-h-screen bg-gray-50">
         {/* 헤더 */}
         <header className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-6 py-6">
