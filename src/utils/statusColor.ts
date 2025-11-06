@@ -1,8 +1,9 @@
 import type { PatentStatus } from "../types/patent";
 import { statusLabel } from "./statusLabel";
 
-export const getStatusColor = (status: PatentStatus): string => {
-  const koreanStatus = statusLabel[status];
+export const getStatusColor = (status: PatentStatus | string): string => {
+  const koreanStatus = statusLabel[status as PatentStatus] || status;
+
   switch (koreanStatus) {
     case "등록":
       return "bg-green-100 text-green-800";
@@ -16,6 +17,8 @@ export const getStatusColor = (status: PatentStatus): string => {
       return "bg-gray-100 text-gray-800";
     case "공개":
       return "bg-purple-100 text-purple-800";
+    case "소멸":
+      return "bg-gray-200 text-gray-800";
     default:
       return "bg-gray-100 text-gray-800";
   }
