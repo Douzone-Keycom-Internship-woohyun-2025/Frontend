@@ -5,7 +5,7 @@ import ProtectedLayout from "../layouts/ProtectedLayout";
 export interface SearchPreset {
   id: string;
   name: string;
-  companyName: string;
+  applicant: string;
   startDate: string;
   endDate: string;
   createdAt: string;
@@ -19,7 +19,7 @@ export default function PresetManagementPage() {
   const [editingPreset, setEditingPreset] = useState<SearchPreset | null>(null);
   const [formData, setFormData] = useState({
     name: "",
-    companyName: "",
+    applicant: "",
     startDate: "",
     endDate: "",
     description: "",
@@ -36,7 +36,7 @@ export default function PresetManagementPage() {
   };
 
   const handleSavePreset = () => {
-    if (!formData.name.trim() || !formData.companyName.trim()) {
+    if (!formData.name.trim() || !formData.applicant.trim()) {
       alert("프리셋명과 회사명은 필수입니다.");
       return;
     }
@@ -44,7 +44,7 @@ export default function PresetManagementPage() {
     const newPreset: SearchPreset = {
       id: editingPreset?.id || Date.now().toString(),
       name: formData.name,
-      companyName: formData.companyName,
+      applicant: formData.applicant,
       startDate: formData.startDate,
       endDate: formData.endDate,
       description: formData.description,
@@ -69,7 +69,7 @@ export default function PresetManagementPage() {
     navigate("/summary", {
       state: {
         preset: {
-          companyName: preset.companyName,
+          applicant: preset.applicant,
           startDate: preset.startDate,
           endDate: preset.endDate,
         },
@@ -82,7 +82,7 @@ export default function PresetManagementPage() {
       setEditingPreset(preset);
       setFormData({
         name: preset.name,
-        companyName: preset.companyName,
+        applicant: preset.applicant,
         startDate: preset.startDate,
         endDate: preset.endDate,
         description: preset.description || "",
@@ -91,7 +91,7 @@ export default function PresetManagementPage() {
       setEditingPreset(null);
       setFormData({
         name: "",
-        companyName: "",
+        applicant: "",
         startDate: "",
         endDate: "",
         description: "",
@@ -184,7 +184,7 @@ export default function PresetManagementPage() {
 
                   <div className="text-sm text-gray-600 space-y-1 mb-4">
                     <div>
-                      <strong>회사:</strong> {preset.companyName}
+                      <strong>회사:</strong> {preset.applicant}
                     </div>
                     {preset.startDate && (
                       <div>
@@ -243,9 +243,9 @@ export default function PresetManagementPage() {
                 />
                 <input
                   type="text"
-                  value={formData.companyName}
+                  value={formData.applicant}
                   onChange={(e) =>
-                    setFormData((p) => ({ ...p, companyName: e.target.value }))
+                    setFormData((p) => ({ ...p, applicant: e.target.value }))
                   }
                   placeholder="회사명"
                   className="w-full border rounded-lg px-3 py-2"
