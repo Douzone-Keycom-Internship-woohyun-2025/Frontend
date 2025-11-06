@@ -1,6 +1,6 @@
-import type { PatentDetail } from "../../types/patent";
-import { getStatusColor } from "../../utils/statusColor";
-import { formatDate } from "../../utils/dateFormat";
+import type { PatentDetail } from "../../../types/patent";
+import { getStatusColor } from "../../../utils/statusColor";
+import { formatDate } from "../../../utils/dateFormat";
 
 interface PatentDetailModalProps {
   patent: PatentDetail;
