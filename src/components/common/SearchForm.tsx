@@ -21,6 +21,7 @@ interface SearchFormProps {
   storageKey?: string;
   title?: string;
   loading?: boolean;
+  initialValues?: Partial<SearchFormParams>;
 }
 
 export default function SearchForm({
@@ -29,6 +30,7 @@ export default function SearchForm({
   storageKey = "searchPresets",
   title = "검색",
   loading = false,
+  initialValues, // ✅ props로 받기
 }: SearchFormProps) {
   const [formData, setFormData] = useState<SearchFormParams>({
     applicant: "",
@@ -40,16 +42,30 @@ export default function SearchForm({
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [selectedPreset, setSelectedPreset] = useState("");
 
+  // ✅ 프리셋 불러오기
   useEffect(() => {
     if (!enablePresets) return;
     const saved = localStorage.getItem(storageKey);
     if (saved) setPresets(JSON.parse(saved));
   }, [enablePresets, storageKey]);
 
+  // ✅ 요약분석 → 검색페이지 이동 시 전달된 initialValues 자동 반영
+  useEffect(() => {
+    if (initialValues) {
+      setFormData({
+        applicant: initialValues.applicant || "",
+        startDate: initialValues.startDate || "",
+        endDate: initialValues.endDate || "",
+      });
+    }
+  }, [initialValues]);
+
+  // ✅ 입력값 변경
   const handleChange = (field: keyof SearchFormParams, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // ✅ 검색 버튼 클릭
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.applicant.trim()) {
@@ -59,7 +75,7 @@ export default function SearchForm({
     onSearch(formData);
   };
 
-  // ===== 프리셋 선택 =====
+  // ✅ 프리셋 선택
   const handleSelectPreset = (id: string) => {
     const preset = presets.find((p) => p.id === id);
     if (preset) {
@@ -72,7 +88,7 @@ export default function SearchForm({
     }
   };
 
-  // ===== 프리셋 저장 =====
+  // ✅ 프리셋 저장
   const handleSavePreset = () => {
     if (!presetName.trim() || !formData.applicant.trim()) {
       alert("프리셋명과 회사명을 입력하세요.");
@@ -96,7 +112,7 @@ export default function SearchForm({
     alert("프리셋이 저장되었습니다!");
   };
 
-  // ===== 프리셋 삭제 =====
+  // ✅ 프리셋 삭제
   const handleDeletePreset = (id: string) => {
     if (!window.confirm("프리셋을 삭제하시겠습니까?")) return;
     const updated = presets.filter((p) => p.id !== id);
@@ -105,13 +121,13 @@ export default function SearchForm({
     if (selectedPreset === id) setSelectedPreset("");
   };
 
-  // ===== 초기화 =====
+  // ✅ 초기화
   const handleReset = () => {
     setFormData({ applicant: "", startDate: "", endDate: "" });
     setSelectedPreset("");
   };
 
-  // ===== 렌더링 =====
+  // ✅ 렌더링
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
       <form onSubmit={handleSubmit} className="space-y-4">
