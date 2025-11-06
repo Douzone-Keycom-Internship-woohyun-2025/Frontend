@@ -1,23 +1,46 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import SearchForm from "../components/common/SearchForm";
+import SummaryDashboard from "../components/Summary/SummaryDashboard";
 import type { SummaryData } from "../types/summary";
 import { dummyPatentListResponse } from "../data/dummyPatentListResponse";
 import ProtectedLayout from "../layouts/ProtectedLayout";
 
 export default function SummaryPage() {
+  const location = useLocation();
+
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [initialPreset, setInitialPreset] = useState<{
+    applicant: string;
+    startDate: string;
+    endDate: string;
+  } | null>(null);
 
-  // ===== 더미데이터 기반 요약분석 =====
+  // ✅ 프리셋으로 이동한 경우: 초기값 세팅 + 자동 검색 실행
+  useEffect(() => {
+    const preset = location.state?.preset;
+    if (preset) {
+      const presetParams = {
+        applicant: preset.companyName || "",
+        startDate: preset.startDate || "",
+        endDate: preset.endDate || "",
+      };
+      setInitialPreset(presetParams);
+      handleSearch(presetParams); // 자동 검색
+    }
+  }, [location.state]);
+
+  // ✅ 요약분석 로직
   const handleSearch = (formData: {
     applicant: string;
     startDate: string;
     endDate: string;
   }) => {
+    setInitialPreset(formData); // ✅ 항상 최신 검색 조건 저장
     setIsLoading(true);
 
     setTimeout(() => {
-      // 필터링
       const filtered = dummyPatentListResponse.patents.filter((patent) => {
         const applicantName = patent.applicant.toLowerCase();
         const companyName = formData.applicant.toLowerCase();
@@ -34,8 +57,7 @@ export default function SummaryPage() {
         return matchesCompany && matchesStartDate && matchesEndDate;
       });
 
-      // 상태 맵핑
-      const statusMap: { [key: string]: string } = {
+      const statusMap: Record<string, string> = {
         pending: "출원",
         examining: "심사중",
         published: "공개",
@@ -45,10 +67,12 @@ export default function SummaryPage() {
         expired: "만료",
       };
 
-      // IPC 분포 계산
-      const ipcMap: { [key: string]: number } = {};
+      // ✅ IPC 분포
+      const ipcMap: Record<string, number> = {};
       filtered.forEach((patent) => {
-        ipcMap[patent.ipcCode] = (ipcMap[patent.ipcCode] || 0) + 1;
+        if (patent.ipcCode) {
+          ipcMap[patent.ipcCode] = (ipcMap[patent.ipcCode] || 0) + 1;
+        }
       });
 
       const ipcDistribution = Object.entries(ipcMap)
@@ -56,13 +80,13 @@ export default function SummaryPage() {
           ipcCode: code,
           ipcName: code,
           count,
-          percentage: Math.round((count / filtered.length) * 100 * 10) / 10,
+          percentage: Math.round((count / filtered.length) * 1000) / 10,
         }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);
 
-      // 월별 추세 계산
-      const monthlyMap: { [key: string]: number } = {};
+      // ✅ 월별 추세
+      const monthlyMap: Record<string, number> = {};
       filtered.forEach((patent) => {
         const month = patent.filingDate.substring(0, 7);
         monthlyMap[month] = (monthlyMap[month] || 0) + 1;
@@ -70,38 +94,39 @@ export default function SummaryPage() {
 
       const monthlyTrend = Object.entries(monthlyMap)
         .sort((a, b) => a[0].localeCompare(b[0]))
-        .map(([month, count], _, sortedArr) => {
-          const cumulativeCount = sortedArr
-            .slice(0, sortedArr.findIndex(([m]) => m === month) + 1)
+        .map(([month, count], _, arr) => {
+          const cumulativeCount = arr
+            .slice(0, arr.findIndex(([m]) => m === month) + 1)
             .reduce((sum, [, c]) => sum + c, 0);
           return { month, count, cumulativeCount };
         });
 
-      // 상태 분포 계산
-      const statusMap2: { [key: string]: number } = {};
+      // ✅ 상태 분포
+      const statusDistributionMap: Record<string, number> = {};
       filtered.forEach((patent) => {
         const status = statusMap[patent.status] || patent.status;
-        statusMap2[status] = (statusMap2[status] || 0) + 1;
+        statusDistributionMap[status] =
+          (statusDistributionMap[status] || 0) + 1;
       });
 
-      const statusDistribution = Object.entries(statusMap2)
+      const statusDistribution = Object.entries(statusDistributionMap)
         .map(([status, count]) => ({
           status,
           count,
-          percentage: Math.round((count / filtered.length) * 100 * 10) / 10,
+          percentage: Math.round((count / filtered.length) * 1000) / 10,
         }))
         .sort((a, b) => b.count - a.count);
 
-      // 등록률 (공개 상태의 비율)
+      // ✅ 등록률, 월평균
       const registrationRate =
-        Math.round(((statusMap2["공개"] || 0) / filtered.length) * 100 * 10) /
-        10;
+        Math.round(
+          ((statusDistributionMap["등록"] || 0) / filtered.length) * 1000
+        ) / 10;
 
-      // 월평균
       const monthlyAverage =
         Math.round((filtered.length / monthlyTrend.length) * 10) / 10;
 
-      // 최근 특허
+      // ✅ 최근 5개 특허
       const recentPatents = filtered
         .sort(
           (a, b) =>
@@ -118,6 +143,7 @@ export default function SummaryPage() {
           isFavorite: false,
         }));
 
+      // ✅ 최종 SummaryData
       const summary: SummaryData = {
         statistics: {
           totalPatents: filtered.length,
@@ -145,20 +171,15 @@ export default function SummaryPage() {
         {/* 헤더 */}
         <header className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-6 py-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-900">요약분석</h1>
-                <p className="mt-2 text-gray-600">
-                  회사의 R&D 동향을 한눈에 분석하세요
-                </p>
-              </div>
-            </div>
+            <h1 className="text-3xl font-bold text-gray-900">요약분석</h1>
+            <p className="mt-2 text-gray-600">
+              회사의 R&D 동향을 한눈에 분석하세요
+            </p>
           </div>
         </header>
 
-        {/* 메인 컨텐츠 */}
+        {/* 메인 */}
         <main className="max-w-7xl mx-auto px-6 py-8">
-          {/* 검색 영역 */}
           <div className="mb-8">
             <SearchForm
               enablePresets={true}
@@ -166,36 +187,33 @@ export default function SummaryPage() {
               title="요약분석"
               loading={isLoading}
               onSearch={handleSearch}
+              initialValues={initialPreset || undefined}
             />
           </div>
 
-          {/* 검색 결과 */}
-          {summaryData && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">
-                분석 결과
-              </h2>
-
-              {/* JSON 출력 (임시) */}
-              <pre className="bg-gray-100 p-4 rounded-lg overflow-auto text-sm max-h-96">
-                {JSON.stringify(summaryData, null, 2)}
-              </pre>
-            </div>
-          )}
-
-          {/* 검색 전 안내 메시지 */}
-          {!summaryData && !isLoading && (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
-              <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4 bg-blue-100 rounded-full">
-                <i className="ri-bar-chart-line text-2xl text-blue-600"></i>
+          {summaryData ? (
+            <SummaryDashboard
+              data={summaryData}
+              presetFilters={{
+                applicant: initialPreset?.applicant || "",
+                startDate: initialPreset?.startDate || "",
+                endDate: initialPreset?.endDate || "",
+              }}
+            />
+          ) : (
+            !isLoading && (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4 bg-blue-100 rounded-full">
+                  <i className="ri-bar-chart-line text-2xl text-blue-600"></i>
+                </div>
+                <h3 className="text-lg font-medium text-gray-900 mb-2">
+                  R&D 동향 분석을 시작하세요
+                </h3>
+                <p className="text-gray-600">
+                  회사명과 분석 기간을 입력하여 특허 동향을 분석해보세요.
+                </p>
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                R&D 동향 분석을 시작하세요
-              </h3>
-              <p className="text-gray-600">
-                회사명과 분석 기간을 입력하여 특허 동향을 분석해보세요.
-              </p>
-            </div>
+            )
           )}
         </main>
       </div>
