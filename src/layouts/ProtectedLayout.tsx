@@ -16,9 +16,9 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="h-screen bg-gray-50">
       <Sidebar userEmail="test@example.com" onLogout={handleLogout} />
-      <div className="flex-1 overflow-auto">{children}</div>
+      <main className="ml-64 overflow-auto h-full">{children}</main>
     </div>
   );
 }

@@ -22,7 +22,6 @@ export default function BasicSearch({
       onSearch={onSearch}
       title="기본 검색"
       enablePresets={true}
-      storageKey="patentPresets"
       initialValues={initialValues}
     />
   );
