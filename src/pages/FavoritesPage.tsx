@@ -4,7 +4,6 @@ import ProtectedLayout from "../layouts/ProtectedLayout";
 import PatentList from "../components/Patent/PatentListComponent/PatentList";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorState from "../components/common/ErrorState";
-import NoData from "../components/common/NoData";
 import { useFavorites } from "../hooks/useFavorites";
 import { dummyPatentListResponse } from "../data/dummyPatentListResponse";
 import type { PatentListItem } from "../types/patent";
@@ -62,52 +61,61 @@ export default function FavoritesPage() {
     );
   }
 
-  if (favoritePatents.length === 0) {
-    return (
-      <ProtectedLayout>
-        <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-          <NoData
-            message="관심특허가 없습니다."
-            subMessage="특허 검색 페이지에서 관심 있는 특허를 추가해보세요."
-          />
-          <Link
-            to="/patent-search"
-            className="mt-6 inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
-          >
-            <i className="ri-search-line text-base mr-2"></i>
-            특허 검색하기
-          </Link>
-        </div>
-      </ProtectedLayout>
-    );
-  }
-
   return (
     <ProtectedLayout>
       <div className="min-h-screen bg-gray-50">
         {/* 헤더 */}
         <header className="bg-white shadow-sm border-b">
-          <div className="max-w-7xl mx-auto px-6 py-6">
-            <h1 className="text-3xl font-bold text-gray-900">관심특허</h1>
-            <p className="mt-2 text-gray-600">
-              관심있는 특허를 모아서 관리하세요
-            </p>
+          <div className="px-8 py-6 flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">관심특허</h1>
+              <p className="mt-2 text-gray-600">
+                관심 있는 특허를 모아 효율적으로 관리하세요.
+              </p>
+            </div>
+            <div className="hidden md:flex items-center text-gray-500 text-sm">
+              <i className="ri-heart-line text-blue-600 mr-2"></i>
+              즐겨찾기 목록
+            </div>
           </div>
         </header>
 
-        {/* 리스트 */}
-        <main className="max-w-7xl mx-auto px-6 py-8">
-          <PatentList
-            patents={favoritePatents}
-            loading={isLoading}
-            favorites={favorites}
-            onToggleFavorite={toggleFavorite}
-            sortOrder={sortOrder}
-            onSortChange={handleSortChange}
-            currentPage={currentPage}
-            totalPages={Math.ceil(favoritePatents.length / 20)}
-            onPageChange={setCurrentPage}
-          />
+        {/* 메인 */}
+        <main className="px-8 py-8">
+          {favoritePatents.length === 0 ? (
+            <div className="bg-white rounded-lg shadow p-12 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+                <i className="ri-heart-line text-2xl text-blue-600"></i>
+              </div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                관심특허가 없습니다
+              </h3>
+              <p className="text-gray-600 mb-6">
+                특허 검색 페이지에서 마음에 드는 특허를 추가해보세요.
+              </p>
+              <Link
+                to="/patent-search"
+                className="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+              >
+                <i className="ri-search-line text-base mr-2"></i>
+                특허 검색하기
+              </Link>
+            </div>
+          ) : (
+            <div className="bg-white rounded-lg shadow p-8">
+              <PatentList
+                patents={favoritePatents}
+                loading={isLoading}
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
+                sortOrder={sortOrder}
+                onSortChange={handleSortChange}
+                currentPage={currentPage}
+                totalPages={Math.ceil(favoritePatents.length / 20)}
+                onPageChange={setCurrentPage}
+              />
+            </div>
+          )}
         </main>
       </div>
     </ProtectedLayout>
