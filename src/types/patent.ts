@@ -7,6 +7,14 @@ export type PatentStatus =
   | "abandoned"
   | "expired";
 
+export interface Patent {
+  id: string;
+  title: string;
+  applicant: string;
+  date: string;
+  status: string;
+}
+
 export interface PatentListItem {
   applicationNumber: number;
   title: string;
