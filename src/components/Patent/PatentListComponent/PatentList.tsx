@@ -3,7 +3,7 @@ import type { PatentListItem, PatentDetail } from "../../../types/patent";
 import { generateDummyDetail } from "../../../data/generateDummyDetail";
 import PatentTable from "./PatentTable";
 import Pagination from "./Pagination";
-import PatentDetailModal from "./PatentDetailModal";
+import PatentDetailModal from "../PatentDetail/PatentDetailModal";
 
 interface PatentListProps {
   patents: PatentListItem[];
