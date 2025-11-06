@@ -79,7 +79,7 @@ export default function SummaryDashboard({
     .slice(0, 5);
   const recentMonths = monthlyData.slice(-6);
 
-  // Chart.js 데이터 구성
+  // IPC 파이차트
   const ipcChartData = {
     labels: topIpcCodes.map(
       (item) => `${item.ipcCode} (${getIpcTechName(item.ipcCode)})`
@@ -99,18 +99,38 @@ export default function SummaryDashboard({
     ],
   };
 
+  // 월별 막대차트 (호버 색상 변화 방지)
+  const monthColors = [
+    "#3B82F6",
+    "#10B981",
+    "#F59E0B",
+    "#EF4444",
+    "#8B5CF6",
+    "#14B8A6",
+    "#A855F7",
+    "#F97316",
+    "#6366F1",
+    "#EAB308",
+  ];
+
+  const monthlyBarColors = recentMonths.map(
+    (_, i) => monthColors[i % monthColors.length]
+  );
+
   const monthlyChartData = {
     labels: recentMonths.map((m) => m.month),
     datasets: [
       {
         label: "출원 건수",
         data: recentMonths.map((m) => m.count),
-        backgroundColor: "rgba(37, 99, 235, 0.6)",
+        backgroundColor: monthlyBarColors,
+        hoverBackgroundColor: monthlyBarColors, // ← 호버해도 동일 색
         borderRadius: 6,
       },
     ],
   };
 
+  // 등록 상태 도넛
   const statusChartData = {
     labels: statusData.map(
       (s) => statusLabel[s.status as keyof typeof statusLabel] || s.status
@@ -127,9 +147,12 @@ export default function SummaryDashboard({
           "#8B5CF6",
         ],
         borderWidth: 0,
+        hoverOffset: 0,
       },
     ],
   };
+
+  const registrationRate = data?.statistics?.registrationRate ?? 0;
 
   return (
     <div className="space-y-6">
@@ -144,7 +167,7 @@ export default function SummaryDashboard({
           },
           {
             label: "등록률",
-            value: `${data.statistics.registrationRate}%`,
+            value: `${registrationRate}%`,
             icon: "ri-check-line",
             color: "green",
           },
@@ -180,9 +203,12 @@ export default function SummaryDashboard({
 
       {/* 🧩 IPC 코드별 기술분야 분포 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">
-          IPC 코드별 기술분야 분포
+        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          상위 5개 IPC 코드별 기술분야 분포
         </h3>
+        <p className="text-sm text-gray-500 mb-6">
+          특허 출원 상위 5개 IPC 코드를 기준으로 기술 분야 비율을 표시합니다.
+        </p>
         {ipcData.length > 0 && totalPatents > 0 ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div className="h-72 relative flex justify-center items-center">
@@ -241,9 +267,14 @@ export default function SummaryDashboard({
               <Bar
                 data={monthlyChartData}
                 options={{
-                  plugins: { legend: { display: false } },
+                  plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: true },
+                  },
+                  interaction: { mode: "nearest", intersect: false },
                   responsive: true,
                   maintainAspectRatio: false,
+                  hover: { mode: undefined }, // 시각적 hover 스타일 비활성화
                   scales: {
                     x: {
                       grid: { display: false },
@@ -262,13 +293,13 @@ export default function SummaryDashboard({
           )}
         </div>
 
-        {/* 등록 상태별 분포 */}
+        {/* 등록 상태별 분포 (중앙 텍스트는 오버레이로 표시) */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-6">
             등록 상태별 분포
           </h3>
           {statusData.length > 0 ? (
-            <div className="h-72 flex justify-center items-center">
+            <div className="h-72 relative flex items-center justify-center">
               <Doughnut
                 data={statusChartData}
                 options={{
@@ -278,6 +309,15 @@ export default function SummaryDashboard({
                   maintainAspectRatio: false,
                 }}
               />
+              {/* 중앙 오버레이 텍스트: 플러그인 대신 확실한 방식 */}
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <div className="text-center">
+                  <div className="text-xs text-gray-500 mb-1">등록률</div>
+                  <div className="text-2xl font-semibold text-gray-900">
+                    {registrationRate}%
+                  </div>
+                </div>
+              </div>
             </div>
           ) : (
             <NoData message="등록 상태 데이터가 없습니다." />
