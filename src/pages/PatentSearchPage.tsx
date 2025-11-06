@@ -4,11 +4,12 @@ import ProtectedLayout from "../layouts/ProtectedLayout";
 import BasicSearch from "../components/PatentSearch/BasicSearch";
 import AdvancedSearch from "../components/PatentSearch/AdvancedSearch";
 import PatentList from "../components/Patent/PatentListComponent/PatentList";
+import LoadingSpinner from "../components/common/LoadingSpinner";
+import ErrorState from "../components/common/ErrorState";
+import NoData from "../components/common/NoData";
 import { usePatentSearch } from "../hooks/usePatentSearch";
 import { useFavorites } from "../hooks/useFavorites";
 import type { PatentStatus } from "../types/patent";
-import LoadingSpinner from "../components/common/LoadingSpinner";
-import ErrorState from "../components/common/ErrorState";
 
 type FiltersState = {
   applicant: string;
@@ -74,7 +75,7 @@ export default function PatentSearchPage() {
     setCurrentPage(1);
   };
 
-  const handleAdvancedReset = () => {
+  const handleResetFilters = () => {
     setFilters({
       applicant: "",
       patentName: "",
@@ -118,7 +119,7 @@ export default function PatentSearchPage() {
   if (isLoading) {
     return (
       <ProtectedLayout>
-        <LoadingSpinner message="검색 중입니다..." size="md" />
+        <LoadingSpinner message="검색 중입니다..." />
       </ProtectedLayout>
     );
   }
@@ -134,7 +135,7 @@ export default function PatentSearchPage() {
   return (
     <ProtectedLayout>
       <div className="min-h-screen bg-gray-50">
-        {/* 상단 헤더 */}
+        {/* 헤더 */}
         <header className="bg-white shadow-sm border-b">
           <div className="px-8 py-6 flex justify-between items-center">
             <div>
@@ -149,37 +150,34 @@ export default function PatentSearchPage() {
           </div>
         </header>
 
-        {/* 메인 */}
+        {/* 탭 메뉴 */}
         <main className="px-8 py-8">
-          {/* 탭 메뉴 */}
           <div className="mb-8 bg-white rounded-lg shadow-sm border p-4">
             <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
-              <button
-                onClick={() => {
-                  setActiveTab("basic");
-                  handleAdvancedReset();
-                }}
-                className={`px-6 py-3 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                  activeTab === "basic"
-                    ? "bg-white text-blue-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                <i className="ri-search-line mr-2"></i>기본 검색
-              </button>
-              <button
-                onClick={() => {
-                  setActiveTab("advanced");
-                  handleAdvancedReset();
-                }}
-                className={`px-6 py-3 rounded-md text-sm font-medium transition-colors cursor-pointer ${
-                  activeTab === "advanced"
-                    ? "bg-white text-blue-600 shadow-sm"
-                    : "text-gray-600 hover:text-gray-900"
-                }`}
-              >
-                <i className="ri-settings-3-line mr-2"></i>상세 검색
-              </button>
+              {[
+                { key: "basic", label: "기본 검색", icon: "ri-search-line" },
+                {
+                  key: "advanced",
+                  label: "상세 검색",
+                  icon: "ri-settings-3-line",
+                },
+              ].map(({ key, label, icon }) => (
+                <button
+                  key={key}
+                  onClick={() => {
+                    setActiveTab(key as "basic" | "advanced");
+                    handleResetFilters();
+                  }}
+                  className={`px-6 py-3 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                    activeTab === key
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-gray-600 hover:text-gray-900"
+                  }`}
+                >
+                  <i className={`${icon} mr-2`}></i>
+                  {label}
+                </button>
+              ))}
             </nav>
           </div>
 
@@ -193,25 +191,18 @@ export default function PatentSearchPage() {
             ) : (
               <AdvancedSearch
                 onSearch={handleAdvancedSearch}
-                onReset={handleAdvancedReset}
+                onReset={handleResetFilters}
               />
             )}
           </section>
 
-          {/* 검색 결과 영역 */}
+          {/* 결과 영역 */}
           <section>
             {results.length === 0 ? (
-              <div className="bg-white rounded-lg shadow p-12 text-center">
-                <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                  <i className="ri-search-line text-3xl text-blue-600"></i>
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  검색 결과가 없습니다
-                </h3>
-                <p className="text-gray-600">
-                  다른 검색 조건으로 시도해보세요.
-                </p>
-              </div>
+              <NoData
+                message="검색 결과가 없습니다."
+                subMessage="다른 검색 조건으로 시도해보세요."
+              />
             ) : (
               <div className="bg-white rounded-lg shadow p-6">
                 <PatentList
