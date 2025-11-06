@@ -5,6 +5,7 @@ import SummaryDashboard from "../components/Summary/SummaryDashboard";
 import type { SummaryData } from "../types/summary";
 import { dummyPatentListResponse } from "../data/dummyPatentListResponse";
 import ProtectedLayout from "../layouts/ProtectedLayout";
+import { statusLabel } from "../utils/statusLabel";
 
 export default function SummaryPage() {
   const location = useLocation();
@@ -17,7 +18,6 @@ export default function SummaryPage() {
     endDate: string;
   } | null>(null);
 
-  // ✅ 프리셋으로 이동한 경우: 초기값 세팅 + 자동 검색 실행
   useEffect(() => {
     const preset = location.state?.preset;
     if (preset) {
@@ -27,17 +27,16 @@ export default function SummaryPage() {
         endDate: preset.endDate || "",
       };
       setInitialPreset(presetParams);
-      handleSearch(presetParams); // 자동 검색
+      handleSearch(presetParams);
     }
   }, [location.state]);
 
-  // ✅ 요약분석 로직
   const handleSearch = (formData: {
     applicant: string;
     startDate: string;
     endDate: string;
   }) => {
-    setInitialPreset(formData); // ✅ 항상 최신 검색 조건 저장
+    setInitialPreset(formData);
     setIsLoading(true);
 
     setTimeout(() => {
@@ -57,17 +56,6 @@ export default function SummaryPage() {
         return matchesCompany && matchesStartDate && matchesEndDate;
       });
 
-      const statusMap: Record<string, string> = {
-        pending: "출원",
-        examining: "심사중",
-        published: "공개",
-        registered: "등록",
-        rejected: "거절",
-        abandoned: "포기",
-        expired: "만료",
-      };
-
-      // ✅ IPC 분포
       const ipcMap: Record<string, number> = {};
       filtered.forEach((patent) => {
         if (patent.ipcCode) {
@@ -85,7 +73,6 @@ export default function SummaryPage() {
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);
 
-      // ✅ 월별 추세
       const monthlyMap: Record<string, number> = {};
       filtered.forEach((patent) => {
         const month = patent.filingDate.substring(0, 7);
@@ -101,10 +88,9 @@ export default function SummaryPage() {
           return { month, count, cumulativeCount };
         });
 
-      // ✅ 상태 분포
       const statusDistributionMap: Record<string, number> = {};
       filtered.forEach((patent) => {
-        const status = statusMap[patent.status] || patent.status;
+        const status = statusLabel[patent.status] || patent.status;
         statusDistributionMap[status] =
           (statusDistributionMap[status] || 0) + 1;
       });
@@ -117,7 +103,6 @@ export default function SummaryPage() {
         }))
         .sort((a, b) => b.count - a.count);
 
-      // ✅ 등록률, 월평균
       const registrationRate =
         Math.round(
           ((statusDistributionMap["등록"] || 0) / filtered.length) * 1000
@@ -126,7 +111,6 @@ export default function SummaryPage() {
       const monthlyAverage =
         Math.round((filtered.length / monthlyTrend.length) * 10) / 10;
 
-      // ✅ 최근 5개 특허
       const recentPatents = filtered
         .sort(
           (a, b) =>
@@ -139,11 +123,10 @@ export default function SummaryPage() {
           applicantName: patent.applicant,
           applicationDate: patent.filingDate,
           ipcCode: patent.ipcCode,
-          registerStatus: statusMap[patent.status] || patent.status,
+          registerStatus: statusLabel[patent.status] || patent.status,
           isFavorite: false,
         }));
 
-      // ✅ 최종 SummaryData
       const summary: SummaryData = {
         statistics: {
           totalPatents: filtered.length,
