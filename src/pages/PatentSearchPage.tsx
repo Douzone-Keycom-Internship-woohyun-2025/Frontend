@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { PatentListItem, PatentStatus } from "../types/patent";
 import { dummyPatentListResponse } from "../data/dummyPatentListResponse";
 import ProtectedLayout from "../layouts/ProtectedLayout";
 import BasicSearch from "../components/PatentSearch/BasicSearch";
 import AdvancedSearch from "../components/PatentSearch/AdvancedSearch";
 import PatentList from "../components/Patent/PatentList";
+import { useLocation } from "react-router-dom";
 
 type FiltersState = {
   applicant: string;
@@ -16,6 +17,7 @@ type FiltersState = {
 };
 
 export default function PatentSearchPage() {
+  const location = useLocation(); // ✅ 요약분석에서 넘어온 state 확인용
   const [activeTab, setActiveTab] = useState<"basic" | "advanced">("basic");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,9 +43,7 @@ export default function PatentSearchPage() {
   const filterPatents = async (
     params: FiltersState
   ): Promise<PatentListItem[]> => {
-    // 실제 API 호출처럼 흉내 (fetch 대체)
     await new Promise((resolve) => setTimeout(resolve, 400));
-
     let filtered = [...dummyPatentListResponse.patents];
 
     if (params.applicant.trim()) {
@@ -78,7 +78,6 @@ export default function PatentSearchPage() {
       filtered = filtered.filter((p) => p.status === params.status);
     }
 
-    // 정렬 적용 (실무 느낌)
     filtered.sort((a, b) => {
       const timeA = new Date(a.filingDate).getTime();
       const timeB = new Date(b.filingDate).getTime();
@@ -189,6 +188,33 @@ export default function PatentSearchPage() {
     setCurrentPage(page);
   };
 
+  useEffect(() => {
+    console.log("📦 location.state:", location.state);
+
+    const state = location.state as
+      | {
+          fromSummary?: boolean;
+          filters?: {
+            applicant?: string;
+            startDate?: string;
+            endDate?: string;
+          };
+        }
+      | undefined;
+
+    if (state?.fromSummary && state.filters) {
+      console.log("✅ 요약분석에서 받은 필터:", state.filters); // ✅ 2️⃣ 실제 전달 데이터 확인
+      handleBasicSearch({
+        applicant: state.filters.applicant || "",
+        startDate: state.filters.startDate || "",
+        endDate: state.filters.endDate || "",
+      });
+    } else {
+      console.log("⚠️ fromSummary 아님 또는 filters 누락됨");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.key]);
+
   // ===== 로딩 / 에러 화면 =====
   if (isLoading) {
     return (
@@ -283,7 +309,10 @@ export default function PatentSearchPage() {
           {/* 검색 폼 */}
           <div className="mb-8">
             {activeTab === "basic" ? (
-              <BasicSearch onSearch={handleBasicSearch} />
+              <BasicSearch
+                onSearch={handleBasicSearch}
+                initialValues={filters}
+              />
             ) : (
               <AdvancedSearch
                 onSearch={handleAdvancedSearch}
