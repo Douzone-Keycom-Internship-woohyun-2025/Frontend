@@ -24,10 +24,22 @@ export default function SummaryPage() {
         startDate: preset.startDate || "",
         endDate: preset.endDate || "",
       };
-      setInitialFilters(presetParams);
-      analyze(presetParams);
+
+      setInitialFilters((prev) => {
+        if (
+          !prev || // 처음 로드거나
+          prev.applicant !== presetParams.applicant ||
+          prev.startDate !== presetParams.startDate ||
+          prev.endDate !== presetParams.endDate
+        ) {
+          analyze(presetParams);
+          return presetParams;
+        }
+        return prev;
+      });
     }
-  }, [location.state, analyze]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSearch = async (params: {
     applicant: string;

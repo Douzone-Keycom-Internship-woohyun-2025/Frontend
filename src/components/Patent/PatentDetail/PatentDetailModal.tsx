@@ -1,6 +1,7 @@
 import type { PatentDetail } from "../../../types/patent";
 import { getStatusColor } from "../../../utils/statusColor";
 import { formatDate } from "../../../utils/dateFormat";
+import { statusLabel } from "../../../utils/statusLabel";
 
 interface PatentDetailModalProps {
   patent: PatentDetail;
@@ -19,6 +20,9 @@ export default function PatentDetailModal({
     if (e.target === e.currentTarget) onClose();
   };
 
+  const displayStatus =
+    statusLabel[patent.status as keyof typeof statusLabel] || patent.status;
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-6"
@@ -35,7 +39,7 @@ export default function PatentDetailModal({
                 patent.status
               )}`}
             >
-              {patent.status}
+              {displayStatus}
             </span>
           </div>
           <button
