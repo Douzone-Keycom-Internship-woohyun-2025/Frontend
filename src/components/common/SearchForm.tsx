@@ -31,7 +31,7 @@ export default function SearchForm({
 
   const [presetName, setPresetName] = useState("");
   const [presetDescription, setPresetDescription] = useState("");
-  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null); // ✅ 선택된 프리셋 추적
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
   const [showSaveModal, setShowSaveModal] = useState(false);
 
   const {
@@ -115,9 +115,11 @@ export default function SearchForm({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
       <form onSubmit={handleSubmit} className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6">{title}</h3>
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
+          {title}
+        </h3>
 
         {/* 프리셋 선택 */}
         {enablePresets && (
@@ -130,11 +132,11 @@ export default function SearchForm({
             ) : error ? (
               <p className="text-red-500 text-sm">{error}</p>
             ) : (
-              <div className="flex gap-2">
+              <div className="flex flex-col sm:flex-row gap-2">
                 <select
                   value={selectedPresetId || ""}
                   onChange={(e) => handleSelectPreset(e.target.value)}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
                 >
                   <option value="">프리셋 선택</option>
                   {presets.map((p) => (
@@ -148,11 +150,14 @@ export default function SearchForm({
                   type="button"
                   disabled={!selectedPresetId}
                   onClick={handleDeleteSelectedPreset}
-                  className={`px-3 py-2 rounded-lg font-medium transition-colors ${
-                    selectedPresetId
-                      ? "bg-red-100 text-red-700 hover:bg-red-200"
-                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                  }`}
+                  className={`
+                    px-3 py-2 rounded-lg font-medium text-sm transition-colors
+                    ${
+                      selectedPresetId
+                        ? "bg-red-100 text-red-700 hover:bg-red-200"
+                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                    }
+                  `}
                 >
                   삭제
                 </button>
@@ -163,6 +168,7 @@ export default function SearchForm({
 
         {/* 입력 영역 */}
         <div className="space-y-4">
+          {/* 회사명 */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               회사명
@@ -172,11 +178,12 @@ export default function SearchForm({
               value={formData.applicant}
               onChange={(e) => handleChange("applicant", e.target.value)}
               placeholder="예: 삼성, LG, 네이버"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          {/* 날짜 범위 */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 시작 날짜
@@ -185,7 +192,7 @@ export default function SearchForm({
                 type="date"
                 value={formData.startDate}
                 onChange={(e) => handleChange("startDate", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>
 
@@ -197,33 +204,60 @@ export default function SearchForm({
                 type="date"
                 value={formData.endDate}
                 onChange={(e) => handleChange("endDate", e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
               />
             </div>
           </div>
         </div>
 
         {/* 버튼 영역 */}
-        <div className="flex gap-3 mt-8">
+        <div className="flex flex-col sm:flex-row gap-3 mt-6">
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors disabled:opacity-50"
+            className="
+              w-full sm:flex-1
+              px-6 py-3
+              bg-blue-600 text-white
+              rounded-lg
+              hover:bg-blue-700
+              font-medium text-sm
+              transition-colors
+              disabled:opacity-50
+            "
           >
             {loading ? "검색 중..." : "검색"}
           </button>
+
           <button
             type="button"
             onClick={handleReset}
-            className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition-colors"
+            className="
+              w-full sm:flex-1
+              px-6 py-3
+              bg-gray-200 text-gray-700
+              rounded-lg
+              hover:bg-gray-300
+              font-medium text-sm
+              transition-colors
+            "
           >
             초기화
           </button>
+
           {enablePresets && (
             <button
               type="button"
               onClick={() => setShowSaveModal(true)}
-              className="flex-1 px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors"
+              className="
+                w-full sm:flex-1
+                px-6 py-3
+                bg-green-600 text-white
+                rounded-lg
+                hover:bg-green-700
+                font-medium text-sm
+                transition-colors
+              "
             >
               프리셋 저장
             </button>
@@ -233,32 +267,32 @@ export default function SearchForm({
 
       {/* 프리셋 저장 모달 */}
       {showSaveModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-md">
             <h4 className="text-lg font-semibold mb-3">프리셋 저장</h4>
             <input
               type="text"
               value={presetName}
               onChange={(e) => setPresetName(e.target.value)}
               placeholder="프리셋 이름 입력"
-              className="w-full border rounded-lg px-3 py-2 mb-3"
+              className="w-full border rounded-lg px-3 py-2 mb-3 text-sm"
             />
             <textarea
               value={presetDescription}
               onChange={(e) => setPresetDescription(e.target.value)}
               placeholder="프리셋 설명 (예: 2023~2024년 삼성전자)"
-              className="w-full border rounded-lg px-3 py-2 mb-4 h-20 resize-none"
+              className="w-full border rounded-lg px-3 py-2 mb-4 h-20 resize-none text-sm"
             />
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-end gap-2">
               <button
                 onClick={() => setShowSaveModal(false)}
-                className="px-4 py-2 bg-gray-200 rounded-lg"
+                className="px-3 sm:px-4 py-2 bg-gray-200 rounded-lg text-sm"
               >
                 취소
               </button>
               <button
                 onClick={handleSavePreset}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+                className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
               >
                 저장
               </button>
