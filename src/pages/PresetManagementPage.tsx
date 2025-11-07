@@ -104,34 +104,44 @@ export default function PresetManagementPage() {
 
   return (
     <ProtectedLayout>
-      <div className="min-h-screen bg-gray-50">
-        {/* 헤더 */}
+      <div className="w-full bg-gray-50">
         <header className="bg-white shadow-sm border-b">
-          <div className="px-8 py-6 flex justify-between items-center">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">프리셋 관리</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                프리셋 관리
+              </h1>
+              <p className="mt-1.5 sm:mt-2 text-sm sm:text-base text-gray-600">
                 자주 사용하는 검색 조건을 프리셋으로 저장하고 관리하세요.
               </p>
             </div>
             <button
               onClick={() => handleOpenModal()}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center"
+              className="
+                w-full md:w-auto
+                inline-flex items-center justify-center
+                px-4 py-2
+                bg-blue-600 text-white
+                text-sm font-medium
+                rounded-lg
+                hover:bg-blue-700
+                transition-colors duration-200
+              "
             >
-              <i className="ri-add-line mr-2"></i>새 프리셋
+              <i className="ri-add-line mr-2" />새 프리셋
             </button>
           </div>
         </header>
 
         {/* 메인 */}
-        <main className="px-8 py-8">
+        <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {presets.length === 0 ? (
             <NoData
               message="저장된 프리셋이 없습니다."
               subMessage="자주 사용하는 검색 조건을 프리셋으로 저장해보세요."
             />
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
               {presets.map((preset) => (
                 <PresetCard
                   key={preset.id}
