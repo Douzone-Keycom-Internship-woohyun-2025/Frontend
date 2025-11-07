@@ -73,48 +73,51 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* 기능 요약 섹션 */}
-          <div className="mt-10 bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-5 text-center">
-              주요 기능
+          <section className="mt-16 text-center">
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              TechLens 주요 기능
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 text-center">
+            <p className="text-gray-600 mb-12">
+              TechLens는 특허 데이터를 쉽고 빠르게 검색하고, 분석하며, 관리할 수
+              있는 통합 플랫폼입니다.
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-center items-start sm:items-center gap-10 sm:gap-16">
               {[
                 {
                   icon: "ri-building-line",
-                  color: "blue",
+                  color: "text-blue-600",
                   title: "회사별 검색",
-                  desc: "특정 회사의 특허를 빠르게 찾아보세요",
+                  desc: "기업명을 기준으로 관련 특허를 신속히 조회",
                 },
                 {
                   icon: "ri-calendar-line",
-                  color: "green",
-                  title: "날짜 범위 검색",
-                  desc: "원하는 기간의 특허만 조회할 수 있습니다",
+                  color: "text-green-600",
+                  title: "기간별 분석",
+                  desc: "연도 또는 분기별 트렌드를 한눈에 확인",
                 },
                 {
                   icon: "ri-flag-line",
-                  color: "purple",
+                  color: "text-purple-600",
                   title: "상태별 필터링",
-                  desc: "출원, 심사중, 등록 등 상태별로 분류",
+                  desc: "출원·심사·등록 등 상태별로 특허 분류",
                 },
               ].map((item) => (
-                <div key={item.title}>
-                  <div
-                    className={`w-10 h-10 bg-${item.color}-100 rounded-lg flex items-center justify-center mx-auto mb-3`}
-                  >
-                    <i
-                      className={`${item.icon} text-${item.color}-600 text-xl`}
-                    ></i>
-                  </div>
-                  <h4 className="font-medium text-gray-900 mb-1 text-sm">
+                <div
+                  key={item.title}
+                  className="flex flex-col items-center max-w-[220px]"
+                >
+                  <i className={`${item.icon} ${item.color} text-4xl mb-3`} />
+                  <h4 className="text-lg font-semibold text-gray-800 mb-1">
                     {item.title}
                   </h4>
-                  <p className="text-xs text-gray-600">{item.desc}</p>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {item.desc}
+                  </p>
                 </div>
               ))}
             </div>
-          </div>
+          </section>
         </div>
       </div>
     </ProtectedLayout>
