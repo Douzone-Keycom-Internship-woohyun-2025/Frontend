@@ -182,7 +182,7 @@ npm run format    # Prettier 포맷팅
 ### 사전 요구사항
 
 ```
-Node.js 18 이상
+Node.js 20.11.1
 npm 또는 yarn
 ```
 
@@ -196,7 +196,7 @@ cd techlens-frontend
 ### 2단계: 의존성 설치
 
 ```bash
-npm install
+npm ci
 ```
 
 ### 3단계: 환경 변수 설정
@@ -251,6 +251,7 @@ VITE_API_TIMEOUT=10000
 ---
 
 **마지막 업데이트**: 2025년 11월
+
 
 
 
