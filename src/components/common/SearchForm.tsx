@@ -30,9 +30,10 @@ export default function SearchForm({
   });
 
   const [presetName, setPresetName] = useState("");
+  const [presetDescription, setPresetDescription] = useState("");
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null); // ✅ 선택된 프리셋 추적
   const [showSaveModal, setShowSaveModal] = useState(false);
 
-  // ✅ 커스텀 훅에서 프리셋 상태/로직 가져오기
   const {
     presets,
     isLoading: presetsLoading,
@@ -59,6 +60,7 @@ export default function SearchForm({
 
   const handleSelectPreset = (id: string) => {
     const preset = presets.find((p) => p.id === id);
+    setSelectedPresetId(id);
     if (preset) {
       setFormData({
         applicant: preset.applicant,
@@ -68,7 +70,22 @@ export default function SearchForm({
     }
   };
 
-  // ✅ 프리셋 저장
+  const handleDeleteSelectedPreset = () => {
+    if (!selectedPresetId) {
+      alert("삭제할 프리셋을 선택하세요.");
+      return;
+    }
+    const selectedPreset = presets.find((p) => p.id === selectedPresetId);
+    if (
+      window.confirm(
+        `정말 "${selectedPreset?.name}" 프리셋을 삭제하시겠습니까?`
+      )
+    ) {
+      deletePreset(selectedPresetId);
+      setSelectedPresetId(null);
+    }
+  };
+
   const handleSavePreset = () => {
     if (!presetName.trim() || !formData.applicant.trim()) {
       alert("프리셋명과 회사명을 입력하세요.");
@@ -78,6 +95,7 @@ export default function SearchForm({
     const newPreset: SearchPreset = {
       id: Date.now().toString(),
       name: presetName,
+      description: presetDescription.trim(),
       applicant: formData.applicant,
       startDate: formData.startDate,
       endDate: formData.endDate,
@@ -86,18 +104,14 @@ export default function SearchForm({
 
     addOrUpdatePreset(newPreset);
     setPresetName("");
+    setPresetDescription("");
     setShowSaveModal(false);
     alert("프리셋이 저장되었습니다!");
   };
 
-  const handleDeletePreset = (id: string) => {
-    if (window.confirm("프리셋을 삭제하시겠습니까?")) {
-      deletePreset(id);
-    }
-  };
-
   const handleReset = () => {
     setFormData({ applicant: "", startDate: "", endDate: "" });
+    setSelectedPresetId(null);
   };
 
   return (
@@ -105,7 +119,7 @@ export default function SearchForm({
       <form onSubmit={handleSubmit} className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900 mb-6">{title}</h3>
 
-        {/* 🔹 프리셋 선택 */}
+        {/* 프리셋 선택 */}
         {enablePresets && (
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -118,23 +132,27 @@ export default function SearchForm({
             ) : (
               <div className="flex gap-2">
                 <select
+                  value={selectedPresetId || ""}
                   onChange={(e) => handleSelectPreset(e.target.value)}
                   className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="">프리셋 선택</option>
                   {presets.map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.name} ({p.applicant})
+                      {p.name} - {p.description || "설명 없음"}
                     </option>
                   ))}
                 </select>
+
                 <button
                   type="button"
-                  onClick={() => {
-                    const id = prompt("삭제할 프리셋 ID를 입력하세요.");
-                    if (id) handleDeletePreset(id);
-                  }}
-                  className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200"
+                  disabled={!selectedPresetId}
+                  onClick={handleDeleteSelectedPreset}
+                  className={`px-3 py-2 rounded-lg font-medium transition-colors ${
+                    selectedPresetId
+                      ? "bg-red-100 text-red-700 hover:bg-red-200"
+                      : "bg-gray-100 text-gray-400 cursor-not-allowed"
+                  }`}
                 >
                   삭제
                 </button>
@@ -143,7 +161,7 @@ export default function SearchForm({
           </div>
         )}
 
-        {/* 🔹 입력 영역 */}
+        {/* 입력 영역 */}
         <div className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -185,7 +203,7 @@ export default function SearchForm({
           </div>
         </div>
 
-        {/* 🔹 버튼 */}
+        {/* 버튼 영역 */}
         <div className="flex gap-3 mt-8">
           <button
             type="submit"
@@ -213,17 +231,23 @@ export default function SearchForm({
         </div>
       </form>
 
-      {/* 🔹 프리셋 저장 모달 */}
+      {/* 프리셋 저장 모달 */}
       {showSaveModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white p-6 rounded-lg shadow-lg w-80">
+          <div className="bg-white p-6 rounded-lg shadow-lg w-96">
             <h4 className="text-lg font-semibold mb-3">프리셋 저장</h4>
             <input
               type="text"
               value={presetName}
               onChange={(e) => setPresetName(e.target.value)}
               placeholder="프리셋 이름 입력"
-              className="w-full border rounded-lg px-3 py-2 mb-4"
+              className="w-full border rounded-lg px-3 py-2 mb-3"
+            />
+            <textarea
+              value={presetDescription}
+              onChange={(e) => setPresetDescription(e.target.value)}
+              placeholder="프리셋 설명 (예: 2023~2024년 삼성전자)"
+              className="w-full border rounded-lg px-3 py-2 mb-4 h-20 resize-none"
             />
             <div className="flex justify-end gap-3">
               <button
