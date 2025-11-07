@@ -164,62 +164,6 @@ npm run format    # Prettier 포맷팅
 
 ---
 
-## 📦 설치 및 실행
-
-### 사전 요구사항
-
-```
-Node.js 18 이상
-npm 또는 yarn
-```
-
-### 1단계: 저장소 클론
-
-```bash
-git clone https://github.com/YOUR_ORG/techlens-frontend.git
-cd techlens-frontend
-```
-
-### 2단계: 의존성 설치
-
-```bash
-npm install
-```
-
-### 3단계: 환경 변수 설정
-
-```bash
-cp .env.example .env.local
-```
-
-`.env.local` 내용:
-
-```env
-VITE_API_URL=http://localhost:3000/api/v1
-VITE_API_TIMEOUT=10000
-```
-
-### 4단계: 개발 서버 실행
-
-```bash
-npm run dev
-```
-
-브라우저에서 `http://localhost:5173` 접속
-
-### 프로덕션 빌드
-
-```bash
-npm run build
-npm run preview
-```
----
-### 환경 변수 (Vercel)
-
-```
-VITE_API_URL=https://api.example.com/api/v1
-VITE_API_TIMEOUT=10000
-```
 
 ## 📊 구현 현황
 
@@ -238,6 +182,7 @@ VITE_API_TIMEOUT=10000
 ---
 
 **마지막 업데이트**: 2025년 11월
+
 
 
 
