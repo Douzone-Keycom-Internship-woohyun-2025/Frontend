@@ -1,4 +1,3 @@
-// src/pages/HelpPage.tsx
 import { useState } from "react";
 import ProtectedLayout from "../layouts/ProtectedLayout";
 import { helpSections } from "../data/helpSections";

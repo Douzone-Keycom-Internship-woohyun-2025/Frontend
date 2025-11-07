@@ -22,12 +22,11 @@ export default function FavoritesPage() {
         setIsLoading(true);
         setError(null);
 
-        // 더미데이터에서 관심 특허만 필터링
         const data = dummyPatentListResponse.patents.filter((p) =>
           favorites.includes(p.applicationNumber)
         );
 
-        await new Promise((resolve) => setTimeout(resolve, 400)); // API 대기 시뮬레이션
+        await new Promise((resolve) => setTimeout(resolve, 400));
         setFavoritePatents(data);
       } catch (err) {
         console.error(err);
@@ -63,46 +62,55 @@ export default function FavoritesPage() {
 
   return (
     <ProtectedLayout>
-      <div className="min-h-screen bg-gray-50">
-        {/* 헤더 */}
+      <div className="w-full bg-gray-50">
         <header className="bg-white shadow-sm border-b">
-          <div className="px-8 py-6 flex justify-between items-center">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">관심특허</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                관심특허
+              </h1>
+              <p className="mt-1.5 sm:mt-2 text-sm sm:text-base text-gray-600">
                 관심 있는 특허를 모아 효율적으로 관리하세요.
               </p>
             </div>
             <div className="hidden md:flex items-center text-gray-500 text-sm">
-              <i className="ri-heart-line text-blue-600 mr-2"></i>
+              <i className="ri-heart-line text-blue-600 mr-2" />
               즐겨찾기 목록
             </div>
           </div>
         </header>
 
         {/* 메인 */}
-        <main className="px-8 py-8">
+        <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {favoritePatents.length === 0 ? (
-            <div className="bg-white rounded-lg shadow p-12 text-center">
+            <div className="bg-white rounded-lg shadow p-8 sm:p-10 text-center">
               <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                <i className="ri-heart-line text-2xl text-blue-600"></i>
+                <i className="ri-heart-line text-2xl text-blue-600" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                 관심특허가 없습니다
               </h3>
-              <p className="text-gray-600 mb-6">
-                특허 검색 페이지에서 마음에 드는 특허를 추가해보세요.
+              <p className="text-sm sm:text-base text-gray-600 mb-6">
+                특허 검색 페이지에서 마음에 드는 특허를 즐겨찾기에 추가해보세요.
               </p>
               <Link
                 to="/patent-search"
-                className="inline-flex items-center px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors duration-200"
+                className="
+                  inline-flex items-center
+                  px-4 sm:px-5 py-2.5
+                  bg-blue-600 text-white
+                  text-sm sm:text-base
+                  rounded-lg
+                  hover:bg-blue-700
+                  transition-colors duration-200
+                "
               >
-                <i className="ri-search-line text-base mr-2"></i>
+                <i className="ri-search-line text-base mr-2" />
                 특허 검색하기
               </Link>
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow p-8">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6 lg:p-8">
               <PatentList
                 patents={favoritePatents}
                 loading={isLoading}
