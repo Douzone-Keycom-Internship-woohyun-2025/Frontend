@@ -32,13 +32,15 @@ const renderSection = (
   message: string
 ) => (condition ? content : <NoData message={message} />);
 
+interface SummaryDashboardProps {
+  data: SummaryData;
+  presetFilters?: { applicant?: string; startDate?: string; endDate?: string };
+}
+
 export default function SummaryDashboard({
   data,
   presetFilters,
-}: {
-  data: SummaryData;
-  presetFilters?: { applicant?: string; startDate?: string; endDate?: string };
-}) {
+}: SummaryDashboardProps) {
   const navigate = useNavigate();
 
   const handleViewPatents = () => {
@@ -78,13 +80,14 @@ export default function SummaryDashboard({
   const ipcData = data?.ipcDistribution || [];
   const monthlyData = data?.monthlyTrend || [];
   const statusData = data?.statusDistribution || [];
+  const registrationRate = data?.statistics?.registrationRate ?? 0;
 
   const topIpcCodes = [...ipcData]
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
   const recentMonths = monthlyData.slice(-6);
 
-  // IPC 파이차트
+  // IPC 파이 차트
   const ipcChartData = {
     labels: topIpcCodes.map(
       (item) => `${item.ipcCode} (${getIpcTechName(item.ipcCode)})`
@@ -104,7 +107,7 @@ export default function SummaryDashboard({
     ],
   };
 
-  // 월별 막대차트 (호버 색상 변화 방지)
+  // 월별 막대 차트 색상
   const monthColors = [
     "#3B82F6",
     "#10B981",
@@ -157,65 +160,73 @@ export default function SummaryDashboard({
     ],
   };
 
-  const registrationRate = data?.statistics?.registrationRate ?? 0;
+  // 상단 통계 카드 (Tailwind-safe)
+  const statCards = [
+    {
+      label: "총 특허 건수",
+      value: totalPatents.toLocaleString(),
+      icon: "ri-file-text-line",
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600",
+    },
+    {
+      label: "등록률",
+      value: `${registrationRate}%`,
+      icon: "ri-check-line",
+      iconBg: "bg-green-100",
+      iconColor: "text-green-600",
+    },
+    {
+      label: "월평균 출원",
+      value: data.statistics.monthlyAverage,
+      icon: "ri-calendar-line",
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-500",
+    },
+  ];
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {[
-          {
-            label: "총 특허 건수",
-            value: totalPatents.toLocaleString(),
-            icon: "ri-file-text-line",
-            color: "blue",
-          },
-          {
-            label: "등록률",
-            value: `${registrationRate}%`,
-            icon: "ri-check-line",
-            color: "green",
-          },
-          {
-            label: "월평균 출원",
-            value: data.statistics.monthlyAverage,
-            icon: "ri-calendar-line",
-            color: "orange",
-          },
-        ].map((card) => (
+    <div className="space-y-6 sm:space-y-7 lg:space-y-8">
+      {/* 상단 통계 카드 */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+        {statCards.map((card) => (
           <div
             key={card.label}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6"
+            className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6"
           >
-            <div className="flex items-center">
+            <div className="flex items-center justify-between gap-3">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">
+                <p className="text-xs sm:text-sm font-medium text-gray-600">
                   {card.label}
                 </p>
-                <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+                <p className="text-xl sm:text-2xl font-bold text-gray-900">
+                  {card.value}
+                </p>
               </div>
               <div
-                className={`w-12 h-12 bg-${card.color}-100 rounded-lg flex items-center justify-center`}
+                className={`w-10 h-10 sm:w-12 sm:h-12 ${card.iconBg} rounded-lg flex items-center justify-center`}
               >
                 <i
-                  className={`${card.icon} text-${card.color}-600 text-2xl`}
-                ></i>
+                  className={`${card.icon} ${card.iconColor} text-xl sm:text-2xl`}
+                />
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">
+      {/* IPC 분포 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1.5 sm:mb-2">
           상위 5개 IPC 코드별 기술분야 분포
         </h3>
-        <p className="text-sm text-gray-500 mb-6">
+        <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
           특허 출원 상위 5개 IPC 코드를 기준으로 기술 분야 비율을 표시합니다.
         </p>
         {renderSection(
           ipcData.length > 0 && totalPatents > 0,
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div className="h-72 relative flex justify-center items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div className="h-56 sm:h-72 relative flex justify-center items-center">
               <Pie
                 data={ipcChartData}
                 options={{
@@ -225,25 +236,25 @@ export default function SummaryDashboard({
                 }}
               />
             </div>
-            <div className="flex flex-col justify-center space-y-3">
+            <div className="flex flex-col justify-center space-y-2.5 sm:space-y-3">
               {topIpcCodes.map((item, index) => (
                 <div
                   key={item.ipcCode}
-                  className="flex justify-between bg-gray-50 px-4 py-2 rounded-lg"
+                  className="flex justify-between bg-gray-50 px-3 sm:px-4 py-2 rounded-lg"
                 >
                   <div className="flex items-center space-x-2">
                     <div
-                      className="w-3 h-3 rounded-full"
+                      className="w-2.5 h-2.5 rounded-full"
                       style={{
                         backgroundColor: ipcChartData.datasets[0]
                           .backgroundColor[index] as string,
                       }}
                     />
-                    <span className="text-gray-800 font-medium">
+                    <span className="text-xs sm:text-sm text-gray-800 font-medium">
                       {item.ipcCode}
                     </span>
                   </div>
-                  <span className="text-gray-600 text-sm">
+                  <span className="text-xs sm:text-sm text-gray-600">
                     {item.count}건 (
                     {totalPatents
                       ? ((item.count / totalPatents) * 100).toFixed(1)
@@ -258,15 +269,16 @@ export default function SummaryDashboard({
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* 월별 출원 동향 */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+      {/* 월별 동향 & 등록 상태 분포 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        {/* 월별 특허 출원 동향 */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
             월별 특허 출원 동향
           </h3>
           {renderSection(
             monthlyData.length > 0,
-            <div className="h-72 relative">
+            <div className="h-56 sm:h-72 relative">
               <Bar
                 data={monthlyChartData}
                 options={{
@@ -281,11 +293,18 @@ export default function SummaryDashboard({
                   scales: {
                     x: {
                       grid: { display: false },
-                      ticks: { color: "#4B5563" },
+                      ticks: {
+                        color: "#4B5563",
+                        font: { size: 10 },
+                      },
                     },
                     y: {
                       beginAtZero: true,
-                      ticks: { precision: 0, color: "#4B5563" },
+                      ticks: {
+                        precision: 0,
+                        color: "#4B5563",
+                        font: { size: 10 },
+                      },
                     },
                   },
                 }}
@@ -295,13 +314,14 @@ export default function SummaryDashboard({
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-6">
+        {/* 등록 상태별 분포 */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
             등록 상태별 분포
           </h3>
           {renderSection(
             statusData.length > 0,
-            <div className="h-72 relative flex items-center justify-center">
+            <div className="h-56 sm:h-72 relative flex items-center justify-center">
               <Doughnut
                 data={statusChartData}
                 options={{
@@ -311,13 +331,14 @@ export default function SummaryDashboard({
                   maintainAspectRatio: false,
                 }}
               />
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <div className="text-xs text-gray-500 mb-1">등록률</div>
-                  <div className="text-2xl font-semibold text-gray-900">
-                    {registrationRate}%
-                  </div>
-                </div>
+              {/* 중앙 텍스트: 항상 정확히 가운데 */}
+              <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-[10px] sm:text-xs text-gray-500 leading-none">
+                  등록률
+                </span>
+                <span className="mt-1 text-xl sm:text-2xl font-semibold text-gray-900 leading-none">
+                  {registrationRate}%
+                </span>
               </div>
             </div>,
             "등록 상태 데이터가 없습니다."
@@ -325,21 +346,30 @@ export default function SummaryDashboard({
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-semibold text-gray-900">
+      {/* 최근 주요 특허 */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">
             최근 주요 특허
           </h3>
           <button
             onClick={handleViewPatents}
-            className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
+            className="
+              px-3 sm:px-4 py-2
+              bg-blue-600 text-white
+              text-xs sm:text-sm font-medium
+              rounded-lg
+              hover:bg-blue-700
+              transition-colors duration-200
+              self-stretch sm:self-auto
+            "
           >
             검색된 특허 보기
           </button>
         </div>
         {renderSection(
           data.recentPatents.length > 0,
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
             {data.recentPatents.slice(0, 3).map((patent, index) => (
               <RecentPatentCard key={index} patent={patent} />
             ))}
