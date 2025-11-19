@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { signupApi } from "../../api/auth";
+import axios from "axios";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -30,14 +32,16 @@ export default function Signup() {
     }
 
     try {
-      console.log("회원가입 시도:", formData);
+      await signupApi(formData.email, formData.password);
 
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userEmail", formData.email);
-
-      navigate("/");
-    } catch {
-      setError("회원가입에 실패했습니다. 다시 시도해주세요.");
+      alert("회원가입 완료! 로그인해주세요.");
+      navigate("/login");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "회원가입에 실패했습니다.");
+      } else {
+        setError("알 수 없는 에러가 발생했습니다.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +76,7 @@ export default function Signup() {
           이미 계정이 있으신가요?{" "}
           <Link
             to="/login"
-            className="font-medium text-blue-600 hover:text-blue-500 cursor-pointer"
+            className="font-medium text-blue-600 hover:text-blue-500"
           >
             로그인
           </Link>
@@ -143,8 +147,7 @@ export default function Signup() {
             disabled={isLoading}
             className="w-full flex justify-center py-2 px-4 rounded-lg shadow-sm 
             text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 
-            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 
-            disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200"
+            disabled:opacity-50 transition-colors duration-200"
           >
             {isLoading ? (
               <div className="flex items-center">
