@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { dummyPatentListResponse } from "../data/dummyPatentListResponse";
 import type { SummaryData } from "../types/summary";
 import { statusLabel } from "../utils/statusLabel";
+import { dummyPatentListResponse } from "../data/dummyPatentListResponse";
 
 interface SearchParams {
   applicant: string;
@@ -19,13 +19,15 @@ export function useSummaryAnalysis() {
       setIsLoading(true);
       setError(null);
 
-      // 더미 데이터 필터링
-      const filtered = dummyPatentListResponse.patents.filter((patent) => {
-        const applicantName = patent.applicant.toLowerCase();
+      const filtered = dummyPatentListResponse.patents.filter((p) => {
+        const applicantName = p.applicantName?.toLowerCase() || "";
         const query = applicant.toLowerCase();
         const matchesCompany = applicantName.includes(query);
 
-        const filingDate = new Date(patent.filingDate).getTime();
+        const filingDate = p.applicationDate
+          ? new Date(p.applicationDate).getTime()
+          : 0;
+
         const matchesStart =
           !startDate || filingDate >= new Date(startDate).getTime();
         const matchesEnd =
@@ -34,11 +36,12 @@ export function useSummaryAnalysis() {
         return matchesCompany && matchesStart && matchesEnd;
       });
 
-      // IPC 분포 계산
       const ipcMap: Record<string, number> = {};
       filtered.forEach((p) => {
-        if (p.ipcCode) ipcMap[p.ipcCode] = (ipcMap[p.ipcCode] || 0) + 1;
+        if (p.mainIpcCode)
+          ipcMap[p.mainIpcCode] = (ipcMap[p.mainIpcCode] || 0) + 1;
       });
+
       const ipcDistribution = Object.entries(ipcMap)
         .map(([ipcCode, count]) => ({
           ipcCode,
@@ -51,12 +54,13 @@ export function useSummaryAnalysis() {
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);
 
-      // 월별 트렌드
       const monthlyMap: Record<string, number> = {};
       filtered.forEach((p) => {
-        const month = p.filingDate.substring(0, 7);
+        if (!p.applicationDate) return;
+        const month = p.applicationDate.substring(0, 7);
         monthlyMap[month] = (monthlyMap[month] || 0) + 1;
       });
+
       const monthlyTrend = Object.entries(monthlyMap)
         .sort((a, b) => a[0].localeCompare(b[0]))
         .map(([month, count], _, arr) => {
@@ -68,10 +72,11 @@ export function useSummaryAnalysis() {
 
       const statusDistributionMap: Record<string, number> = {};
       filtered.forEach((p) => {
-        const status = statusLabel[p.status] || p.status;
-        statusDistributionMap[status] =
-          (statusDistributionMap[status] || 0) + 1;
+        const statusText = statusLabel[p.registerStatus || ""] || "기타";
+        statusDistributionMap[statusText] =
+          (statusDistributionMap[statusText] || 0) + 1;
       });
+
       const statusDistribution = Object.entries(statusDistributionMap).map(
         ([status, count]) => ({
           status,
@@ -82,33 +87,37 @@ export function useSummaryAnalysis() {
         })
       );
 
-      // 주요 통계
       const registrationRate =
         filtered.length > 0
           ? Math.round(
               ((statusDistributionMap["등록"] || 0) / filtered.length) * 1000
             ) / 10
           : 0;
+
       const monthlyAverage =
         filtered.length && monthlyTrend.length
           ? Math.round((filtered.length / monthlyTrend.length) * 10) / 10
           : 0;
 
-      // 최신 특허 5건 - statusLabel 사용
       const recentPatents = filtered
-        .sort(
-          (a, b) =>
-            new Date(b.filingDate).getTime() - new Date(a.filingDate).getTime()
-        )
+        .sort((a, b) => {
+          const t1 = a.applicationDate
+            ? new Date(a.applicationDate).getTime()
+            : 0;
+          const t2 = b.applicationDate
+            ? new Date(b.applicationDate).getTime()
+            : 0;
+          return t2 - t1;
+        })
         .slice(0, 5)
         .map((p) => ({
-          applicationNumber: p.applicationNumber.toString(),
-          inventionTitle: p.title,
-          applicantName: p.applicant,
-          applicationDate: p.filingDate,
-          ipcCode: p.ipcCode,
-          registerStatus: statusLabel[p.status] || p.status, // 여기 변경!
-          isFavorite: false,
+          applicationNumber: p.applicationNumber ?? "",
+          inventionTitle: p.inventionTitle ?? "",
+          applicantName: p.applicantName ?? "",
+          applicationDate: p.applicationDate ?? "",
+          ipcCode: p.mainIpcCode ?? "",
+          registerStatus: statusLabel[p.registerStatus || ""] || "기타",
+          isFavorite: p.isFavorite ?? false,
         }));
 
       const summary: SummaryData = {
@@ -127,7 +136,7 @@ export function useSummaryAnalysis() {
         recentPatents,
       };
 
-      await new Promise((r) => setTimeout(r, 800));
+      await new Promise((r) => setTimeout(r, 600));
       setSummaryData(summary);
     } catch (err) {
       console.error(err);

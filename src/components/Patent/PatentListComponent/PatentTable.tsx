@@ -9,8 +9,8 @@ import { ArrowUpDown, Heart, HeartOff } from "lucide-react";
 interface PatentTableProps {
   patents: PatentListItem[];
   loading: boolean;
-  favorites: number[];
-  onToggleFavorite: (patentId: number) => void;
+  favorites: string[];
+  onToggleFavorite: (applicationNumber: string) => void;
   sortOrder: "asc" | "desc";
   onSortChange: () => void;
   onPatentClick: (patent: PatentListItem) => void;
@@ -22,7 +22,6 @@ export default function PatentTable({
   loading,
   favorites,
   onToggleFavorite,
-  sortOrder,
   onSortChange,
   onPatentClick,
   currentPage,
@@ -48,15 +47,14 @@ export default function PatentTable({
   return (
     <div className="overflow-x-auto bg-white border border-gray-200 rounded-xl shadow-sm">
       <table className="w-full">
-        {/* ===== 헤더 ===== */}
         <thead className="bg-gray-50 border-b border-gray-200">
           <tr>
             {[
               "출원번호",
-              "회사명",
-              "특허명",
+              "출원인",
+              "발명명칭",
               "출원일",
-              "IPC 분야",
+              "IPC",
               "상태",
               "관심",
             ].map((header, idx) => (
@@ -70,17 +68,8 @@ export default function PatentTable({
                     <button
                       onClick={onSortChange}
                       className="p-1 rounded hover:bg-gray-200 transition-colors"
-                      title={
-                        sortOrder === "desc" ? "오름차순 정렬" : "내림차순 정렬"
-                      }
                     >
-                      <ArrowUpDown
-                        className={`w-4 h-4 ${
-                          sortOrder === "desc"
-                            ? "text-gray-500"
-                            : "text-gray-400"
-                        }`}
-                      />
+                      <ArrowUpDown className="w-4 h-4 text-gray-500" />
                     </button>
                   </div>
                 ) : (
@@ -91,41 +80,62 @@ export default function PatentTable({
           </tr>
         </thead>
 
-        {/* ===== 본문 ===== */}
         <tbody className="divide-y divide-gray-200">
           {displayPatents.map((patent) => {
             const isFavorite = favorites.includes(patent.applicationNumber);
+
+            // 🔥 상태 (registerStatus)는 A, C, F ... | undefined
+            const statusKey = patent.registerStatus || "";
+            const statusText = statusLabel[statusKey] || "기타";
+
             return (
               <tr
                 key={patent.applicationNumber}
                 onClick={() => onPatentClick(patent)}
                 className="hover:bg-gray-50 cursor-pointer transition-colors"
               >
+                {/* 출원번호 */}
                 <td className="px-6 py-4 text-sm text-gray-900">
                   {patent.applicationNumber}
                 </td>
+
+                {/* 출원인 */}
                 <td className="px-6 py-4 text-sm text-gray-900">
-                  {patent.applicant}
+                  {patent.applicantName || "정보 없음"}
                 </td>
+
+                {/* 발명명칭 */}
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                  {patent.title}
+                  {patent.inventionTitle || "정보 없음"}
                 </td>
+
+                {/* 출원일 */}
                 <td className="px-6 py-4 text-sm text-gray-900">
-                  {formatDate(patent.filingDate)}
+                  {patent.applicationDate
+                    ? formatDate(patent.applicationDate)
+                    : "정보 없음"}
                 </td>
+
+                {/* IPC */}
                 <td className="px-6 py-4 text-sm text-gray-900">
-                  <div>{patent.ipcCodeField}</div>
-                  <div className="text-gray-500 text-xs">{patent.ipcCode}</div>
+                  {patent.mainIpcCode || "-"}
+                  <div className="text-gray-500 text-xs">
+                    {patent.ipcKorName || ""}
+                  </div>
                 </td>
+
+                {/* 상태 */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      patent.status
+                      statusKey
                     )}`}
                   >
-                    {statusLabel[patent.status] || "기타"}
+                    {statusText}
                   </span>
                 </td>
+
+                {/* 관심 버튼 */}
                 <td className="px-6 py-4">
                   <button
                     onClick={(e) => {
@@ -133,7 +143,6 @@ export default function PatentTable({
                       onToggleFavorite(patent.applicationNumber);
                     }}
                     className="p-2 rounded-full hover:bg-gray-100 transition-colors"
-                    title={isFavorite ? "관심특허에서 제거" : "관심특허에 추가"}
                   >
                     {isFavorite ? (
                       <Heart className="w-5 h-5 text-red-500 fill-red-500" />
