@@ -30,8 +30,8 @@ export interface PatentDetail {
   applicationNumber: string;
   inventionTitle: string;
   applicant: string;
-
   applicationDate: string;
+  status?: string;
   openDate?: string;
   openNumber?: string;
   publicationDate?: string;
@@ -44,4 +44,5 @@ export interface PatentDetail {
   registerStatus?: PatentStatus;
   abstract?: string;
   drawingUrl?: string | null;
+  isFavorite?: boolean;
 }
