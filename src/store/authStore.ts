@@ -2,18 +2,23 @@ import { create } from "zustand";
 
 interface AuthState {
   isLoggedIn: boolean;
-  login: () => void;
+  login: (accessToken: string, userEmail: string) => void;
   logout: () => void;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  isLoggedIn: false,
+  isLoggedIn: !!localStorage.getItem("accessToken"),
 
-  login: () => {
+  login: (accessToken: string, email: string) => {
+    localStorage.setItem("accessToken", accessToken);
+    localStorage.setItem("userEmail", email);
     set({ isLoggedIn: true });
   },
 
   logout: () => {
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userEmail");
     set({ isLoggedIn: false });
   },
 }));

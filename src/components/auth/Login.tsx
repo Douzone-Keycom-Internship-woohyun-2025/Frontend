@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { loginApi } from "../../api/auth";
+import axios from "axios";
+import { useAuthStore } from "../../store/authStore";
 
 export default function Login() {
   const navigate = useNavigate();
+  const authStore = useAuthStore();
+
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -16,13 +22,20 @@ export default function Login() {
     setError("");
 
     try {
-      console.log("로그인 시도:", formData);
+      const res = await loginApi(formData.email, formData.password);
+      const { accessToken, refreshToken, user } = res.data;
 
-      localStorage.setItem("isLoggedIn", "true");
-      localStorage.setItem("userEmail", formData.email);
+      localStorage.setItem("refreshToken", refreshToken);
+      authStore.login(accessToken, user.email);
+
+      // 홈으로 이동
       navigate("/");
-    } catch {
-      setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "로그인에 실패했습니다.");
+      } else {
+        setError("알 수 없는 에러가 발생했습니다.");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -70,41 +83,33 @@ export default function Login() {
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
             <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 이메일
               </label>
               <input
-                id="email"
                 name="email"
                 type="email"
-                autoComplete="email"
                 required
                 value={formData.email}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 placeholder="이메일을 입력하세요"
               />
             </div>
 
             <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 비밀번호
               </label>
               <input
-                id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
                 required
                 value={formData.password}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
                 placeholder="비밀번호를 입력하세요"
               />
             </div>
@@ -113,28 +118,28 @@ export default function Login() {
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <div className="flex items-center">
-                <i className="ri-error-warning-line w-4 h-4 flex items-center justify-center text-red-500 mr-2"></i>
+                <i className="ri-error-warning-line text-red-500 mr-2"></i>
                 <span className="text-sm text-red-700">{error}</span>
               </div>
             </div>
           )}
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 cursor-pointer whitespace-nowrap"
-            >
-              {isLoading ? (
-                <div className="flex items-center">
-                  <i className="ri-loader-4-line w-4 h-4 flex items-center justify-center animate-spin mr-2"></i>
-                  로그인 중...
-                </div>
-              ) : (
-                "로그인"
-              )}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={isLoading}
+            className="w-full flex justify-center py-2 px-4 rounded-lg shadow-sm 
+            text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 
+            disabled:opacity-50 transition-colors duration-200"
+          >
+            {isLoading ? (
+              <div className="flex items-center">
+                <i className="ri-loader-4-line animate-spin mr-2"></i>
+                로그인 중...
+              </div>
+            ) : (
+              "로그인"
+            )}
+          </button>
         </form>
       </div>
     </div>
