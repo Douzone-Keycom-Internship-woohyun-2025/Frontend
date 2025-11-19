@@ -1,4 +1,8 @@
-import type { PatentListResponse, PatentStatus } from "../types/patent";
+import type {
+  PatentListResponse,
+  PatentListItem,
+  PatentStatus,
+} from "../types/patent";
 
 const companies = [
   "삼성전자주식회사",
@@ -11,6 +15,7 @@ const companies = [
   "롯데정보통신",
 ];
 
+// IPC 코드 + 분야
 const ipcCodeWithField = [
   { code: "G06F", field: "컴퓨터" },
   { code: "H04L", field: "통신" },
@@ -24,6 +29,7 @@ const ipcCodeWithField = [
   { code: "H04B", field: "음향" },
 ];
 
+// 더미 발명명칭
 const titles = [
   "개선된 SSD 신뢰성",
   "통신 시스템 방법",
@@ -37,49 +43,57 @@ const titles = [
   "엣지 AI 최적화",
 ];
 
-const statuses: PatentStatus[] = [
-  "published",
-  "registered",
-  "examining",
-  "pending",
-  "rejected",
-  "expired",
+// 실제 PatentStatus 값에 맞춘 상태 목록
+const registerStatuses: PatentStatus[] = [
+  "A",
+  "C",
+  "F",
+  "G",
+  "I",
+  "J",
+  "R",
+  "",
 ];
 
 const rand = (n: number) => Math.floor(Math.random() * n);
 const pick = <T>(arr: T[]) => arr[rand(arr.length)];
 const pad2 = (n: number) => String(n).padStart(2, "0");
-const randomDate = (year: number) =>
+
+const randomDate = (year: number): string =>
   `${year}-${pad2(1 + rand(12))}-${pad2(1 + rand(28))}`;
 
+/**
+ * PatentListResponse 더미 데이터를 반환
+ */
 export function generateDummyPatentListResponse(
   count = 200
 ): PatentListResponse {
-  const base = 1020250100000;
-  const patents = Array.from({ length: count }).map((_, i) => {
-    const appNo = base + i + 1;
-    const company = pick(companies);
-    const ipcObj = pick(ipcCodeWithField);
-    const title = pick(titles);
-    const status = pick(statuses);
-    const year = 2024 + rand(2);
+  const patents: PatentListItem[] = Array.from({ length: count }).map(
+    (_, i) => {
+      const applicationNumber = `KR${202400000000 + i}`; // 문자열로 변경
+      const company = pick(companies);
+      const ipcObj = pick(ipcCodeWithField);
+      const inventionTitle = pick(titles);
+      const registerStatus = pick(registerStatuses);
+      const year = 2023 + rand(3);
 
-    return {
-      applicationNumber: appNo,
-      title: `${title} ${i + 1}`,
-      applicant: company,
-      filingDate: randomDate(year),
-      ipcCode: ipcObj.code,
-      ipcCodeField: ipcObj.field,
-      status,
-      isFavorite: Math.random() < 0.2,
-    };
-  });
+      return {
+        applicationNumber,
+        inventionTitle: `${inventionTitle} ${i + 1}`,
+        applicantName: company,
+        applicationDate: randomDate(year),
+        mainIpcCode: ipcObj.code,
+        ipcKorName: ipcObj.field,
+        registerStatus,
+        isFavorite: Math.random() < 0.2,
+      };
+    }
+  );
 
   return {
     total: count,
     page: 1,
-    totalPages: Math.max(1, Math.ceil(count / 20)),
+    totalPages: Math.ceil(count / 20),
     patents,
   };
 }

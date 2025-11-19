@@ -10,9 +10,9 @@ export interface Patent {
 
 export interface PatentListItem {
   applicationNumber: string;
-  inventionTitle: string;
-  applicant: string;
-  applicationDate: string;
+  inventionTitle?: string;
+  applicantName?: string;
+  applicationDate?: string;
   mainIpcCode?: string;
   ipcKorName?: string;
   registerStatus?: PatentStatus;
@@ -28,21 +28,20 @@ export interface PatentListResponse {
 
 export interface PatentDetail {
   applicationNumber: string;
-  inventionTitle: string;
-  applicant: string;
-  applicationDate: string;
-  status?: string;
+  inventionTitle?: string;
+  applicantName?: string;
+  applicationDate?: string;
   openDate?: string;
   openNumber?: string;
-  publicationDate?: string;
-  publicationNumber?: string;
-  registerDate?: string;
-  registerNumber?: string;
+  publicationDate?: string | null;
+  publicationNumber?: string | null;
+  registerDate?: string | null;
+  registerNumber?: string | null;
+  registerStatus?: PatentStatus;
   mainIpcCode?: string;
   ipcKorName?: string;
   ipcNumber?: string;
-  registerStatus?: PatentStatus;
-  abstract?: string;
-  drawingUrl?: string | null;
-  isFavorite?: boolean;
+  astrtCont?: string;
+  drawing?: string;
+  isFavorite: boolean;
 }

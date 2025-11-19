@@ -21,6 +21,8 @@ export default function AdvancedSearch({
   const [companyName, setCompanyName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+
+  // 백엔드 규격 : "A" | "C" | "F" | "G" | "I" | "J" | "R" | ""
   const [status, setStatus] = useState<PatentStatus | "">("");
 
   const handleSearch = () => {
@@ -36,7 +38,7 @@ export default function AdvancedSearch({
     if (companyName.trim()) params.companyName = companyName.trim();
     if (startDate) params.startDate = startDate;
     if (endDate) params.endDate = endDate;
-    if (status) params.status = status as PatentStatus;
+    if (status) params.status = status;
 
     onSearch(params);
   };
@@ -55,6 +57,7 @@ export default function AdvancedSearch({
       <h3 className="text-lg font-semibold text-gray-900 mb-6">상세 검색</h3>
 
       <div className="space-y-4">
+        {/* 특허명 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             특허명 <span className="text-gray-400">(선택)</span>
@@ -68,19 +71,21 @@ export default function AdvancedSearch({
           />
         </div>
 
+        {/* 회사명 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            회사명 <span className="text-gray-400">(선택)</span>
+            출원인 <span className="text-gray-400">(선택)</span>
           </label>
           <input
             type="text"
-            placeholder="예: 삼성, LG, 네이버"
+            placeholder="예: 삼성전자, LG전자"
             value={companyName}
             onChange={(e) => setCompanyName(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
+        {/* 날짜 */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -107,6 +112,7 @@ export default function AdvancedSearch({
           </div>
         </div>
 
+        {/* 상태 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             상태 <span className="text-gray-400">(선택)</span>
@@ -117,17 +123,18 @@ export default function AdvancedSearch({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option value="">전체</option>
-            <option value="pending">{statusLabel.pending}</option>
-            <option value="examining">{statusLabel.examining}</option>
-            <option value="published">{statusLabel.published}</option>
-            <option value="registered">{statusLabel.registered}</option>
-            <option value="rejected">{statusLabel.rejected}</option>
-            <option value="abandoned">{statusLabel.abandoned}</option>
-            <option value="expired">{statusLabel.expired}</option>
+            <option value="A">{statusLabel["A"]}</option>
+            <option value="C">{statusLabel["C"]}</option>
+            <option value="F">{statusLabel["F"]}</option>
+            <option value="G">{statusLabel["G"]}</option>
+            <option value="I">{statusLabel["I"]}</option>
+            <option value="J">{statusLabel["J"]}</option>
+            <option value="R">{statusLabel["R"]}</option>
           </select>
         </div>
       </div>
 
+      {/* 버튼 */}
       <div className="flex gap-3 mt-8">
         <button
           onClick={handleSearch}
