@@ -8,9 +8,12 @@ import ErrorState from "../components/common/ErrorState";
 import NoData from "../components/common/NoData";
 import { usePresets } from "../hooks/usePresets";
 import type { SearchPreset } from "../types/preset";
+import { useToast } from "@/hooks/use-toast";
 
 export default function PresetManagementPage() {
   const navigate = useNavigate();
+  const { toast } = useToast(); // <-- ⭐ 반드시 있어야 함!
+
   const {
     presets,
     isLoading,
@@ -33,7 +36,11 @@ export default function PresetManagementPage() {
 
   const handleSavePreset = async () => {
     if (!formData.name.trim() || !formData.applicant.trim()) {
-      alert("프리셋명과 회사명은 필수입니다.");
+      toast({
+        title: "필수 입력 누락",
+        description: "프리셋명과 회사명은 필수입니다.",
+        variant: "destructive",
+      });
       return;
     }
 
@@ -47,20 +54,40 @@ export default function PresetManagementPage() {
       createdAt: editingPreset?.createdAt || new Date().toISOString(),
     };
 
-    await addOrUpdatePreset(preset);
-    handleCloseModal();
+    try {
+      await addOrUpdatePreset(preset);
+
+      toast({
+        title: editingPreset ? "수정 완료" : "생성 완료",
+        description: editingPreset
+          ? "프리셋이 성공적으로 수정되었습니다."
+          : "새 프리셋이 생성되었습니다.",
+      });
+
+      handleCloseModal();
+    } catch {
+      toast({
+        title: "저장 실패",
+        description: "프리셋 저장 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUsePreset = (preset: SearchPreset) => {
-    navigate("/summary", {
-      state: {
-        preset: {
-          applicant: preset.applicant,
-          startDate: preset.startDate,
-          endDate: preset.endDate,
-        },
-      },
-    });
+  const handleDeletePreset = async (id: string) => {
+    try {
+      await deletePreset(id);
+      toast({
+        title: "삭제 완료",
+        description: "프리셋이 성공적으로 삭제되었습니다.",
+      });
+    } catch {
+      toast({
+        title: "삭제 실패",
+        description: "프리셋 삭제 중 오류가 발생했습니다.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleOpenModal = async (preset?: SearchPreset) => {
@@ -131,6 +158,7 @@ export default function PresetManagementPage() {
   return (
     <ProtectedLayout>
       <div className="w-full bg-gray-50">
+        {/* header */}
         <header className="bg-white shadow-sm border-b">
           <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
@@ -151,6 +179,7 @@ export default function PresetManagementPage() {
           </div>
         </header>
 
+        {/* main */}
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {presets.length === 0 ? (
             <NoData
@@ -164,8 +193,18 @@ export default function PresetManagementPage() {
                   key={preset.id}
                   preset={preset}
                   onEdit={handleOpenModal}
-                  onDelete={deletePreset}
-                  onUse={handleUsePreset}
+                  onDelete={handleDeletePreset}
+                  onUse={() =>
+                    navigate("/summary", {
+                      state: {
+                        preset: {
+                          applicant: preset.applicant,
+                          startDate: preset.startDate,
+                          endDate: preset.endDate,
+                        },
+                      },
+                    })
+                  }
                 />
               ))}
             </div>
