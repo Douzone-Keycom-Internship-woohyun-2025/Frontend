@@ -11,11 +11,18 @@ import type { SearchPreset } from "../types/preset";
 
 export default function PresetManagementPage() {
   const navigate = useNavigate();
-  const { presets, isLoading, error, addOrUpdatePreset, deletePreset } =
-    usePresets();
+  const {
+    presets,
+    isLoading,
+    error,
+    addOrUpdatePreset,
+    deletePreset,
+    loadPresetDetail,
+  } = usePresets();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPreset, setEditingPreset] = useState<SearchPreset | null>(null);
+
   const [formData, setFormData] = useState({
     name: "",
     applicant: "",
@@ -24,23 +31,23 @@ export default function PresetManagementPage() {
     description: "",
   });
 
-  const handleSavePreset = () => {
+  const handleSavePreset = async () => {
     if (!formData.name.trim() || !formData.applicant.trim()) {
       alert("프리셋명과 회사명은 필수입니다.");
       return;
     }
 
     const preset: SearchPreset = {
-      id: editingPreset?.id || Date.now().toString(),
+      id: editingPreset?.id || "temp_" + Date.now().toString(),
       name: formData.name,
       applicant: formData.applicant,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
+      startDate: formData.startDate.replaceAll("-", ""),
+      endDate: formData.endDate.replaceAll("-", ""),
       description: formData.description,
       createdAt: editingPreset?.createdAt || new Date().toISOString(),
     };
 
-    addOrUpdatePreset(preset);
+    await addOrUpdatePreset(preset);
     handleCloseModal();
   };
 
@@ -56,15 +63,35 @@ export default function PresetManagementPage() {
     });
   };
 
-  const handleOpenModal = (preset?: SearchPreset) => {
+  const handleOpenModal = async (preset?: SearchPreset) => {
     if (preset) {
-      setEditingPreset(preset);
+      const fullPreset = await loadPresetDetail(preset.id);
+      const target = fullPreset ?? preset;
+
+      setEditingPreset(target);
+
+      const fmtStart =
+        target.startDate.length === 8
+          ? `${target.startDate.slice(0, 4)}-${target.startDate.slice(
+              4,
+              6
+            )}-${target.startDate.slice(6, 8)}`
+          : target.startDate;
+
+      const fmtEnd =
+        target.endDate.length === 8
+          ? `${target.endDate.slice(0, 4)}-${target.endDate.slice(
+              4,
+              6
+            )}-${target.endDate.slice(6, 8)}`
+          : target.endDate;
+
       setFormData({
-        name: preset.name,
-        applicant: preset.applicant,
-        startDate: preset.startDate,
-        endDate: preset.endDate,
-        description: preset.description || "",
+        name: target.name,
+        applicant: target.applicant,
+        startDate: fmtStart,
+        endDate: fmtEnd,
+        description: target.description || "",
       });
     } else {
       setEditingPreset(null);
@@ -76,6 +103,7 @@ export default function PresetManagementPage() {
         description: "",
       });
     }
+
     setIsModalOpen(true);
   };
 
@@ -84,7 +112,6 @@ export default function PresetManagementPage() {
     setEditingPreset(null);
   };
 
-  // 로딩 상태
   if (isLoading) {
     return (
       <ProtectedLayout>
@@ -93,7 +120,6 @@ export default function PresetManagementPage() {
     );
   }
 
-  // 에러 상태
   if (error) {
     return (
       <ProtectedLayout>
@@ -115,25 +141,16 @@ export default function PresetManagementPage() {
                 자주 사용하는 검색 조건을 프리셋으로 저장하고 관리하세요.
               </p>
             </div>
+
             <button
               onClick={() => handleOpenModal()}
-              className="
-                w-full md:w-auto
-                inline-flex items-center justify-center
-                px-4 py-2
-                bg-blue-600 text-white
-                text-sm font-medium
-                rounded-lg
-                hover:bg-blue-700
-                transition-colors duration-200
-              "
+              className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
             >
               <i className="ri-add-line mr-2" />새 프리셋
             </button>
           </div>
         </header>
 
-        {/* 메인 */}
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {presets.length === 0 ? (
             <NoData
@@ -155,7 +172,6 @@ export default function PresetManagementPage() {
           )}
         </main>
 
-        {/* 모달 */}
         <PresetModal
           isOpen={isModalOpen}
           onClose={handleCloseModal}
