@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtecteedRoute/ProtectedRoute";
 import HomePage from "./pages/HomePage";
@@ -7,12 +7,14 @@ import PatentSearchPage from "./pages/PatentSearchPage";
 import SummaryPage from "./pages/SummaryPage";
 import FavoritesPage from "./pages/FavoritesPage";
 import PresetManagementPage from "./pages/PresetManagementPage";
+import SignupPage from "./pages/SignupPage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/signup" element={<SignupPage />} />
         <Route
           path="/"
           element={
@@ -61,8 +63,6 @@ function App() {
             </ProtectedRoute>
           }
         />
-
-        <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );

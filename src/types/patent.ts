@@ -1,11 +1,4 @@
-export type PatentStatus =
-  | "pending"
-  | "examining"
-  | "published"
-  | "registered"
-  | "rejected"
-  | "abandoned"
-  | "expired";
+export type PatentStatus = "A" | "C" | "F" | "G" | "I" | "J" | "R" | "";
 
 export interface Patent {
   id: string;
@@ -16,13 +9,13 @@ export interface Patent {
 }
 
 export interface PatentListItem {
-  applicationNumber: number;
-  title: string;
+  applicationNumber: string;
+  inventionTitle: string;
   applicant: string;
-  filingDate: string;
-  ipcCode: string;
-  ipcCodeField: string; // ← DB에서 이미 매핑된 분야명 (예: "컴퓨터")
-  status: PatentStatus;
+  applicationDate: string;
+  mainIpcCode?: string;
+  ipcKorName?: string;
+  registerStatus?: PatentStatus;
   isFavorite: boolean;
 }
 
@@ -34,22 +27,21 @@ export interface PatentListResponse {
 }
 
 export interface PatentDetail {
-  applicationNumber: number;
-  title: string;
+  applicationNumber: string;
+  inventionTitle: string;
   applicant: string;
-  filingDate: string;
+
+  applicationDate: string;
   openDate?: string;
-  openNumber?: number;
-  publicationDate?: string | null;
-  publicationNumber?: number | null;
-  registerDate?: string | null;
-  registerNumber?: number | null;
-  ipcMain: string; // "G06F"
-  ipcMainField: string; // "컴퓨터" (← DB에서 이미 매핑)
-  ipcAll: string[]; // ["G06F", "H04L"]
-  ipcAllFields: string[]; // ["컴퓨터", "통신"] (← DB에서 이미 매핑)
-  status: PatentStatus;
-  abstract: string;
-  bigDrawing?: string | null;
-  drawing?: string | null;
+  openNumber?: string;
+  publicationDate?: string;
+  publicationNumber?: string;
+  registerDate?: string;
+  registerNumber?: string;
+  mainIpcCode?: string;
+  ipcKorName?: string;
+  ipcNumber?: string;
+  registerStatus?: PatentStatus;
+  abstract?: string;
+  drawingUrl?: string | null;
 }
