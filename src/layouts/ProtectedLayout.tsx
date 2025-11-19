@@ -18,11 +18,13 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     navigate("/login");
   };
 
+  const userEmail = localStorage.getItem("userEmail") ?? "";
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* 공통 사이드바 */}
       <Sidebar
-        userEmail="test@example.com" // TODO: 실제 유저 이메일
+        userEmail={userEmail}
         onLogout={handleLogout}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
@@ -35,8 +37,8 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
       <main
         className="
           h-screen overflow-auto
-          pt-14 md:pt-0      /* 모바일: 헤더만큼 아래로 */
-          md:ml-64           /* 데스크탑: 사이드바 폭만큼 오른쪽으로 */
+          pt-14 md:pt-0
+          md:ml-64
         "
       >
         {children}
