@@ -1,4 +1,15 @@
 import type { SearchPreset } from "../../types/preset";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 interface PresetCardProps {
   preset: SearchPreset;
@@ -22,7 +33,9 @@ export default function PresetCard({
             <p className="text-sm text-gray-600">{preset.description}</p>
           )}
         </div>
+
         <div className="flex space-x-2">
+          {/* 편집 버튼 */}
           <button
             onClick={() => onEdit(preset)}
             className="text-gray-400 hover:text-gray-600"
@@ -30,13 +43,36 @@ export default function PresetCard({
           >
             <i className="ri-edit-line"></i>
           </button>
-          <button
-            onClick={() => onDelete(preset.id)}
-            className="text-gray-400 hover:text-red-600"
-            title="삭제"
-          >
-            <i className="ri-delete-bin-line"></i>
-          </button>
+
+          {/* 삭제 버튼 → 모달 */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="text-gray-400 hover:text-red-600" title="삭제">
+                <i className="ri-delete-bin-line"></i>
+              </button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>정말 삭제하시겠습니까?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  삭제된 프리셋은 복구할 수 없습니다.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel>취소</AlertDialogCancel>
+
+                {/* 실제 삭제 실행 */}
+                <AlertDialogAction
+                  onClick={() => onDelete(preset.id)}
+                  className="bg-red-600 text-white hover:bg-red-700"
+                >
+                  삭제
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
