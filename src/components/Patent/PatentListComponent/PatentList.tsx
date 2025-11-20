@@ -5,6 +5,7 @@ import Pagination from "./Pagination";
 import PatentDetailModal from "../PatentDetail/PatentDetailModal";
 import LoadingSpinner from "../../common/LoadingSpinner";
 import EmptyState from "../../common/EmptyState";
+import { getStatusColor } from "../../../utils/statusColor";
 
 interface PatentListProps {
   patents: PatentListItem[];
@@ -15,6 +16,7 @@ interface PatentListProps {
   onSortChange: (order: "asc" | "desc") => void;
   currentPage: number;
   totalPages: number;
+  totalCount: number;
   onPageChange: (page: number) => void;
 }
 
@@ -27,14 +29,13 @@ export default function PatentList({
   onSortChange,
   currentPage,
   totalPages,
+  totalCount,
   onPageChange,
 }: PatentListProps) {
   const [selectedPatentDetail, setSelectedPatentDetail] =
     useState<PatentDetail | null>(null);
 
-  // 특허 클릭 → 상세정보 백엔드에서 받아온 값 전달하도록 변경해야 함 (해당 부분은 추후 API 연결)
   const handlePatentClick = (patent: PatentListItem) => {
-    // ✔ 현재는 PatentDetailModal 구조에 맞게 변환
     const detail: PatentDetail = {
       applicationNumber: patent.applicationNumber,
       inventionTitle: patent.inventionTitle,
@@ -55,9 +56,6 @@ export default function PatentList({
   };
 
   const itemsPerPage = 20;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = Math.min(startIndex + itemsPerPage, patents.length);
-  const paginatedPatents = patents.slice(startIndex, endIndex);
 
   return (
     <>
@@ -67,11 +65,10 @@ export default function PatentList({
             검색 결과
           </h3>
           <span className="text-xs sm:text-sm text-gray-500">
-            총 {patents.length}건
+            총 {totalCount}건
           </span>
         </div>
 
-        {/* 데스크탑 테이블 */}
         <div className="hidden md:block">
           <PatentTable
             patents={patents}
@@ -85,7 +82,6 @@ export default function PatentList({
           />
         </div>
 
-        {/* 모바일 카드 리스트 */}
         <div className="md:hidden px-4 py-3">
           {loading ? (
             <LoadingSpinner message="검색 중입니다..." size="md" />
@@ -97,7 +93,6 @@ export default function PatentList({
             />
           ) : (
             <>
-              {/* 정렬 */}
               <div className="flex justify-end mb-3">
                 <button
                   onClick={handleSortToggle}
@@ -109,7 +104,7 @@ export default function PatentList({
               </div>
 
               <div className="space-y-3">
-                {paginatedPatents.map((patent) => {
+                {patents.map((patent) => {
                   const isFavorite = favorites.includes(
                     patent.applicationNumber
                   );
@@ -120,7 +115,6 @@ export default function PatentList({
                       onClick={() => handlePatentClick(patent)}
                       className="border border-gray-200 rounded-lg p-3 bg-white shadow-xs flex flex-col gap-1.5 hover:bg-gray-50 transition-colors cursor-pointer"
                     >
-                      {/* 상단 */}
                       <div className="flex items-center justify-between">
                         <div className="text-[10px] text-gray-500 truncate">
                           {patent.applicationNumber}
@@ -141,22 +135,18 @@ export default function PatentList({
                         </button>
                       </div>
 
-                      {/* 제목 */}
                       <div className="text-xs font-semibold text-gray-900 line-clamp-2">
                         {patent.inventionTitle}
                       </div>
 
-                      {/* 출원인 */}
                       <div className="text-[10px] text-gray-600">
                         {patent.applicantName}
                       </div>
 
-                      {/* IPC */}
                       <div className="text-[10px] text-gray-500">
                         {patent.ipcKorName} | {patent.mainIpcCode}
                       </div>
 
-                      {/* 날짜 + 상태 */}
                       <div className="mt-1 flex items-center justify-between">
                         <div className="text-[10px] text-gray-500">
                           출원일: {patent.applicationDate || "정보 없음"}
@@ -165,13 +155,7 @@ export default function PatentList({
                         <span
                           className={`
                             px-2 py-0.5 rounded-full text-[9px] font-medium
-                            ${
-                              patent.registerStatus === "R"
-                                ? "bg-green-50 text-green-600 border border-green-100"
-                                : patent.registerStatus === "A"
-                                  ? "bg-blue-50 text-blue-600 border border-blue-100"
-                                  : "bg-gray-50 text-gray-600 border border-gray-100"
-                            }
+                            ${getStatusColor(patent.registerStatus || "")}
                           `}
                         >
                           {patent.registerStatus || "상태없음"}
@@ -186,8 +170,8 @@ export default function PatentList({
                 <Pagination
                   currentPage={currentPage}
                   totalPages={totalPages}
+                  totalCount={totalCount}
                   onPageChange={onPageChange}
-                  totalCount={patents.length}
                   itemsPerPage={itemsPerPage}
                 />
               </div>
@@ -195,13 +179,12 @@ export default function PatentList({
           )}
         </div>
 
-        {/* 데스크탑 Pagination */}
         <div className="hidden md:block">
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}
+            totalCount={totalCount}
             onPageChange={onPageChange}
-            totalCount={patents.length}
             itemsPerPage={itemsPerPage}
           />
         </div>
