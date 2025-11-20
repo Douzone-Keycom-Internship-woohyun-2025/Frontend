@@ -136,8 +136,6 @@ export default function PatentSearchPage() {
 
   return (
     <ProtectedLayout>
-      {isLoading && <LoadingSpinner message="검색 중입니다..." size="md" />}
-
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white shadow-sm border-b">
           <div className="px-8 py-6 flex justify-between items-center">
@@ -147,8 +145,8 @@ export default function PatentSearchPage() {
         </header>
 
         <main className="px-8 py-8">
-          <div className="mb-8 bg-white rounded-lg shadow-sm border p-4">
-            <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
+          <section className="bg-white rounded-lg shadow p-8 mb-10">
+            <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit mb-6">
               {[
                 { key: "basic", label: "기본 검색", icon: "ri-search-line" },
                 {
@@ -159,10 +157,7 @@ export default function PatentSearchPage() {
               ].map(({ key, label, icon }) => (
                 <button
                   key={key}
-                  onClick={() => {
-                    setActiveTab(key as "basic" | "advanced");
-                    handleResetFilters();
-                  }}
+                  onClick={() => setActiveTab(key as "basic" | "advanced")}
                   className={`px-6 py-3 rounded-md text-sm font-medium ${
                     activeTab === key
                       ? "bg-white text-blue-600 shadow-sm"
@@ -174,26 +169,30 @@ export default function PatentSearchPage() {
                 </button>
               ))}
             </nav>
-          </div>
 
-          <section className="bg-white rounded-lg shadow p-8 mb-10">
-            {activeTab === "basic" ? (
+            <div className={activeTab === "basic" ? "block" : "hidden"}>
               <BasicSearch
                 onSearch={handleBasicSearch}
                 initialValues={filters}
                 selectedPresetId={selectedPresetId}
                 onPresetChange={setSelectedPresetId}
               />
-            ) : (
+            </div>
+
+            <div className={activeTab === "advanced" ? "block" : "hidden"}>
               <AdvancedSearch
                 onSearch={handleAdvancedSearch}
                 onReset={handleResetFilters}
               />
-            )}
+            </div>
           </section>
 
           <section>
-            {results.length === 0 && !isLoading ? (
+            {isLoading ? (
+              <div className="bg-white rounded-lg shadow p-12">
+                <LoadingSpinner message="검색 중입니다..." size="md" />
+              </div>
+            ) : results.length === 0 ? (
               <NoData
                 message="검색 결과가 없습니다."
                 subMessage="다른 조건으로 검색해보세요."

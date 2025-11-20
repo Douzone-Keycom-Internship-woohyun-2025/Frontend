@@ -48,20 +48,22 @@ export interface PatentListResponse {
 
 export interface PatentDetail {
   applicationNumber: string;
-  inventionTitle?: string;
-  applicantName?: string;
-  applicationDate?: string;
-  openDate?: string;
-  openNumber?: string;
-  publicationDate?: string | null;
-  publicationNumber?: string | null;
-  registerDate?: string | null;
-  registerNumber?: string | null;
-  registerStatus?: PatentStatus | "";
-  mainIpcCode?: string;
-  ipcKorName?: string;
-  ipcNumber?: string;
-  astrtCont?: string;
-  drawing?: string;
+  inventionTitle: string;
+  applicantName: string;
+  applicationDate: string;
+  openDate: string;
+  publicationDate: string;
+  registerDate: string;
+  openNumber: string;
+  publicationNumber: string;
+  registerNumber: string;
+  registerStatus: PatentStatus | "";
+  mainIpcCode: string;
+  ipcKorName: string;
+  ipcNumber: string;
+  astrtCont: string;
+  drawing: string;
+  bigDrawing: string;
+  indexNo: string;
   isFavorite: boolean;
 }

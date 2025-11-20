@@ -61,10 +61,6 @@ export default function AdvancedSearch({
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
-        상세 검색
-      </h3>
-
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
