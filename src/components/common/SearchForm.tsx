@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { usePresets } from "../../hooks/usePresets";
+import { toInputDateFormat, toApiDateFormat } from "../../utils/dateTransform";
 
 interface SearchFormParams {
   applicant: string;
@@ -23,7 +24,6 @@ export default function SearchForm({
   title = "검색",
   loading = false,
   initialValues,
-
   selectedPresetId,
   onPresetChange,
 }: SearchFormProps) {
@@ -39,8 +39,8 @@ export default function SearchForm({
     if (initialValues) {
       setFormData({
         applicant: initialValues.applicant ?? "",
-        startDate: initialValues.startDate ?? "",
-        endDate: initialValues.endDate ?? "",
+        startDate: toInputDateFormat(initialValues.startDate ?? ""),
+        endDate: toInputDateFormat(initialValues.endDate ?? ""),
       });
     }
   }, [initialValues]);
@@ -56,13 +56,10 @@ export default function SearchForm({
     const preset = presets.find((p) => p.id === presetId);
     if (!preset) return;
 
-    const format = (v: string) =>
-      v.length === 8 ? `${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}` : v;
-
     setFormData({
       applicant: preset.applicant,
-      startDate: format(preset.startDate),
-      endDate: format(preset.endDate),
+      startDate: toInputDateFormat(preset.startDate),
+      endDate: toInputDateFormat(preset.endDate),
     });
   };
 
@@ -73,16 +70,12 @@ export default function SearchForm({
       if (selectedPresetId) {
         const preset = presets.find((p) => p.id === selectedPresetId);
         if (preset) {
-          const format = (v: string) =>
-            v.length === 8
-              ? `${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}`
-              : v;
-          const presetDataMatches =
+          const matches =
             preset.applicant === newData.applicant &&
-            format(preset.startDate) === newData.startDate &&
-            format(preset.endDate) === newData.endDate;
+            toInputDateFormat(preset.startDate) === newData.startDate &&
+            toInputDateFormat(preset.endDate) === newData.endDate;
 
-          if (!presetDataMatches) {
+          if (!matches) {
             onPresetChange("");
           }
         }
@@ -94,15 +87,16 @@ export default function SearchForm({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
     if (!formData.applicant.trim()) {
       alert("회사명을 입력하세요!");
       return;
     }
 
     onSearch({
-      applicant: formData.applicant,
-      startDate: formData.startDate.replace(/-/g, ""),
-      endDate: formData.endDate.replace(/-/g, ""),
+      applicant: formData.applicant.trim(),
+      startDate: toApiDateFormat(formData.startDate),
+      endDate: toApiDateFormat(formData.endDate),
     });
   };
 

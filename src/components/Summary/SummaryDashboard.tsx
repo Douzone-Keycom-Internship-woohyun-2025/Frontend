@@ -1,6 +1,5 @@
 import type { SummaryData } from "../../types/summary";
 import { useNavigate } from "react-router-dom";
-import { statusLabel } from "../../utils/statusLabel";
 import RecentPatentCard from "./RecentPatentCard";
 import NoData from "../common/NoData";
 
@@ -57,24 +56,6 @@ export default function SummaryDashboard({
     });
   };
 
-  const getIpcTechName = (ipcCode: string): string => {
-    const ipcTechMap: Record<string, string> = {
-      "G06F 3": "입력 장치",
-      "H04L 29": "네트워크 프로토콜",
-      "G06Q 50": "비즈니스 시스템",
-      "H04W 4": "무선 통신",
-      "G06F 21": "보안 시스템",
-      "G06N 3": "인공지능",
-      "H04N 21": "멀티미디어",
-      "G06F 9": "프로그램 제어",
-      A61M: "치료 기기",
-      "G06F 15": "디지털 컴퓨터",
-      H04M: "전화 통신",
-      "G06F 17": "디지털 컴퓨팅",
-    };
-    return ipcTechMap[ipcCode] || "기타 기술";
-  };
-
   // 데이터 정제
   const totalPatents = data?.statistics?.totalPatents || 0;
   const ipcData = data?.ipcDistribution || [];
@@ -85,13 +66,12 @@ export default function SummaryDashboard({
   const topIpcCodes = [...ipcData]
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
+
   const recentMonths = monthlyData.slice(-6);
 
   // IPC 파이 차트
   const ipcChartData = {
-    labels: topIpcCodes.map(
-      (item) => `${item.ipcCode} (${getIpcTechName(item.ipcCode)})`
-    ),
+    labels: topIpcCodes.map((item) => item.ipcCode),
     datasets: [
       {
         data: topIpcCodes.map((item) => item.count),
@@ -107,7 +87,7 @@ export default function SummaryDashboard({
     ],
   };
 
-  // 월별 막대 차트 색상
+  // 월별 색상
   const monthColors = [
     "#3B82F6",
     "#10B981",
@@ -138,11 +118,9 @@ export default function SummaryDashboard({
     ],
   };
 
-  // 등록 상태 도넛
+  // 🔥 등록 상태 도넛 (statusLabel 없이 한글 그대로)
   const statusChartData = {
-    labels: statusData.map(
-      (s) => statusLabel[s.status as keyof typeof statusLabel] || s.status
-    ),
+    labels: statusData.map((s) => s.status || "정보 없음"),
     datasets: [
       {
         data: statusData.map((s) => s.count),
@@ -160,7 +138,7 @@ export default function SummaryDashboard({
     ],
   };
 
-  // 상단 통계 카드 (Tailwind-safe)
+  // 상단 통계 카드
   const statCards = [
     {
       label: "총 특허 건수",
@@ -221,8 +199,9 @@ export default function SummaryDashboard({
           상위 5개 IPC 코드별 기술분야 분포
         </h3>
         <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
-          특허 출원 상위 5개 IPC 코드를 기준으로 기술 분야 비율을 표시합니다.
+          특허 출원 상위 IPC 코드를 기준으로 비율을 표시합니다.
         </p>
+
         {renderSection(
           ipcData.length > 0 && totalPatents > 0,
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
@@ -236,6 +215,7 @@ export default function SummaryDashboard({
                 }}
               />
             </div>
+
             <div className="flex flex-col justify-center space-y-2.5 sm:space-y-3">
               {topIpcCodes.map((item, index) => (
                 <div
@@ -269,13 +249,14 @@ export default function SummaryDashboard({
         )}
       </div>
 
-      {/* 월별 동향 & 등록 상태 분포 */}
+      {/* 월별 동향 & 상태 분포 */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        {/* 월별 특허 출원 동향 */}
+        {/* 월별 동향 */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
             월별 특허 출원 동향
           </h3>
+
           {renderSection(
             monthlyData.length > 0,
             <div className="h-56 sm:h-72 relative">
@@ -289,14 +270,10 @@ export default function SummaryDashboard({
                   interaction: { mode: "nearest", intersect: false },
                   responsive: true,
                   maintainAspectRatio: false,
-                  hover: { mode: undefined },
                   scales: {
                     x: {
                       grid: { display: false },
-                      ticks: {
-                        color: "#4B5563",
-                        font: { size: 10 },
-                      },
+                      ticks: { color: "#4B5563", font: { size: 10 } },
                     },
                     y: {
                       beginAtZero: true,
@@ -314,11 +291,12 @@ export default function SummaryDashboard({
           )}
         </div>
 
-        {/* 등록 상태별 분포 */}
+        {/* 상태 분포 */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
             등록 상태별 분포
           </h3>
+
           {renderSection(
             statusData.length > 0,
             <div className="h-56 sm:h-72 relative flex items-center justify-center">
@@ -331,7 +309,8 @@ export default function SummaryDashboard({
                   maintainAspectRatio: false,
                 }}
               />
-              {/* 중앙 텍스트: 항상 정확히 가운데 */}
+
+              {/* 중앙 퍼센트 */}
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-[10px] sm:text-xs text-gray-500 leading-none">
                   등록률
@@ -346,7 +325,7 @@ export default function SummaryDashboard({
         </div>
       </div>
 
-      {/* 최근 주요 특허 */}
+      {/* 최근 특허 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 sm:mb-6">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">
@@ -354,19 +333,12 @@ export default function SummaryDashboard({
           </h3>
           <button
             onClick={handleViewPatents}
-            className="
-              px-3 sm:px-4 py-2
-              bg-blue-600 text-white
-              text-xs sm:text-sm font-medium
-              rounded-lg
-              hover:bg-blue-700
-              transition-colors duration-200
-              self-stretch sm:self-auto
-            "
+            className="px-3 sm:px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
           >
             검색된 특허 보기
           </button>
         </div>
+
         {renderSection(
           data.recentPatents.length > 0,
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">

@@ -1,7 +1,6 @@
 import type { PatentDetail } from "../../../types/patent";
 import { getStatusColor } from "../../../utils/statusColor";
 import { formatDate } from "../../../utils/dateFormat";
-import { statusLabel } from "../../../utils/statusLabel";
 
 interface PatentDetailModalProps {
   patent: PatentDetail;
@@ -20,8 +19,7 @@ export default function PatentDetailModal({
     if (e.target === e.currentTarget) onClose();
   };
 
-  const displayStatus =
-    statusLabel[patent.registerStatus ?? ""] ?? patent.registerStatus;
+  const displayStatus = patent.registerStatus || "정보 없음";
 
   return (
     <div
@@ -29,7 +27,6 @@ export default function PatentDetailModal({
       onClick={handleBackdropClick}
     >
       <div className="bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-gray-200">
-        {/* HEADER */}
         <div className="sticky top-0 flex justify-between items-center px-6 py-4 border-b bg-white">
           <div className="flex items-center space-x-3">
             <i className="ri-file-text-line text-xl text-blue-600"></i>
@@ -54,9 +51,7 @@ export default function PatentDetailModal({
           </button>
         </div>
 
-        {/* BODY */}
         <div className="p-8 space-y-10">
-          {/* TITLE */}
           <section>
             <h3 className="text-2xl font-bold text-gray-900 mb-3 leading-snug">
               {patent.inventionTitle}
@@ -77,11 +72,8 @@ export default function PatentDetailModal({
             </div>
           </section>
 
-          {/* BASIC INFO */}
           <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* LEFT */}
             <div className="space-y-6">
-              {/* Applicant */}
               <div className="bg-gray-50 p-5 rounded-lg border">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
                   <i className="ri-building-line mr-2"></i>출원인
@@ -92,7 +84,6 @@ export default function PatentDetailModal({
                 </p>
               </div>
 
-              {/* Main IPC */}
               <div className="bg-gray-50 p-5 rounded-lg border">
                 <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
                   <i className="ri-code-line mr-2"></i>주요 IPC
@@ -109,7 +100,6 @@ export default function PatentDetailModal({
               </div>
             </div>
 
-            {/* RIGHT DATE SECTION */}
             <div className="space-y-5">
               {[
                 {
@@ -152,7 +142,6 @@ export default function PatentDetailModal({
             </div>
           </section>
 
-          {/* ABSTRACT */}
           {patent.astrtCont && (
             <section>
               <label className="flex items-center text-lg font-bold text-gray-900 mb-3">
@@ -168,7 +157,6 @@ export default function PatentDetailModal({
             </section>
           )}
 
-          {/* DRAWINGS */}
           {patent.drawing && (
             <section>
               <label className="flex items-center text-lg font-bold text-gray-900 mb-3">
@@ -190,7 +178,6 @@ export default function PatentDetailModal({
             </section>
           )}
 
-          {/* CLOSE BUTTON */}
           <div className="flex justify-end pt-4 border-t">
             <button
               onClick={onClose}
