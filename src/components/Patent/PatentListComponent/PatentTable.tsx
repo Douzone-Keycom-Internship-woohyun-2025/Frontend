@@ -1,5 +1,4 @@
 import { getStatusColor } from "../../../utils/statusColor";
-import { statusLabel } from "../../../utils/statusLabel";
 import { formatDate } from "../../../utils/dateFormat";
 import type { PatentListItem } from "../../../types/patent";
 import LoadingSpinner from "../../common/LoadingSpinner";
@@ -24,7 +23,6 @@ export default function PatentTable({
   onToggleFavorite,
   onSortChange,
   onPatentClick,
-  currentPage,
 }: PatentTableProps) {
   if (loading) {
     return <LoadingSpinner message="검색 중입니다..." size="md" />;
@@ -39,10 +37,6 @@ export default function PatentTable({
       />
     );
   }
-
-  const itemsPerPage = 20;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const displayPatents = patents.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className="overflow-x-auto bg-white border border-gray-200 rounded-xl shadow-sm">
@@ -81,12 +75,9 @@ export default function PatentTable({
         </thead>
 
         <tbody className="divide-y divide-gray-200">
-          {displayPatents.map((patent) => {
+          {patents.map((patent) => {
             const isFavorite = favorites.includes(patent.applicationNumber);
-
-            // 🔥 상태 (registerStatus)는 A, C, F ... | undefined
-            const statusKey = patent.registerStatus || "";
-            const statusText = statusLabel[statusKey] || "기타";
+            const statusText = patent.registerStatus || "정보 없음";
 
             return (
               <tr
@@ -94,29 +85,24 @@ export default function PatentTable({
                 onClick={() => onPatentClick(patent)}
                 className="hover:bg-gray-50 cursor-pointer transition-colors"
               >
-                {/* 출원번호 */}
                 <td className="px-6 py-4 text-sm text-gray-900">
                   {patent.applicationNumber}
                 </td>
 
-                {/* 출원인 */}
                 <td className="px-6 py-4 text-sm text-gray-900">
                   {patent.applicantName || "정보 없음"}
                 </td>
 
-                {/* 발명명칭 */}
                 <td className="px-6 py-4 text-sm font-medium text-gray-900">
                   {patent.inventionTitle || "정보 없음"}
                 </td>
 
-                {/* 출원일 */}
                 <td className="px-6 py-4 text-sm text-gray-900">
                   {patent.applicationDate
                     ? formatDate(patent.applicationDate)
                     : "정보 없음"}
                 </td>
 
-                {/* IPC */}
                 <td className="px-6 py-4 text-sm text-gray-900">
                   {patent.mainIpcCode || "-"}
                   <div className="text-gray-500 text-xs">
@@ -124,18 +110,16 @@ export default function PatentTable({
                   </div>
                 </td>
 
-                {/* 상태 */}
                 <td className="px-6 py-4 whitespace-nowrap">
                   <span
                     className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
-                      statusKey
+                      statusText
                     )}`}
                   >
                     {statusText}
                   </span>
                 </td>
 
-                {/* 관심 버튼 */}
                 <td className="px-6 py-4">
                   <button
                     onClick={(e) => {

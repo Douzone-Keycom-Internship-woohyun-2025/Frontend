@@ -1,11 +1,27 @@
-export type PatentStatus = "A" | "C" | "F" | "G" | "I" | "J" | "R" | "";
+export type PatentStatus =
+  | "등록"
+  | "공개"
+  | "취하"
+  | "소멸"
+  | "포기"
+  | "무효"
+  | "거절"
+  | "";
 
-export interface Patent {
-  id: string;
-  title: string;
+export interface BasicPatentSearchParams {
   applicant: string;
-  date: string;
-  status: string;
+  startDate: string;
+  endDate: string;
+  page?: number;
+}
+
+export interface AdvancedPatentSearchParams {
+  applicant?: string;
+  inventionTitle?: string;
+  registerStatus?: PatentStatus | "";
+  startDate?: string;
+  endDate?: string;
+  page?: number;
 }
 
 export interface PatentListItem {
@@ -15,7 +31,7 @@ export interface PatentListItem {
   applicationDate?: string;
   mainIpcCode?: string;
   ipcKorName?: string;
-  registerStatus?: PatentStatus;
+  registerStatus?: PatentStatus | "";
   isFavorite: boolean;
 }
 
@@ -37,7 +53,7 @@ export interface PatentDetail {
   publicationNumber?: string | null;
   registerDate?: string | null;
   registerNumber?: string | null;
-  registerStatus?: PatentStatus;
+  registerStatus?: PatentStatus | "";
   mainIpcCode?: string;
   ipcKorName?: string;
   ipcNumber?: string;

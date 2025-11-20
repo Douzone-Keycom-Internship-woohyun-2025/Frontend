@@ -1,6 +1,5 @@
 import { useState } from "react";
 import type { PatentStatus } from "../../types/patent";
-import { statusLabel } from "../../utils/statusLabel";
 
 interface AdvancedSearchProps {
   onSearch: (params: {
@@ -13,6 +12,16 @@ interface AdvancedSearchProps {
   onReset: () => void;
 }
 
+const STATUS_OPTIONS: PatentStatus[] = [
+  "등록",
+  "공개",
+  "취하",
+  "소멸",
+  "포기",
+  "무효",
+  "거절",
+];
+
 export default function AdvancedSearch({
   onSearch,
   onReset,
@@ -21,8 +30,6 @@ export default function AdvancedSearch({
   const [companyName, setCompanyName] = useState("");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-
-  // 백엔드 규격 : "A" | "C" | "F" | "G" | "I" | "J" | "R" | ""
   const [status, setStatus] = useState<PatentStatus | "">("");
 
   const handleSearch = () => {
@@ -57,7 +64,6 @@ export default function AdvancedSearch({
       <h3 className="text-lg font-semibold text-gray-900 mb-6">상세 검색</h3>
 
       <div className="space-y-4">
-        {/* 특허명 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             특허명 <span className="text-gray-400">(선택)</span>
@@ -71,7 +77,6 @@ export default function AdvancedSearch({
           />
         </div>
 
-        {/* 회사명 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             출원인 <span className="text-gray-400">(선택)</span>
@@ -85,7 +90,6 @@ export default function AdvancedSearch({
           />
         </div>
 
-        {/* 날짜 */}
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -112,29 +116,26 @@ export default function AdvancedSearch({
           </div>
         </div>
 
-        {/* 상태 */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
             상태 <span className="text-gray-400">(선택)</span>
           </label>
+
           <select
             value={status}
             onChange={(e) => setStatus(e.target.value as PatentStatus | "")}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option value="">전체</option>
-            <option value="A">{statusLabel["A"]}</option>
-            <option value="C">{statusLabel["C"]}</option>
-            <option value="F">{statusLabel["F"]}</option>
-            <option value="G">{statusLabel["G"]}</option>
-            <option value="I">{statusLabel["I"]}</option>
-            <option value="J">{statusLabel["J"]}</option>
-            <option value="R">{statusLabel["R"]}</option>
+            {STATUS_OPTIONS.map((s) => (
+              <option key={s} value={s}>
+                {s}
+              </option>
+            ))}
           </select>
         </div>
       </div>
 
-      {/* 버튼 */}
       <div className="flex gap-3 mt-8">
         <button
           onClick={handleSearch}
@@ -142,6 +143,7 @@ export default function AdvancedSearch({
         >
           검색
         </button>
+
         <button
           onClick={handleReset}
           className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition-colors"

@@ -10,31 +10,33 @@ import NoData from "../components/common/NoData";
 import { usePatentSearch } from "../hooks/usePatentSearch";
 import { useFavorites } from "../hooks/useFavorites";
 import type { PatentStatus } from "../types/patent";
+import { toApiDateFormat, toInputDateFormat } from "../utils/dateTransform";
 
 type FiltersState = {
-  applicant: string;
-  patentName: string;
-  companyName: string;
-  startDate: string;
-  endDate: string;
-  status: PatentStatus | "";
+  applicant?: string;
+  patentName?: string;
+  companyName?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: PatentStatus | "";
 };
 
 export default function PatentSearchPage() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<"basic" | "advanced">("basic");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [filters, setFilters] = useState<FiltersState>({
-    applicant: "",
-    patentName: "",
-    companyName: "",
-    startDate: "",
-    endDate: "",
-    status: "",
-  });
+  const [filters, setFilters] = useState<FiltersState>({});
+  const [selectedPresetId, setSelectedPresetId] = useState<string>("");
 
-  const { results, isLoading, error, filterPatents } = usePatentSearch();
+  const {
+    results,
+    isLoading,
+    error,
+    totalPages,
+    currentPage,
+    totalCount,
+    filterPatents,
+  } = usePatentSearch();
+
   const { favorites, toggleFavorite } = useFavorites();
 
   const handleBasicSearch = async (params: {
@@ -42,17 +44,22 @@ export default function PatentSearchPage() {
     startDate: string;
     endDate: string;
   }) => {
-    const newFilters: FiltersState = {
+    const uiFilters = {
       applicant: params.applicant,
-      patentName: "",
-      companyName: "",
-      startDate: params.startDate,
-      endDate: params.endDate,
-      status: "",
+      startDate: toInputDateFormat(params.startDate),
+      endDate: toInputDateFormat(params.endDate),
     };
-    setFilters(newFilters);
-    await filterPatents({ ...newFilters, sortOrder });
-    setCurrentPage(1);
+
+    setFilters(uiFilters);
+
+    await filterPatents(
+      {
+        applicant: params.applicant,
+        startDate: toApiDateFormat(params.startDate),
+        endDate: toApiDateFormat(params.endDate),
+      },
+      1
+    );
   };
 
   const handleAdvancedSearch = async (params: {
@@ -62,37 +69,38 @@ export default function PatentSearchPage() {
     endDate?: string;
     status?: PatentStatus;
   }) => {
-    const newFilters: FiltersState = {
-      applicant: "",
-      patentName: params.patentName || "",
-      companyName: params.companyName || "",
-      startDate: params.startDate || "",
-      endDate: params.endDate || "",
-      status: params.status || "",
+    const uiFilters = {
+      ...params,
+      startDate: toInputDateFormat(params.startDate),
+      endDate: toInputDateFormat(params.endDate),
     };
-    setFilters(newFilters);
-    await filterPatents({ ...newFilters, sortOrder });
-    setCurrentPage(1);
+
+    setFilters(uiFilters);
+
+    await filterPatents(
+      {
+        ...params,
+        startDate: toApiDateFormat(params.startDate),
+        endDate: toApiDateFormat(params.endDate),
+      },
+      1
+    );
   };
 
   const handleResetFilters = () => {
-    setFilters({
-      applicant: "",
-      patentName: "",
-      companyName: "",
-      startDate: "",
-      endDate: "",
-      status: "",
-    });
-    setCurrentPage(1);
+    setFilters({});
   };
 
-  const handleSortChange = async (order: "asc" | "desc") => {
-    setSortOrder(order);
-    await filterPatents({ ...filters, sortOrder: order });
+  const handlePageChange = (page: number) => {
+    filterPatents(
+      {
+        ...filters,
+        startDate: toApiDateFormat(filters.startDate),
+        endDate: toApiDateFormat(filters.endDate),
+      },
+      page
+    );
   };
-
-  const handlePageChange = (page: number) => setCurrentPage(page);
 
   useEffect(() => {
     const state = location.state as
@@ -109,20 +117,11 @@ export default function PatentSearchPage() {
     if (state?.fromSummary && state.filters) {
       handleBasicSearch({
         applicant: state.filters.applicant || "",
-        startDate: state.filters.startDate || "",
-        endDate: state.filters.endDate || "",
+        startDate: toInputDateFormat(state.filters.startDate || ""),
+        endDate: toInputDateFormat(state.filters.endDate || ""),
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key]);
-
-  if (isLoading) {
-    return (
-      <ProtectedLayout>
-        <LoadingSpinner message="검색 중입니다..." />
-      </ProtectedLayout>
-    );
-  }
 
   if (error) {
     return (
@@ -134,8 +133,9 @@ export default function PatentSearchPage() {
 
   return (
     <ProtectedLayout>
+      {isLoading && <LoadingSpinner message="검색 중입니다..." size="md" />}
+
       <div className="min-h-screen bg-gray-50">
-        {/* 헤더 */}
         <header className="bg-white shadow-sm border-b">
           <div className="px-8 py-6 flex justify-between items-center">
             <div>
@@ -144,13 +144,13 @@ export default function PatentSearchPage() {
                 특허명, 출원인, 날짜로 특허를 검색하세요.
               </p>
             </div>
+
             <div className="text-sm text-gray-500">
-              총 {results.length}건의 특허
+              총 {totalCount}건의 특허
             </div>
           </div>
         </header>
 
-        {/* 탭 메뉴 */}
         <main className="px-8 py-8">
           <div className="mb-8 bg-white rounded-lg shadow-sm border p-4">
             <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit">
@@ -174,19 +174,20 @@ export default function PatentSearchPage() {
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
-                  <i className={`${icon} mr-2`}></i>
+                  <i className={`${icon} mr-2`} />
                   {label}
                 </button>
               ))}
             </nav>
           </div>
 
-          {/* 검색 영역 */}
           <section className="bg-white rounded-lg shadow p-8 mb-10">
             {activeTab === "basic" ? (
               <BasicSearch
                 onSearch={handleBasicSearch}
                 initialValues={filters}
+                selectedPresetId={selectedPresetId}
+                onPresetChange={setSelectedPresetId}
               />
             ) : (
               <AdvancedSearch
@@ -196,12 +197,11 @@ export default function PatentSearchPage() {
             )}
           </section>
 
-          {/* 결과 영역 */}
           <section>
-            {results.length === 0 ? (
+            {results.length === 0 && !isLoading ? (
               <NoData
                 message="검색 결과가 없습니다."
-                subMessage="다른 검색 조건으로 시도해보세요."
+                subMessage="다른 조건으로 검색해보세요."
               />
             ) : (
               <div className="bg-white rounded-lg shadow p-6">
@@ -210,10 +210,11 @@ export default function PatentSearchPage() {
                   loading={isLoading}
                   favorites={favorites}
                   onToggleFavorite={toggleFavorite}
-                  sortOrder={sortOrder}
-                  onSortChange={handleSortChange}
+                  sortOrder="desc"
+                  onSortChange={() => {}}
                   currentPage={currentPage}
-                  totalPages={Math.ceil(results.length / 20)}
+                  totalPages={totalPages}
+                  totalCount={totalCount}
                   onPageChange={handlePageChange}
                 />
               </div>

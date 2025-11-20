@@ -11,11 +11,15 @@ interface BasicSearchProps {
     startDate?: string;
     endDate?: string;
   };
+  selectedPresetId: string;
+  onPresetChange: (id: string) => void;
 }
 
 export default function BasicSearch({
   onSearch,
   initialValues,
+  selectedPresetId,
+  onPresetChange,
 }: BasicSearchProps) {
   return (
     <SearchForm
@@ -23,6 +27,8 @@ export default function BasicSearch({
       title="기본 검색"
       enablePresets={true}
       initialValues={initialValues}
+      selectedPresetId={selectedPresetId}
+      onPresetChange={onPresetChange}
     />
   );
 }
