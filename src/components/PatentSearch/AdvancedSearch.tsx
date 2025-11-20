@@ -60,8 +60,10 @@ export default function AdvancedSearch({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-lg font-semibold text-gray-900 mb-6">상세 검색</h3>
+    <div className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
+        상세 검색
+      </h3>
 
       <div className="space-y-4">
         <div>
@@ -90,7 +92,7 @@ export default function AdvancedSearch({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               시작 날짜 <span className="text-gray-400">(선택)</span>
@@ -136,17 +138,17 @@ export default function AdvancedSearch({
         </div>
       </div>
 
-      <div className="flex gap-3 mt-8">
+      <div className="flex flex-col sm:flex-row gap-3 mt-6">
         <button
           onClick={handleSearch}
-          className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
+          className="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
         >
           검색
         </button>
 
         <button
           onClick={handleReset}
-          className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition-colors"
+          className="w-full sm:flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition-colors"
         >
           초기화
         </button>
