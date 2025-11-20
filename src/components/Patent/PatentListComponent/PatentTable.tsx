@@ -3,7 +3,7 @@ import { formatDate } from "../../../utils/dateFormat";
 import type { PatentListItem } from "../../../types/patent";
 import LoadingSpinner from "../../common/LoadingSpinner";
 import EmptyState from "../../common/EmptyState";
-import { ArrowUpDown, Heart, HeartOff } from "lucide-react";
+import { ArrowUp, ArrowDown, Heart, HeartOff } from "lucide-react";
 
 interface PatentTableProps {
   patents: PatentListItem[];
@@ -21,6 +21,7 @@ export default function PatentTable({
   loading,
   favorites,
   onToggleFavorite,
+  sortOrder,
   onSortChange,
   onPatentClick,
 }: PatentTableProps) {
@@ -63,7 +64,11 @@ export default function PatentTable({
                       onClick={onSortChange}
                       className="p-1 rounded hover:bg-gray-200 transition-colors"
                     >
-                      <ArrowUpDown className="w-4 h-4 text-gray-500" />
+                      {sortOrder === "desc" ? (
+                        <ArrowDown className="w-4 h-4 text-gray-600" />
+                      ) : (
+                        <ArrowUp className="w-4 h-4 text-gray-600" />
+                      )}
                     </button>
                   </div>
                 ) : (

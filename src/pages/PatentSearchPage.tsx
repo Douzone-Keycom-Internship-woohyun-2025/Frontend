@@ -19,13 +19,14 @@ type FiltersState = {
   startDate?: string;
   endDate?: string;
   status?: PatentStatus | "";
+  sort?: "asc" | "desc";
 };
 
 export default function PatentSearchPage() {
   const location = useLocation();
   const [activeTab, setActiveTab] = useState<"basic" | "advanced">("basic");
   const [filters, setFilters] = useState<FiltersState>({});
-  const [selectedPresetId, setSelectedPresetId] = useState<string>("");
+  const [selectedPresetId, setSelectedPresetId] = useState("");
 
   const {
     results,
@@ -34,6 +35,8 @@ export default function PatentSearchPage() {
     totalPages,
     currentPage,
     totalCount,
+    sortOrder,
+    changeSortOrder,
     filterPatents,
   } = usePatentSearch();
 
@@ -138,16 +141,8 @@ export default function PatentSearchPage() {
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white shadow-sm border-b">
           <div className="px-8 py-6 flex justify-between items-center">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">특허 검색</h1>
-              <p className="mt-2 text-gray-600">
-                특허명, 출원인, 날짜로 특허를 검색하세요.
-              </p>
-            </div>
-
-            <div className="text-sm text-gray-500">
-              총 {totalCount}건의 특허
-            </div>
+            <h1 className="text-3xl font-bold text-gray-900">특허 검색</h1>
+            <div className="text-sm text-gray-500">총 {totalCount}건</div>
           </div>
         </header>
 
@@ -168,7 +163,7 @@ export default function PatentSearchPage() {
                     setActiveTab(key as "basic" | "advanced");
                     handleResetFilters();
                   }}
-                  className={`px-6 py-3 rounded-md text-sm font-medium transition-colors cursor-pointer ${
+                  className={`px-6 py-3 rounded-md text-sm font-medium ${
                     activeTab === key
                       ? "bg-white text-blue-600 shadow-sm"
                       : "text-gray-600 hover:text-gray-900"
@@ -210,8 +205,8 @@ export default function PatentSearchPage() {
                   loading={isLoading}
                   favorites={favorites}
                   onToggleFavorite={toggleFavorite}
-                  sortOrder="desc"
-                  onSortChange={() => {}}
+                  sortOrder={sortOrder}
+                  onSortChange={changeSortOrder}
                   currentPage={currentPage}
                   totalPages={totalPages}
                   totalCount={totalCount}

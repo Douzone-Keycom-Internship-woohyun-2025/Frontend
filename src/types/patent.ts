@@ -8,11 +8,14 @@ export type PatentStatus =
   | "거절"
   | "";
 
+export type PatentSortOrder = "asc" | "desc";
+
 export interface BasicPatentSearchParams {
   applicant: string;
   startDate: string;
   endDate: string;
   page?: number;
+  sort?: PatentSortOrder;
 }
 
 export interface AdvancedPatentSearchParams {
@@ -22,6 +25,7 @@ export interface AdvancedPatentSearchParams {
   startDate?: string;
   endDate?: string;
   page?: number;
+  sort?: PatentSortOrder;
 }
 
 export interface PatentListItem {
