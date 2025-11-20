@@ -24,6 +24,11 @@ export default function PresetCard({
   onDelete,
   onUse,
 }: PresetCardProps) {
+  const toInputDate = (str: string) =>
+    str && str.length === 8
+      ? `${str.slice(0, 4)}-${str.slice(4, 6)}-${str.slice(6, 8)}`
+      : str;
+
   return (
     <div className="bg-white rounded-lg shadow hover:shadow-md p-6 transition-all">
       <div className="flex justify-between items-start mb-4">
@@ -35,7 +40,6 @@ export default function PresetCard({
         </div>
 
         <div className="flex space-x-2">
-          {/* 편집 버튼 */}
           <button
             onClick={() => onEdit(preset)}
             className="text-gray-400 hover:text-gray-600"
@@ -44,7 +48,6 @@ export default function PresetCard({
             <i className="ri-edit-line"></i>
           </button>
 
-          {/* 삭제 버튼 → 모달 */}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <button className="text-gray-400 hover:text-red-600" title="삭제">
@@ -63,7 +66,6 @@ export default function PresetCard({
               <AlertDialogFooter>
                 <AlertDialogCancel>취소</AlertDialogCancel>
 
-                {/* 실제 삭제 실행 */}
                 <AlertDialogAction
                   onClick={() => onDelete(preset.id)}
                   className="bg-red-600 text-white hover:bg-red-700"
@@ -82,12 +84,12 @@ export default function PresetCard({
         </div>
         {preset.startDate && (
           <div>
-            <strong>시작일:</strong> {preset.startDate}
+            <strong>시작일:</strong> {toInputDate(preset.startDate)}
           </div>
         )}
         {preset.endDate && (
           <div>
-            <strong>종료일:</strong> {preset.endDate}
+            <strong>종료일:</strong> {toInputDate(preset.endDate)}
           </div>
         )}
         <div className="text-gray-500 text-xs">
@@ -96,7 +98,13 @@ export default function PresetCard({
       </div>
 
       <button
-        onClick={() => onUse(preset)}
+        onClick={() =>
+          onUse({
+            ...preset,
+            startDate: toInputDate(preset.startDate),
+            endDate: toInputDate(preset.endDate),
+          })
+        }
         className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center"
       >
         <i className="ri-search-line mr-2"></i>이 프리셋으로 분석하기
