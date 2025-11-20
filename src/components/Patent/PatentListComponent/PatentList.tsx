@@ -11,7 +11,7 @@ interface PatentListProps {
   patents: PatentListItem[];
   loading: boolean;
   favorites: string[];
-  onToggleFavorite: (applicationNumber: string) => void;
+  onToggleFavorite: (applicationNumber: string, detail?: PatentDetail) => void;
   sortOrder: "asc" | "desc";
   onSortChange: (order: "asc" | "desc") => void;
   currentPage: number;
@@ -51,6 +51,20 @@ export default function PatentList({
     }
   };
 
+  const handleFavoriteToggle = async (
+    e: React.MouseEvent,
+    patent: PatentListItem
+  ) => {
+    e.stopPropagation();
+
+    try {
+      const detail = await getPatentDetail(patent.applicationNumber);
+      onToggleFavorite(patent.applicationNumber, detail);
+    } catch (err) {
+      console.error("관심특허 토글 실패:", err);
+    }
+  };
+
   const handleSortToggle = () => {
     const newOrder = sortOrder === "asc" ? "desc" : "asc";
     onSortChange(newOrder);
@@ -75,7 +89,9 @@ export default function PatentList({
           <PatentTable
             patents={patents}
             favorites={favorites}
-            onToggleFavorite={onToggleFavorite}
+            onToggleFavorite={(applicationNumber) => {
+              onToggleFavorite(applicationNumber);
+            }}
             sortOrder={sortOrder}
             onSortChange={handleSortToggle}
             onPatentClick={handlePatentClick}
@@ -86,7 +102,7 @@ export default function PatentList({
         {/* 모바일 */}
         <div className="md:hidden px-4 py-3">
           {loading ? (
-            <></> // 로딩은 검색 페이지에서만 표시
+            <></>
           ) : patents.length === 0 ? (
             <EmptyState
               title="검색 결과가 없습니다"
@@ -132,10 +148,7 @@ export default function PatentList({
                         </div>
 
                         <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onToggleFavorite(patent.applicationNumber);
-                          }}
+                          onClick={(e) => handleFavoriteToggle(e, patent)}
                           className="p-1 rounded-full hover:bg-gray-100"
                         >
                           {isFavorite ? (
@@ -205,6 +218,10 @@ export default function PatentList({
         isOpen={detailLoading || !!selectedPatentDetail}
         loading={detailLoading}
         onClose={() => setSelectedPatentDetail(null)}
+        isFavorite={favorites.includes(
+          selectedPatentDetail?.applicationNumber ?? ""
+        )}
+        onToggleFavorite={onToggleFavorite}
       />
     </>
   );

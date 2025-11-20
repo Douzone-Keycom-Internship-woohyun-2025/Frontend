@@ -19,6 +19,7 @@ export default function SummaryPage() {
 
   const [selectedPresetId, setSelectedPresetId] = useState<string>("");
 
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const preset = location.state?.preset;
     if (preset) {
