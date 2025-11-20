@@ -12,7 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function PresetManagementPage() {
   const navigate = useNavigate();
-  const { toast } = useToast(); // <-- ⭐ 반드시 있어야 함!
+  const { toast } = useToast();
 
   const {
     presets,
@@ -198,9 +198,13 @@ export default function PresetManagementPage() {
                     navigate("/summary", {
                       state: {
                         preset: {
+                          id: preset.id,
+                          name: preset.name,
+                          description: preset.description,
                           applicant: preset.applicant,
                           startDate: preset.startDate,
                           endDate: preset.endDate,
+                          createdAt: preset.createdAt,
                         },
                       },
                     })

@@ -1,6 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { usePresets } from "../../hooks/usePresets";
-import type { SearchPreset } from "../../types/preset";
 
 interface SearchFormParams {
   applicant: string;
@@ -14,6 +13,8 @@ interface SearchFormProps {
   title?: string;
   loading?: boolean;
   initialValues?: Partial<SearchFormParams>;
+  selectedPresetId: string;
+  onPresetChange: (id: string) => void;
 }
 
 export default function SearchForm({
@@ -22,32 +23,74 @@ export default function SearchForm({
   title = "검색",
   loading = false,
   initialValues,
+
+  selectedPresetId,
+  onPresetChange,
 }: SearchFormProps) {
+  const { presets, isLoading: presetLoading, error } = usePresets();
+
   const [formData, setFormData] = useState<SearchFormParams>({
-    applicant: initialValues?.applicant ?? "",
-    startDate: initialValues?.startDate ?? "",
-    endDate: initialValues?.endDate ?? "",
+    applicant: "",
+    startDate: "",
+    endDate: "",
   });
 
-  const [presetName, setPresetName] = useState("");
-  const [presetDescription, setPresetDescription] = useState("");
-  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
-  const [showSaveModal, setShowSaveModal] = useState(false);
+  useEffect(() => {
+    if (initialValues) {
+      setFormData({
+        applicant: initialValues.applicant ?? "",
+        startDate: initialValues.startDate ?? "",
+        endDate: initialValues.endDate ?? "",
+      });
+    }
+  }, [initialValues]);
 
-  const {
-    presets,
-    isLoading: presetsLoading,
-    error,
-    addOrUpdatePreset,
-    deletePreset,
-  } = usePresets();
+  const handleSelectPreset = (presetId: string) => {
+    onPresetChange(presetId);
 
-  const handleChange = useCallback(
-    (field: keyof SearchFormParams, value: string) => {
-      setFormData((prev) => ({ ...prev, [field]: value }));
-    },
-    []
-  );
+    if (presetId === "") {
+      setFormData({ applicant: "", startDate: "", endDate: "" });
+      return;
+    }
+
+    const preset = presets.find((p) => p.id === presetId);
+    if (!preset) return;
+
+    const format = (v: string) =>
+      v.length === 8 ? `${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}` : v;
+
+    setFormData({
+      applicant: preset.applicant,
+      startDate: format(preset.startDate),
+      endDate: format(preset.endDate),
+    });
+  };
+
+  const handleChange = (field: keyof SearchFormParams, value: string) => {
+    setFormData((prev) => {
+      const newData = { ...prev, [field]: value };
+
+      if (selectedPresetId) {
+        const preset = presets.find((p) => p.id === selectedPresetId);
+        if (preset) {
+          const format = (v: string) =>
+            v.length === 8
+              ? `${v.slice(0, 4)}-${v.slice(4, 6)}-${v.slice(6, 8)}`
+              : v;
+          const presetDataMatches =
+            preset.applicant === newData.applicant &&
+            format(preset.startDate) === newData.startDate &&
+            format(preset.endDate) === newData.endDate;
+
+          if (!presetDataMatches) {
+            onPresetChange("");
+          }
+        }
+      }
+
+      return newData;
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,251 +98,104 @@ export default function SearchForm({
       alert("회사명을 입력하세요!");
       return;
     }
-    onSearch(formData);
-  };
 
-  const handleSelectPreset = (id: string) => {
-    const preset = presets.find((p) => p.id === id);
-    setSelectedPresetId(id);
-    if (preset) {
-      setFormData({
-        applicant: preset.applicant,
-        startDate: preset.startDate,
-        endDate: preset.endDate,
-      });
-    }
-  };
-
-  const handleDeleteSelectedPreset = () => {
-    if (!selectedPresetId) {
-      alert("삭제할 프리셋을 선택하세요.");
-      return;
-    }
-    const selectedPreset = presets.find((p) => p.id === selectedPresetId);
-    if (
-      window.confirm(
-        `정말 "${selectedPreset?.name}" 프리셋을 삭제하시겠습니까?`
-      )
-    ) {
-      deletePreset(selectedPresetId);
-      setSelectedPresetId(null);
-    }
-  };
-
-  const handleSavePreset = () => {
-    if (!presetName.trim() || !formData.applicant.trim()) {
-      alert("프리셋명과 회사명을 입력하세요.");
-      return;
-    }
-
-    const newPreset: SearchPreset = {
-      id: Date.now().toString(),
-      name: presetName,
-      description: presetDescription.trim(),
+    onSearch({
       applicant: formData.applicant,
-      startDate: formData.startDate,
-      endDate: formData.endDate,
-      createdAt: new Date().toISOString(),
-    };
-
-    addOrUpdatePreset(newPreset);
-    setPresetName("");
-    setPresetDescription("");
-    setShowSaveModal(false);
-    alert("프리셋이 저장되었습니다!");
+      startDate: formData.startDate.replace(/-/g, ""),
+      endDate: formData.endDate.replace(/-/g, ""),
+    });
   };
 
   const handleReset = () => {
+    onPresetChange("");
     setFormData({ applicant: "", startDate: "", endDate: "" });
-    setSelectedPresetId(null);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
-          {title}
-        </h3>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
+        {title}
+      </h3>
 
-        {/* 프리셋 선택 */}
-        {enablePresets && (
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              저장된 프리셋
-            </label>
-            {presetsLoading ? (
-              <p className="text-gray-500 text-sm">로딩 중...</p>
-            ) : error ? (
-              <p className="text-red-500 text-sm">{error}</p>
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-2">
-                <select
-                  value={selectedPresetId || ""}
-                  onChange={(e) => handleSelectPreset(e.target.value)}
-                  className="flex-1 px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-                >
-                  <option value="">프리셋 선택</option>
-                  {presets.map((p) => (
-                    <option key={p.id} value={p.id}>
-                      {p.name} - {p.description || "설명 없음"}
-                    </option>
-                  ))}
-                </select>
+      {enablePresets && (
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            저장된 프리셋
+          </label>
 
-                <button
-                  type="button"
-                  disabled={!selectedPresetId}
-                  onClick={handleDeleteSelectedPreset}
-                  className={`
-                    px-3 py-2 rounded-lg font-medium text-sm transition-colors
-                    ${
-                      selectedPresetId
-                        ? "bg-red-100 text-red-700 hover:bg-red-200"
-                        : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                    }
-                  `}
-                >
-                  삭제
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* 입력 영역 */}
-        <div className="space-y-4">
-          {/* 회사명 */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              회사명
-            </label>
-            <input
-              type="text"
-              value={formData.applicant}
-              onChange={(e) => handleChange("applicant", e.target.value)}
-              placeholder="예: 삼성, LG, 네이버"
-              className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-            />
-          </div>
-
-          {/* 날짜 범위 */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                시작 날짜
-              </label>
-              <input
-                type="date"
-                value={formData.startDate}
-                onChange={(e) => handleChange("startDate", e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                종료 날짜
-              </label>
-              <input
-                type="date"
-                value={formData.endDate}
-                onChange={(e) => handleChange("endDate", e.target.value)}
-                className="w-full px-3 sm:px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm"
-              />
-            </div>
-          </div>
-        </div>
-
-        {/* 버튼 영역 */}
-        <div className="flex flex-col sm:flex-row gap-3 mt-6">
-          <button
-            type="submit"
-            disabled={loading}
-            className="
-              w-full sm:flex-1
-              px-6 py-3
-              bg-blue-600 text-white
-              rounded-lg
-              hover:bg-blue-700
-              font-medium text-sm
-              transition-colors
-              disabled:opacity-50
-            "
-          >
-            {loading ? "검색 중..." : "검색"}
-          </button>
-
-          <button
-            type="button"
-            onClick={handleReset}
-            className="
-              w-full sm:flex-1
-              px-6 py-3
-              bg-gray-200 text-gray-700
-              rounded-lg
-              hover:bg-gray-300
-              font-medium text-sm
-              transition-colors
-            "
-          >
-            초기화
-          </button>
-
-          {enablePresets && (
-            <button
-              type="button"
-              onClick={() => setShowSaveModal(true)}
-              className="
-                w-full sm:flex-1
-                px-6 py-3
-                bg-green-600 text-white
-                rounded-lg
-                hover:bg-green-700
-                font-medium text-sm
-                transition-colors
-              "
+          {presetLoading ? (
+            <p className="text-sm text-gray-500">프리셋 로딩 중...</p>
+          ) : error ? (
+            <p className="text-sm text-red-500">{error}</p>
+          ) : (
+            <select
+              value={selectedPresetId}
+              onChange={(e) => handleSelectPreset(e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg text-sm"
             >
-              프리셋 저장
-            </button>
+              <option value="">프리셋 선택</option>
+              {presets.map((p) => (
+                <option key={p.id} value={p.id}>
+                  {p.name}
+                </option>
+              ))}
+            </select>
           )}
         </div>
-      </form>
+      )}
 
-      {/* 프리셋 저장 모달 */}
-      {showSaveModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white p-4 sm:p-6 rounded-lg shadow-lg w-full max-w-md">
-            <h4 className="text-lg font-semibold mb-3">프리셋 저장</h4>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2">회사명</label>
+          <input
+            type="text"
+            value={formData.applicant}
+            onChange={(e) => handleChange("applicant", e.target.value)}
+            className="w-full px-3 py-2 border rounded-lg"
+            placeholder="예: 삼성, LG, 네이버"
+          />
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium mb-2">시작 날짜</label>
             <input
-              type="text"
-              value={presetName}
-              onChange={(e) => setPresetName(e.target.value)}
-              placeholder="프리셋 이름 입력"
-              className="w-full border rounded-lg px-3 py-2 mb-3 text-sm"
+              type="date"
+              value={formData.startDate}
+              onChange={(e) => handleChange("startDate", e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg"
             />
-            <textarea
-              value={presetDescription}
-              onChange={(e) => setPresetDescription(e.target.value)}
-              placeholder="프리셋 설명 (예: 2023~2024년 삼성전자)"
-              className="w-full border rounded-lg px-3 py-2 mb-4 h-20 resize-none text-sm"
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-2">종료 날짜</label>
+            <input
+              type="date"
+              value={formData.endDate}
+              onChange={(e) => handleChange("endDate", e.target.value)}
+              className="w-full px-3 py-2 border rounded-lg"
             />
-            <div className="flex justify-end gap-2">
-              <button
-                onClick={() => setShowSaveModal(false)}
-                className="px-3 sm:px-4 py-2 bg-gray-200 rounded-lg text-sm"
-              >
-                취소
-              </button>
-              <button
-                onClick={handleSavePreset}
-                className="px-3 sm:px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
-              >
-                저장
-              </button>
-            </div>
           </div>
         </div>
-      )}
-    </div>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-3 mt-6">
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          {loading ? "검색 중..." : "검색"}
+        </button>
+
+        <button
+          type="button"
+          onClick={handleReset}
+          className="w-full sm:flex-1 px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300"
+        >
+          초기화
+        </button>
+      </div>
+    </form>
   );
 }
