@@ -1,4 +1,15 @@
 import type { SearchPreset } from "../../types/preset";
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 
 interface PresetCardProps {
   preset: SearchPreset;
@@ -13,6 +24,11 @@ export default function PresetCard({
   onDelete,
   onUse,
 }: PresetCardProps) {
+  const toInputDate = (str: string) =>
+    str && str.length === 8
+      ? `${str.slice(0, 4)}-${str.slice(4, 6)}-${str.slice(6, 8)}`
+      : str;
+
   return (
     <div className="bg-white rounded-lg shadow hover:shadow-md p-6 transition-all">
       <div className="flex justify-between items-start mb-4">
@@ -22,6 +38,7 @@ export default function PresetCard({
             <p className="text-sm text-gray-600">{preset.description}</p>
           )}
         </div>
+
         <div className="flex space-x-2">
           <button
             onClick={() => onEdit(preset)}
@@ -30,13 +47,34 @@ export default function PresetCard({
           >
             <i className="ri-edit-line"></i>
           </button>
-          <button
-            onClick={() => onDelete(preset.id)}
-            className="text-gray-400 hover:text-red-600"
-            title="삭제"
-          >
-            <i className="ri-delete-bin-line"></i>
-          </button>
+
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="text-gray-400 hover:text-red-600" title="삭제">
+                <i className="ri-delete-bin-line"></i>
+              </button>
+            </AlertDialogTrigger>
+
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>정말 삭제하시겠습니까?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  삭제된 프리셋은 복구할 수 없습니다.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+
+              <AlertDialogFooter>
+                <AlertDialogCancel>취소</AlertDialogCancel>
+
+                <AlertDialogAction
+                  onClick={() => onDelete(preset.id)}
+                  className="bg-red-600 text-white hover:bg-red-700"
+                >
+                  삭제
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
@@ -46,12 +84,12 @@ export default function PresetCard({
         </div>
         {preset.startDate && (
           <div>
-            <strong>시작일:</strong> {preset.startDate}
+            <strong>시작일:</strong> {toInputDate(preset.startDate)}
           </div>
         )}
         {preset.endDate && (
           <div>
-            <strong>종료일:</strong> {preset.endDate}
+            <strong>종료일:</strong> {toInputDate(preset.endDate)}
           </div>
         )}
         <div className="text-gray-500 text-xs">
@@ -60,7 +98,13 @@ export default function PresetCard({
       </div>
 
       <button
-        onClick={() => onUse(preset)}
+        onClick={() =>
+          onUse({
+            ...preset,
+            startDate: toInputDate(preset.startDate),
+            endDate: toInputDate(preset.endDate),
+          })
+        }
         className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center"
       >
         <i className="ri-search-line mr-2"></i>이 프리셋으로 분석하기

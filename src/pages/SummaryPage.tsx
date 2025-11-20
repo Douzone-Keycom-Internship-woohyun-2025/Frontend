@@ -10,35 +10,49 @@ import { useSummaryAnalysis } from "../hooks/useSummaryAnalysis";
 export default function SummaryPage() {
   const location = useLocation();
   const { summaryData, isLoading, error, analyze } = useSummaryAnalysis();
+
   const [initialFilters, setInitialFilters] = useState<{
     applicant: string;
     startDate: string;
     endDate: string;
   } | null>(null);
 
+  const [selectedPresetId, setSelectedPresetId] = useState<string>("");
+
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const preset = location.state?.preset;
     if (preset) {
+      const formatToDateInput = (value: string) =>
+        value && value.length === 8
+          ? `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`
+          : value;
+
       const presetParams = {
         applicant: preset.applicant || "",
-        startDate: preset.startDate || "",
-        endDate: preset.endDate || "",
+        startDate: formatToDateInput(preset.startDate) || "",
+        endDate: formatToDateInput(preset.endDate) || "",
       };
 
       setInitialFilters((prev) => {
-        if (
-          !prev || // 처음 로드거나
+        const changed =
+          !prev ||
           prev.applicant !== presetParams.applicant ||
           prev.startDate !== presetParams.startDate ||
-          prev.endDate !== presetParams.endDate
-        ) {
-          analyze(presetParams);
+          prev.endDate !== presetParams.endDate;
+
+        if (changed) {
+          analyze({
+            applicant: preset.applicant,
+            startDate: preset.startDate,
+            endDate: preset.endDate,
+          });
+          setSelectedPresetId(preset.id?.toString() || "");
           return presetParams;
         }
         return prev;
       });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearch = async (params: {
@@ -47,29 +61,21 @@ export default function SummaryPage() {
     endDate: string;
   }) => {
     await analyze(params);
-    setInitialFilters(params);
+
+    const formatToDateInput = (value: string) =>
+      value.length === 8
+        ? `${value.slice(0, 4)}-${value.slice(4, 6)}-${value.slice(6, 8)}`
+        : value;
+
+    setInitialFilters({
+      applicant: params.applicant,
+      startDate: formatToDateInput(params.startDate),
+      endDate: formatToDateInput(params.endDate),
+    });
   };
-
-  if (isLoading) {
-    return (
-      <ProtectedLayout>
-        <LoadingSpinner message="요약 데이터를 분석 중입니다..." size="md" />
-      </ProtectedLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <ProtectedLayout>
-        <ErrorState message={error} onRetry={() => window.location.reload()} />
-      </ProtectedLayout>
-    );
-  }
-
   return (
     <ProtectedLayout>
       <div className="min-h-screen bg-gray-50">
-        {/* 헤더 */}
         <header className="bg-white shadow-sm border-b">
           <div className="px-8 py-6 flex justify-between items-center">
             <div>
@@ -86,9 +92,7 @@ export default function SummaryPage() {
           </div>
         </header>
 
-        {/* 본문 */}
         <main className="px-8 py-8">
-          {/* 검색 섹션 */}
           <div className="bg-white rounded-lg shadow p-8 mb-8">
             <SearchForm
               enablePresets
@@ -96,11 +100,22 @@ export default function SummaryPage() {
               loading={isLoading}
               onSearch={handleSearch}
               initialValues={initialFilters || undefined}
+              selectedPresetId={selectedPresetId}
+              onPresetChange={setSelectedPresetId}
             />
           </div>
 
-          {/* 결과 섹션 */}
-          {summaryData ? (
+          {isLoading ? (
+            <LoadingSpinner
+              message="요약 데이터를 분석 중입니다..."
+              size="md"
+            />
+          ) : error ? (
+            <ErrorState
+              message={error}
+              onRetry={() => window.location.reload()}
+            />
+          ) : summaryData ? (
             <div className="bg-white rounded-lg shadow p-8">
               <SummaryDashboard
                 data={summaryData}

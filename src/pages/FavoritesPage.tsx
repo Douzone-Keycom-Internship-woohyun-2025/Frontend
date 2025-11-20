@@ -4,9 +4,12 @@ import ProtectedLayout from "../layouts/ProtectedLayout";
 import PatentList from "../components/Patent/PatentListComponent/PatentList";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorState from "../components/common/ErrorState";
+
 import { useFavorites } from "../hooks/useFavorites";
-import { dummyPatentListResponse } from "../data/dummyPatentListResponse";
-import type { PatentListItem } from "../types/patent";
+import { getFavoritesApi } from "../api/favorite";
+
+import type { PatentListItem, PatentStatus } from "../types/patent";
+import type { FavoriteItem } from "../types/favorite";
 
 export default function FavoritesPage() {
   const { favorites, toggleFavorite } = useFavorites();
@@ -16,28 +19,55 @@ export default function FavoritesPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
 
+  // 👉 여기서 TS 타입 정확히 맞게 sanitize
+  const VALID_STATUS: PatentStatus[] = [
+    "등록",
+    "공개",
+    "취하",
+    "소멸",
+    "포기",
+    "무효",
+    "거절",
+    "",
+  ];
+
+  const sanitizeStatus = (value: string | null | undefined): PatentStatus => {
+    if (!value) return "";
+    return VALID_STATUS.includes(value as PatentStatus)
+      ? (value as PatentStatus)
+      : "";
+  };
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
-    const fetchFavorites = async () => {
+    async function loadFavorites() {
       try {
-        setIsLoading(true);
         setError(null);
+        setIsLoading(true);
 
-        const data = dummyPatentListResponse.patents.filter((p) =>
-          favorites.includes(p.applicationNumber)
-        );
+        const { favorites: list } = await getFavoritesApi();
 
-        await new Promise((resolve) => setTimeout(resolve, 400));
-        setFavoritePatents(data);
+        const mapped: PatentListItem[] = list.map((item: FavoriteItem) => ({
+          applicationNumber: item.applicationNumber,
+          inventionTitle: item.inventionTitle,
+          applicantName: item.applicantName,
+          applicationDate: item.applicationDate,
+          mainIpcCode: item.mainIpcCode ?? undefined,
+          ipcKorName: undefined,
+          registerStatus: sanitizeStatus(item.registerStatus),
+          isFavorite: true,
+        }));
+
+        setFavoritePatents(mapped);
       } catch (err) {
         console.error(err);
         setError("관심 특허 목록을 불러오는 중 오류가 발생했습니다.");
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
-    fetchFavorites();
-  }, [favorites]);
+    loadFavorites();
+  }, []);
 
   const handleSortChange = (order: "asc" | "desc") => {
     setSortOrder(order);
@@ -80,7 +110,6 @@ export default function FavoritesPage() {
           </div>
         </header>
 
-        {/* 메인 */}
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {favoritePatents.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 sm:p-10 text-center">
@@ -102,8 +131,7 @@ export default function FavoritesPage() {
                   text-sm sm:text-base
                   rounded-lg
                   hover:bg-blue-700
-                  transition-colors duration-200
-                "
+                  transition-colors duration-200"
               >
                 <i className="ri-search-line text-base mr-2" />
                 특허 검색하기
@@ -120,6 +148,7 @@ export default function FavoritesPage() {
                 onSortChange={handleSortChange}
                 currentPage={currentPage}
                 totalPages={Math.ceil(favoritePatents.length / 20)}
+                totalCount={favoritePatents.length}
                 onPageChange={setCurrentPage}
               />
             </div>

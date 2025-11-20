@@ -1,7 +1,38 @@
+export interface BackendSummaryResponse {
+  applicant: string;
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+  totalCount: number;
+
+  statusCount: Record<string, number>;
+  statusPercent: Record<string, number>;
+
+  monthlyTrend: Array<{
+    month: string;
+    count: number;
+  }>;
+
+  topIPC: Array<{
+    code: string;
+    count: number;
+  }>;
+
+  avgMonthlyCount: number;
+
+  recentPatents: Array<{
+    title: string;
+    date: string;
+    ipcMain: string;
+    status: string;
+  }>;
+}
+
 export interface SummaryApiResponse {
   status: "success" | "error";
   message: string;
-  data: SummaryData;
+  data: BackendSummaryResponse;
 }
 
 export interface SummaryData {
