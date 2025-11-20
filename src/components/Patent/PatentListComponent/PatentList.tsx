@@ -3,9 +3,9 @@ import type { PatentListItem, PatentDetail } from "../../../types/patent";
 import PatentTable from "./PatentTable";
 import Pagination from "./Pagination";
 import PatentDetailModal from "../PatentDetail/PatentDetailModal";
-import LoadingSpinner from "../../common/LoadingSpinner";
 import EmptyState from "../../common/EmptyState";
 import { getStatusColor } from "../../../utils/statusColor";
+import { getPatentDetail } from "../../../api/patent";
 
 interface PatentListProps {
   patents: PatentListItem[];
@@ -34,19 +34,21 @@ export default function PatentList({
 }: PatentListProps) {
   const [selectedPatentDetail, setSelectedPatentDetail] =
     useState<PatentDetail | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
 
-  const handlePatentClick = (patent: PatentListItem) => {
-    const detail: PatentDetail = {
-      applicationNumber: patent.applicationNumber,
-      inventionTitle: patent.inventionTitle,
-      applicantName: patent.applicantName,
-      applicationDate: patent.applicationDate,
-      mainIpcCode: patent.mainIpcCode,
-      ipcKorName: patent.ipcKorName,
-      registerStatus: patent.registerStatus,
-      isFavorite: patent.isFavorite,
-    };
-    setSelectedPatentDetail(detail);
+  const handlePatentClick = async (patent: PatentListItem) => {
+    setSelectedPatentDetail(null);
+    setDetailLoading(true);
+
+    try {
+      const detail = await getPatentDetail(patent.applicationNumber);
+      setSelectedPatentDetail(detail);
+    } catch (err) {
+      console.error(err);
+      alert("특허 상세 정보를 가져오지 못했습니다.");
+    } finally {
+      setDetailLoading(false);
+    }
   };
 
   const handleSortToggle = () => {
@@ -68,10 +70,10 @@ export default function PatentList({
           </span>
         </div>
 
+        {/* 데스크탑 */}
         <div className="hidden md:block">
           <PatentTable
             patents={patents}
-            loading={loading}
             favorites={favorites}
             onToggleFavorite={onToggleFavorite}
             sortOrder={sortOrder}
@@ -81,10 +83,10 @@ export default function PatentList({
           />
         </div>
 
-        {/* 모바일 UI */}
+        {/* 모바일 */}
         <div className="md:hidden px-4 py-3">
           {loading ? (
-            <LoadingSpinner message="검색 중입니다..." size="md" />
+            <></> // 로딩은 검색 페이지에서만 표시
           ) : patents.length === 0 ? (
             <EmptyState
               title="검색 결과가 없습니다"
@@ -122,7 +124,7 @@ export default function PatentList({
                     <div
                       key={patent.applicationNumber}
                       onClick={() => handlePatentClick(patent)}
-                      className="border border-gray-200 rounded-lg p-3 bg-white shadow-xs"
+                      className="border border-gray-200 rounded-lg p-3 bg-white shadow-xs cursor-pointer"
                     >
                       <div className="flex items-center justify-between">
                         <div className="text-[10px] text-gray-500 truncate">
@@ -162,10 +164,9 @@ export default function PatentList({
                         </div>
 
                         <span
-                          className={`
-                            px-2 py-0.5 rounded-full text-[9px] font-medium
-                            ${getStatusColor(patent.registerStatus || "")}
-                          `}
+                          className={`px-2 py-0.5 rounded-full text-[9px] font-medium ${getStatusColor(
+                            patent.registerStatus || ""
+                          )}`}
                         >
                           {patent.registerStatus || "상태없음"}
                         </span>
@@ -199,13 +200,12 @@ export default function PatentList({
         </div>
       </div>
 
-      {selectedPatentDetail && (
-        <PatentDetailModal
-          patent={selectedPatentDetail}
-          isOpen={!!selectedPatentDetail}
-          onClose={() => setSelectedPatentDetail(null)}
-        />
-      )}
+      <PatentDetailModal
+        patent={selectedPatentDetail}
+        isOpen={detailLoading || !!selectedPatentDetail}
+        loading={detailLoading}
+        onClose={() => setSelectedPatentDetail(null)}
+      />
     </>
   );
 }

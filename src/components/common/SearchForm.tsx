@@ -16,6 +16,7 @@ interface SearchFormProps {
   initialValues?: Partial<SearchFormParams>;
   selectedPresetId: string;
   onPresetChange: (id: string) => void;
+  showTitle?: boolean;
 }
 
 export default function SearchForm({
@@ -26,6 +27,7 @@ export default function SearchForm({
   initialValues,
   selectedPresetId,
   onPresetChange,
+  showTitle = true,
 }: SearchFormProps) {
   const { presets, isLoading: presetLoading, error } = usePresets();
 
@@ -107,9 +109,11 @@ export default function SearchForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
-        {title}
-      </h3>
+      {showTitle && (
+        <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
+          {title}
+        </h3>
+      )}
 
       {enablePresets && (
         <div>

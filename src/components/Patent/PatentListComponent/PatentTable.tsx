@@ -1,13 +1,11 @@
 import { getStatusColor } from "../../../utils/statusColor";
 import { formatDate } from "../../../utils/dateFormat";
 import type { PatentListItem } from "../../../types/patent";
-import LoadingSpinner from "../../common/LoadingSpinner";
 import EmptyState from "../../common/EmptyState";
 import { ArrowUp, ArrowDown, Heart, HeartOff } from "lucide-react";
 
 interface PatentTableProps {
   patents: PatentListItem[];
-  loading: boolean;
   favorites: string[];
   onToggleFavorite: (applicationNumber: string) => void;
   sortOrder: "asc" | "desc";
@@ -18,17 +16,12 @@ interface PatentTableProps {
 
 export default function PatentTable({
   patents,
-  loading,
   favorites,
   onToggleFavorite,
   sortOrder,
   onSortChange,
   onPatentClick,
 }: PatentTableProps) {
-  if (loading) {
-    return <LoadingSpinner message="검색 중입니다..." size="md" />;
-  }
-
   if (patents.length === 0) {
     return (
       <EmptyState

@@ -29,6 +29,7 @@ export default function BasicSearch({
       initialValues={initialValues}
       selectedPresetId={selectedPresetId}
       onPresetChange={onPresetChange}
+      showTitle={false}
     />
   );
 }
