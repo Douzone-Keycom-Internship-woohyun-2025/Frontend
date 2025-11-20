@@ -52,7 +52,6 @@ export default function PatentList({
   const handleSortToggle = () => {
     const newOrder = sortOrder === "asc" ? "desc" : "asc";
     onSortChange(newOrder);
-    onPageChange(1);
   };
 
   const itemsPerPage = 20;
@@ -60,7 +59,7 @@ export default function PatentList({
   return (
     <>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between gap-2">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">
             검색 결과
           </h3>
@@ -82,6 +81,7 @@ export default function PatentList({
           />
         </div>
 
+        {/* 모바일 UI */}
         <div className="md:hidden px-4 py-3">
           {loading ? (
             <LoadingSpinner message="검색 중입니다..." size="md" />
@@ -98,8 +98,17 @@ export default function PatentList({
                   onClick={handleSortToggle}
                   className="inline-flex items-center px-2.5 py-1.5 text-[10px] text-gray-600 border border-gray-200 rounded-full hover:bg-gray-50 transition-colors"
                 >
-                  <i className="ri-sort-desc text-xs mr-1" />
-                  출원일 {sortOrder === "desc" ? "최신순" : "오래된순"}
+                  {sortOrder === "desc" ? (
+                    <>
+                      <i className="ri-arrow-down-s-line text-xs mr-1" />
+                      최신순
+                    </>
+                  ) : (
+                    <>
+                      <i className="ri-arrow-up-s-line text-xs mr-1" />
+                      오래된순
+                    </>
+                  )}
                 </button>
               </div>
 
@@ -113,7 +122,7 @@ export default function PatentList({
                     <div
                       key={patent.applicationNumber}
                       onClick={() => handlePatentClick(patent)}
-                      className="border border-gray-200 rounded-lg p-3 bg-white shadow-xs flex flex-col gap-1.5 hover:bg-gray-50 transition-colors cursor-pointer"
+                      className="border border-gray-200 rounded-lg p-3 bg-white shadow-xs"
                     >
                       <div className="flex items-center justify-between">
                         <div className="text-[10px] text-gray-500 truncate">
