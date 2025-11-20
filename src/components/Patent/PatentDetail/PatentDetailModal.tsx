@@ -8,6 +8,8 @@ interface PatentDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   loading: boolean;
+  isFavorite: boolean;
+  onToggleFavorite: (applicationNumber: string, detail?: PatentDetail) => void;
 }
 
 export default function PatentDetailModal({
@@ -15,6 +17,8 @@ export default function PatentDetailModal({
   isOpen,
   onClose,
   loading,
+  isFavorite,
+  onToggleFavorite,
 }: PatentDetailModalProps) {
   if (!isOpen) return null;
 
@@ -36,7 +40,8 @@ export default function PatentDetailModal({
           </div>
         ) : (
           <>
-            <div className="sticky top-0 flex justify-between items-center px-6 py-4 border-b bg-white">
+            {/* 헤더 영역 */}
+            <div className="sticky top-0 flex justify-between items-center px-6 py-4 border-b bg-white z-10">
               <div className="flex items-center space-x-3">
                 <i className="ri-file-text-line text-xl text-blue-600"></i>
                 <h2 className="text-xl font-bold text-gray-900">
@@ -54,14 +59,31 @@ export default function PatentDetailModal({
                 )}
               </div>
 
-              <button
-                onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition"
-              >
-                <i className="ri-close-line text-lg"></i>
-              </button>
+              <div className="flex items-center space-x-2">
+                {/* 관심토글 버튼 */}
+                <button
+                  onClick={() =>
+                    onToggleFavorite(patent.applicationNumber, patent)
+                  }
+                  className="p-2 rounded-full hover:bg-gray-100 transition"
+                >
+                  {isFavorite ? (
+                    <i className="ri-heart-fill text-red-500 text-xl"></i>
+                  ) : (
+                    <i className="ri-heart-line text-gray-500 text-xl"></i>
+                  )}
+                </button>
+
+                <button
+                  onClick={onClose}
+                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                >
+                  <i className="ri-close-line text-lg"></i>
+                </button>
+              </div>
             </div>
 
+            {/* 내용 */}
             <div className="p-8 space-y-10">
               <section>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3 leading-snug">
@@ -87,6 +109,7 @@ export default function PatentDetailModal({
 
               <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-6">
+                  {/* 출원인 */}
                   <div className="bg-gray-50 p-5 rounded-lg border">
                     <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
                       <i className="ri-building-line mr-2"></i>
@@ -97,6 +120,7 @@ export default function PatentDetailModal({
                     </p>
                   </div>
 
+                  {/* 주요 IPC */}
                   <div className="bg-gray-50 p-5 rounded-lg border">
                     <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
                       <i className="ri-code-line mr-2"></i>
@@ -113,6 +137,7 @@ export default function PatentDetailModal({
                     </div>
                   </div>
 
+                  {/* 전체 IPC */}
                   {ipcList.length > 0 && (
                     <div className="bg-gray-50 p-5 rounded-lg border">
                       <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
@@ -134,6 +159,7 @@ export default function PatentDetailModal({
                   )}
                 </div>
 
+                {/* 날짜 정보 */}
                 <div className="space-y-5">
                   {[
                     {
@@ -176,6 +202,7 @@ export default function PatentDetailModal({
                 </div>
               </section>
 
+              {/* 요약 */}
               {patent.astrtCont && (
                 <section>
                   <label className="flex items-center text-lg font-bold text-gray-900 mb-3">
@@ -191,6 +218,7 @@ export default function PatentDetailModal({
                 </section>
               )}
 
+              {/* 도면 */}
               {patent.drawing && (
                 <section>
                   <label className="flex items-center text-lg font-bold text-gray-900 mb-3">
@@ -212,6 +240,7 @@ export default function PatentDetailModal({
                 </section>
               )}
 
+              {/* 닫기 버튼 */}
               <div className="flex justify-end pt-4 border-t">
                 <button
                   onClick={onClose}
