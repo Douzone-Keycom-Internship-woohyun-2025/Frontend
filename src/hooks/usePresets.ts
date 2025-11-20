@@ -1,39 +1,109 @@
 import { useState, useEffect } from "react";
-import type { SearchPreset } from "../types/preset";
+import {
+  getPresetsApi,
+  getPresetDetailApi,
+  createPresetApi,
+  updatePresetApi,
+  deletePresetApi,
+} from "../api/preset";
+import type { SearchPreset, PresetResponse } from "../types/preset";
 
 export function usePresets() {
   const [presets, setPresets] = useState<SearchPreset[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  const loadPresets = async () => {
     try {
-      const saved = localStorage.getItem("searchPresets");
-      if (saved) setPresets(JSON.parse(saved));
+      setIsLoading(true);
+      setError(null);
+
+      const data = await getPresetsApi(0, 10);
+
+      const mapped = data.map(
+        (p: PresetResponse): SearchPreset => ({
+          id: p.id.toString(),
+          name: p.presetName,
+          applicant: p.applicant,
+          startDate: p.startDate,
+          endDate: p.endDate,
+          description: p.description || "",
+          createdAt: p.createdAt,
+        })
+      );
+
+      setPresets(mapped);
     } catch (err) {
       console.error(err);
-      setError("프리셋 데이터를 불러오는 중 오류가 발생했습니다.");
+      setError("프리셋 조회 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
+    loadPresets();
   }, []);
 
-  const savePresets = (newList: SearchPreset[]) => {
-    localStorage.setItem("searchPresets", JSON.stringify(newList));
-    setPresets(newList);
+  const loadPresetDetail = async (id: string): Promise<SearchPreset | null> => {
+    try {
+      const data = await getPresetDetailApi(Number(id));
+      if (!data) return null;
+
+      return {
+        id: data.id.toString(),
+        name: data.presetName,
+        applicant: data.applicant,
+        startDate: data.startDate,
+        endDate: data.endDate,
+        description: data.description || "",
+        createdAt: data.createdAt,
+      };
+    } catch (err) {
+      console.error(err);
+      return null;
+    }
   };
 
-  const addOrUpdatePreset = (preset: SearchPreset) => {
-    const exists = presets.some((p) => p.id === preset.id);
-    const newList = exists
-      ? presets.map((p) => (p.id === preset.id ? preset : p))
-      : [...presets, preset];
-    savePresets(newList);
+  const addOrUpdatePreset = async (preset: SearchPreset) => {
+    try {
+      setError(null);
+
+      const exists = !isNaN(Number(preset.id)); // 숫자면 존재하는 프리셋
+
+      if (exists) {
+        await updatePresetApi(Number(preset.id), {
+          presetName: preset.name,
+          applicant: preset.applicant,
+          startDate: preset.startDate,
+          endDate: preset.endDate,
+          description: preset.description,
+        });
+      } else {
+        await createPresetApi({
+          presetName: preset.name,
+          applicant: preset.applicant,
+          startDate: preset.startDate,
+          endDate: preset.endDate,
+          description: preset.description,
+        });
+      }
+
+      await loadPresets();
+    } catch (err) {
+      console.error(err);
+      setError("프리셋 저장 중 오류가 발생했습니다.");
+    }
   };
 
-  const deletePreset = (id: string) => {
-    const newList = presets.filter((p) => p.id !== id);
-    savePresets(newList);
+  const removePreset = async (id: string) => {
+    try {
+      await deletePresetApi(Number(id));
+      await loadPresets();
+    } catch (err) {
+      console.error(err);
+      setError("프리셋 삭제 중 오류가 발생했습니다.");
+    }
   };
 
   return {
@@ -41,6 +111,7 @@ export function usePresets() {
     isLoading,
     error,
     addOrUpdatePreset,
-    deletePreset,
+    deletePreset: removePreset,
+    loadPresetDetail,
   };
 }
