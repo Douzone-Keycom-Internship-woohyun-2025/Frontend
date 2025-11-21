@@ -1,21 +1,13 @@
 import axios, { AxiosError } from "axios";
-import type { InternalAxiosRequestConfig, AxiosResponse } from "axios";
+import type { InternalAxiosRequestConfig } from "axios";
+import { refreshTokenApi } from "./auth";
 
-const API_BASE_URL = "https://techlens-backend-develop.onrender.com";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
 });
-
-/* Refresh Response 타입 */
-interface RefreshResponse {
-  status: string;
-  message: string;
-  data: {
-    accessToken: string;
-  };
-}
 
 api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
   const token = localStorage.getItem("accessToken");
@@ -40,7 +32,6 @@ api.interceptors.response.use(
 
       const refreshToken = localStorage.getItem("refreshToken");
       if (!refreshToken) {
-        console.error("Refresh Token 없음 → 로그인 필요");
         window.location.href = "/login";
         return Promise.reject(error);
       }
@@ -57,29 +48,22 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const refreshResponse: AxiosResponse<RefreshResponse> =
-          await axios.post(`${API_BASE_URL}/auth/refresh`, {
-            refreshToken,
-          });
-
-        const newToken = refreshResponse.data.data.accessToken;
+        const response = await refreshTokenApi(refreshToken);
+        const newToken = response.data.accessToken;
 
         localStorage.setItem("accessToken", newToken);
 
         requestQueue.forEach((cb) => cb(newToken));
         requestQueue = [];
         isRefreshing = false;
+
         original.headers.Authorization = `Bearer ${newToken}`;
         return api(original);
       } catch (err) {
-        console.error("Refresh 실패 → 로그인으로 이동");
-
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-
         isRefreshing = false;
         requestQueue = [];
-
         window.location.href = "/login";
         return Promise.reject(err);
       }
