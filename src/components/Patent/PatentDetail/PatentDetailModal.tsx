@@ -1,4 +1,5 @@
 import type { PatentDetail } from "../../../types/patent";
+import type { AddFavoritePayload } from "../../../types/favorite";
 import { getStatusColor } from "../../../utils/statusColor";
 import { formatDate } from "../../../utils/dateFormat";
 import LoadingSpinner from "../../common/LoadingSpinner";
@@ -9,7 +10,10 @@ interface PatentDetailModalProps {
   onClose: () => void;
   loading: boolean;
   isFavorite: boolean;
-  onToggleFavorite: (applicationNumber: string, detail?: PatentDetail) => void;
+  onToggleFavorite: (
+    applicationNumber: string,
+    payload?: AddFavoritePayload
+  ) => void;
 }
 
 export default function PatentDetailModal({
@@ -26,6 +30,24 @@ export default function PatentDetailModal({
     if (e.target === e.currentTarget) onClose();
   };
 
+  /** ⭐ PatentDetail → AddFavoritePayload 변환 */
+  const buildPayloadFromDetail = (d: PatentDetail): AddFavoritePayload => ({
+    applicationNumber: d.applicationNumber,
+    inventionTitle: d.inventionTitle ?? "",
+    applicantName: d.applicantName ?? "",
+    abstract: d.astrtCont ?? null,
+    applicationDate: d.applicationDate ?? "",
+    openNumber: d.openNumber ?? null,
+    publicationNumber: d.publicationNumber ?? null,
+    publicationDate: d.publicationDate ?? null,
+    registerNumber: d.registerNumber ?? null,
+    registerDate: d.registerDate ?? null,
+    registerStatus: d.registerStatus ?? null,
+    drawingUrl: d.drawing ?? null,
+    ipcNumber: d.ipcNumber ?? null,
+    mainIpcCode: d.mainIpcCode ?? null,
+  });
+
   const ipcList = patent?.ipcNumber?.split("|").map((ipc) => ipc.trim()) ?? [];
 
   return (
@@ -40,7 +62,7 @@ export default function PatentDetailModal({
           </div>
         ) : (
           <>
-            {/* 헤더 영역 */}
+            {/* 헤더 */}
             <div className="sticky top-0 flex justify-between items-center px-6 py-4 border-b bg-white z-10">
               <div className="flex items-center space-x-3">
                 <i className="ri-file-text-line text-xl text-blue-600"></i>
@@ -60,11 +82,12 @@ export default function PatentDetailModal({
               </div>
 
               <div className="flex items-center space-x-2">
-                {/* 관심토글 버튼 */}
+                {/* ⭐ 좋아요 버튼 */}
                 <button
-                  onClick={() =>
-                    onToggleFavorite(patent.applicationNumber, patent)
-                  }
+                  onClick={() => {
+                    const payload = buildPayloadFromDetail(patent);
+                    onToggleFavorite(patent.applicationNumber, payload);
+                  }}
                   className="p-2 rounded-full hover:bg-gray-100 transition"
                 >
                   {isFavorite ? (
@@ -74,6 +97,7 @@ export default function PatentDetailModal({
                   )}
                 </button>
 
+                {/* 닫기 */}
                 <button
                   onClick={onClose}
                   className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition"
@@ -107,6 +131,7 @@ export default function PatentDetailModal({
                 </div>
               </section>
 
+              {/* 좌측 · 우측 정보 */}
               <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 <div className="space-y-6">
                   {/* 출원인 */}
@@ -137,7 +162,7 @@ export default function PatentDetailModal({
                     </div>
                   </div>
 
-                  {/* 전체 IPC */}
+                  {/* 전체 IPC 목록 */}
                   {ipcList.length > 0 && (
                     <div className="bg-gray-50 p-5 rounded-lg border">
                       <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
@@ -219,7 +244,7 @@ export default function PatentDetailModal({
               )}
 
               {/* 도면 */}
-              {patent.drawing && (
+              {patent.bigDrawing && (
                 <section>
                   <label className="flex items-center text-lg font-bold text-gray-900 mb-3">
                     <i className="ri-image-line mr-3 text-blue-600"></i>
@@ -227,7 +252,7 @@ export default function PatentDetailModal({
                   </label>
 
                   <a
-                    href={patent.drawing}
+                    href={patent.bigDrawing}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center p-5 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all"
