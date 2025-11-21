@@ -220,19 +220,10 @@ npm run dev
 
 브라우저에서 `http://localhost:5173` 접속
 
-### 프로덕션 빌드
+**배포 URL (production)**: [https://techlens-frontend.vercel.app](https://frontend-woohyun-sims-projects.vercel.app/)
 
-```bash
-npm run build
-npm run preview
-```
 ---
-### 환경 변수 (Vercel)
 
-```
-VITE_API_URL=https://api.example.com/api/v1
-VITE_API_TIMEOUT=10000
-```
 
 ## 📊 구현 현황
 
