@@ -10,8 +10,8 @@ export async function signupApi(email: string, password: string) {
   return res.data;
 }
 
-export async function refreshTokenApi() {
-  const res = await api.post("/users/refresh");
+export async function refreshTokenApi(refreshToken: string) {
+  const res = await api.post("/users/refresh", { refreshToken });
   return res.data;
 }
 
