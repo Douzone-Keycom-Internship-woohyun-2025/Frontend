@@ -22,6 +22,7 @@ export interface BackendSummaryResponse {
   avgMonthlyCount: number;
 
   recentPatents: Array<{
+    applicationNumber: string;
     title: string;
     date: string;
     ipcMain: string;

@@ -27,12 +27,8 @@ export async function getSummaryApi(
   }
 
   const res = await api.get("/summary", { params: query });
-
   const raw: BackendSummaryResponse = res.data.data;
 
-  // -----------------------------
-  // 🔥 statistics
-  // -----------------------------
   const statistics: SummaryData["statistics"] = {
     totalPatents: raw.totalCount,
     registrationRate: raw.statusPercent?.등록 ?? 0,
@@ -43,9 +39,6 @@ export async function getSummaryApi(
     },
   };
 
-  // -----------------------------
-  // 🔥 IPC 분포
-  // -----------------------------
   const ipcDistribution: SummaryData["ipcDistribution"] = raw.topIPC.map(
     (item) => ({
       ipcCode: item.code,
@@ -58,9 +51,6 @@ export async function getSummaryApi(
     })
   );
 
-  // -----------------------------
-  // 🔥 월별 추세
-  // -----------------------------
   const monthlyTrend: SummaryData["monthlyTrend"] = raw.monthlyTrend.map(
     (item, index, arr) => ({
       month: item.month,
@@ -71,9 +61,6 @@ export async function getSummaryApi(
     })
   );
 
-  // -----------------------------
-  // 🔥 상태 분포
-  // -----------------------------
   const statusDistribution: SummaryData["statusDistribution"] = Object.entries(
     raw.statusCount
   ).map(([status, count]) => ({
@@ -82,12 +69,9 @@ export async function getSummaryApi(
     percentage: raw.statusPercent?.[status] ?? 0,
   }));
 
-  // -----------------------------
-  // 🔥 최근 특허
-  // -----------------------------
   const recentPatents: SummaryData["recentPatents"] = raw.recentPatents.map(
     (p) => ({
-      applicationNumber: "",
+      applicationNumber: p.applicationNumber,
       inventionTitle: p.title,
       applicantName: raw.applicant,
       applicationDate: p.date,
