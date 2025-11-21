@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import dayjs from "dayjs";
 import { usePresets } from "../../hooks/usePresets";
 import { toInputDateFormat, toApiDateFormat } from "../../utils/dateTransform";
 
@@ -31,27 +32,38 @@ export default function SearchForm({
 }: SearchFormProps) {
   const { presets, isLoading: presetLoading, error } = usePresets();
 
+  const today = useMemo(() => dayjs().format("YYYY-MM-DD"), []);
+
+  const oneMonthAgo = useMemo(
+    () => dayjs().subtract(1, "month").format("YYYY-MM-DD"),
+    []
+  );
+
   const [formData, setFormData] = useState<SearchFormParams>({
     applicant: "",
-    startDate: "",
-    endDate: "",
+    startDate: oneMonthAgo,
+    endDate: today,
   });
 
   useEffect(() => {
     if (initialValues) {
       setFormData({
         applicant: initialValues.applicant ?? "",
-        startDate: toInputDateFormat(initialValues.startDate ?? ""),
-        endDate: toInputDateFormat(initialValues.endDate ?? ""),
+        startDate: toInputDateFormat(initialValues.startDate ?? oneMonthAgo),
+        endDate: toInputDateFormat(initialValues.endDate ?? today),
       });
     }
-  }, [initialValues]);
+  }, [initialValues, oneMonthAgo, today]);
 
   const handleSelectPreset = (presetId: string) => {
     onPresetChange(presetId);
 
     if (presetId === "") {
-      setFormData({ applicant: "", startDate: "", endDate: "" });
+      setFormData({
+        applicant: "",
+        startDate: oneMonthAgo,
+        endDate: today,
+      });
       return;
     }
 
@@ -104,7 +116,11 @@ export default function SearchForm({
 
   const handleReset = () => {
     onPresetChange("");
-    setFormData({ applicant: "", startDate: "", endDate: "" });
+    setFormData({
+      applicant: "",
+      startDate: oneMonthAgo,
+      endDate: today,
+    });
   };
 
   return (
