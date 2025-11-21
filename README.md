@@ -49,36 +49,52 @@ TechLens 프로젝트
 
 ```
 src/
-├── components/          # 재사용 가능한 UI 컴포넌트
-│   ├── Header.tsx
-│   ├── Sidebar.tsx
-│   ├── PatentTable.tsx
-│   └── ...
+├── api/                      # 백엔드 API 통신
+│   ├── client.ts             # Axios 인스턴스
+│   └── services/             # 특허, 분석, 프리셋 등 서비스 API
 │
-├── pages/              # 페이지 컴포넌트
-│   ├── LoginPage.tsx
-│   ├── SearchPage.tsx
-│   ├── AnalysisPage.tsx
-│   ├── FavoritesPage.tsx
-│   └── PresetPage.tsx
+├── components/
+│   ├── common/               # 공통 컴포넌트 (로딩, 에러, NoData 등)
+│   ├── Patent/               # 특허 관련 컴포넌트
+│   ├── Summary/             # 요약 분석 대시보드
+│   └── Layout/               # ProtectedLayout, Header 등
+|   └── Preset/               # 프리셋 관련 컴포넌트
+|   └── Sidebar/               # 사이드바 컴포넌트
+|   └── PatentSearch/          # 특허검색 관련 컴포넌트
+|   └── ProtectedRoute/        # 사이드바 레이아웃 컴포넌트
 │
-├── api/                # 백엔드 API 통신
-│   ├── client.ts
-│   └── services.ts
+├── hooks/
+│   ├── usePresets.ts         # 검색 프리셋 관리 훅
+│   ├── useFavorites.ts       # 관심특허 관리 훅
+│   └── useSummaryAnalysis.ts # 요약분석 데이터 훅
+│   └── usePatentSearch.ts    # 특허검색 데이터 훅
 │
-├── store/              # Zustand 상태 관리
-│   ├── authStore.ts
-│   ├── patentStore.ts
-│   └── presetStore.ts
+├── pages/
+│   ├── PatentSearchPage.tsx        # 검색 및 프리셋
+│   ├── SummaryPage.tsx       # 요약분석 및 프리셋셋
+│   ├── FavoritesPage.tsx     # 관심특허
+│   ├── HomePage.tsx          # 메인
+│   └── HelpPage.tsx          # 도움말
+│   └── LoginPage.tsx         # 로그인
+│   └── PresetManagementPage.tsx     #프리셋 관리
 │
-├── types/              # TypeScript 타입 정의
-│   └── index.ts
+├── store/                    # Zustand 전역상태
+│   ├── uiStore.ts
+│   └── userStore.ts
 │
-├── utils/              # 유틸리티 함수
-│   └── constants.ts
+├── types/
+│   ├── patent.ts             # 특허 타입
+│   ├── summary.ts            # 분석 타입
+│   └── preset.ts             # 프리셋 타입
+│
+├── utils/
+│   ├── dateFormat.ts
+│   ├── statusColor.ts
+│   └── statusLabel.ts
 │
 ├── App.tsx
 └── main.tsx
+
 ```
 
 
@@ -158,7 +174,51 @@ npm run format    # Prettier 포맷팅
 - **Staging**: develop 브랜치 변경 시
 - **Production**: main 브랜치 변경 시
 
-**배포 URL (staging)**: [https://frontend-mnitgzfvt-woohyun-sims-projects.vercel.app/login](https://staging-frontend-techlens.vercel.app)
+**배포 URL**: [https://techlens-frontend.vercel.app](https://frontend-woohyun-sims-projects.vercel.app/)
+---
+
+## 📦 설치 및 실행
+
+### 사전 요구사항
+
+```
+Node.js 20.11.1
+npm 또는 yarn
+```
+
+### 1단계: 저장소 클론
+
+```bash
+git clone https://github.com/YOUR_ORG/techlens-frontend.git
+cd techlens-frontend
+```
+
+### 2단계: 의존성 설치
+
+```bash
+npm ci
+```
+
+### 3단계: 환경 변수 설정
+
+```bash
+cp .env.example .env.local
+```
+
+`.env.local` 내용:
+
+```env
+VITE_API_URL=http://localhost:3000/api/v1
+VITE_API_TIMEOUT=10000
+```
+
+### 4단계: 개발 서버 실행
+
+```bash
+npm run dev
+```
+
+브라우저에서 `http://localhost:5173` 접속
 
 **배포 URL (production)**: [https://techlens-frontend.vercel.app](https://frontend-woohyun-sims-projects.vercel.app/)
 
@@ -182,8 +242,6 @@ npm run format    # Prettier 포맷팅
 ---
 
 **마지막 업데이트**: 2025년 11월
-
-
 
 
 
