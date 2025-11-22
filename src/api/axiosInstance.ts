@@ -22,6 +22,7 @@ let requestQueue: ((token: string) => void)[] = [];
 
 api.interceptors.response.use(
   (res) => res,
+
   async (error: AxiosError) => {
     const original = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
@@ -31,6 +32,7 @@ api.interceptors.response.use(
       original._retry = true;
 
       const refreshToken = localStorage.getItem("refreshToken");
+
       if (!refreshToken) {
         window.location.href = "/login";
         return Promise.reject(error);
@@ -49,21 +51,24 @@ api.interceptors.response.use(
 
       try {
         const response = await refreshTokenApi(refreshToken);
-        const newToken = response.data.accessToken;
+        const newAccessToken = response.data.accessToken;
+        const newRefreshToken = response.data.refreshToken;
 
-        localStorage.setItem("accessToken", newToken);
+        localStorage.setItem("accessToken", newAccessToken);
+        localStorage.setItem("refreshToken", newRefreshToken);
 
-        requestQueue.forEach((cb) => cb(newToken));
+        requestQueue.forEach((cb) => cb(newAccessToken));
         requestQueue = [];
         isRefreshing = false;
 
-        original.headers.Authorization = `Bearer ${newToken}`;
+        original.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(original);
       } catch (err) {
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
         isRefreshing = false;
         requestQueue = [];
+
         window.location.href = "/login";
         return Promise.reject(err);
       }
