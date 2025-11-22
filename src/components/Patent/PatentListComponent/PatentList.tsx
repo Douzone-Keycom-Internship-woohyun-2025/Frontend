@@ -7,11 +7,31 @@ import EmptyState from "../../common/EmptyState";
 import { getStatusColor } from "../../../utils/statusColor";
 import { getPatentDetail } from "../../../api/patent";
 
+interface FavoritePayload {
+  applicationNumber: string;
+  inventionTitle: string;
+  applicantName: string;
+  abstract: string | null;
+  applicationDate: string;
+  openNumber: string | null;
+  publicationNumber: string | null;
+  publicationDate: string | null;
+  registerNumber: string | null;
+  registerDate: string | null;
+  registerStatus: string | null;
+  drawingUrl: string | null;
+  ipcNumber: string | null;
+  mainIpcCode: string | null;
+}
+
 interface PatentListProps {
   patents: PatentListItem[];
   loading: boolean;
   favorites: string[];
-  onToggleFavorite: (applicationNumber: string, detail?: PatentDetail) => void;
+  onToggleFavorite: (
+    applicationNumber: string,
+    payload?: FavoritePayload
+  ) => void;
   sortOrder: "asc" | "desc";
   onSortChange: (order: "asc" | "desc") => void;
   currentPage: number;
@@ -36,6 +56,7 @@ export default function PatentList({
     useState<PatentDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
+  // 상세 정보 모달 열기
   const handlePatentClick = async (patent: PatentListItem) => {
     setSelectedPatentDetail(null);
     setDetailLoading(true);
@@ -43,26 +64,37 @@ export default function PatentList({
     try {
       const detail = await getPatentDetail(patent.applicationNumber);
       setSelectedPatentDetail(detail);
-    } catch (err) {
-      console.error(err);
+    } catch {
       alert("특허 상세 정보를 가져오지 못했습니다.");
     } finally {
       setDetailLoading(false);
     }
   };
 
-  const handleFavoriteToggle = async (
+  // 즐겨찾기 추가용 payload 생성 (검색 리스트 기반)
+  const buildFavoritePayload = (p: PatentListItem): FavoritePayload => ({
+    applicationNumber: p.applicationNumber,
+    inventionTitle: p.inventionTitle ?? "",
+    applicantName: p.applicantName ?? "",
+    abstract: null,
+    applicationDate: p.applicationDate ?? "",
+    openNumber: null,
+    publicationNumber: null,
+    publicationDate: null,
+    registerNumber: null,
+    registerDate: null,
+    registerStatus: p.registerStatus ?? null,
+    drawingUrl: null,
+    ipcNumber: null,
+    mainIpcCode: p.mainIpcCode ?? null,
+  });
+
+  const handleFavoriteToggleMobile = (
     e: React.MouseEvent,
     patent: PatentListItem
   ) => {
     e.stopPropagation();
-
-    try {
-      const detail = await getPatentDetail(patent.applicationNumber);
-      onToggleFavorite(patent.applicationNumber, detail);
-    } catch (err) {
-      console.error("관심특허 토글 실패:", err);
-    }
+    onToggleFavorite(patent.applicationNumber, buildFavoritePayload(patent));
   };
 
   const handleSortToggle = () => {
@@ -75,6 +107,7 @@ export default function PatentList({
   return (
     <>
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        {/* 헤더 */}
         <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50 flex items-center justify-between">
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">
             검색 결과
@@ -84,13 +117,17 @@ export default function PatentList({
           </span>
         </div>
 
-        {/* 데스크탑 */}
+        {/* 데스크탑 테이블 */}
         <div className="hidden md:block">
           <PatentTable
             patents={patents}
             favorites={favorites}
             onToggleFavorite={(applicationNumber) => {
-              onToggleFavorite(applicationNumber);
+              const patent = patents.find(
+                (p) => p.applicationNumber === applicationNumber
+              );
+              if (!patent) return;
+              onToggleFavorite(applicationNumber, buildFavoritePayload(patent));
             }}
             sortOrder={sortOrder}
             onSortChange={handleSortToggle}
@@ -99,7 +136,7 @@ export default function PatentList({
           />
         </div>
 
-        {/* 모바일 */}
+        {/* 모바일 카드형 */}
         <div className="md:hidden px-4 py-3">
           {loading ? (
             <></>
@@ -147,8 +184,9 @@ export default function PatentList({
                           {patent.applicationNumber}
                         </div>
 
+                        {/* 모바일 즐겨찾기 */}
                         <button
-                          onClick={(e) => handleFavoriteToggle(e, patent)}
+                          onClick={(e) => handleFavoriteToggleMobile(e, patent)}
                           className="p-1 rounded-full hover:bg-gray-100"
                         >
                           {isFavorite ? (
@@ -202,6 +240,7 @@ export default function PatentList({
           )}
         </div>
 
+        {/* 데스크탑 pagination */}
         <div className="hidden md:block">
           <Pagination
             currentPage={currentPage}
@@ -213,6 +252,7 @@ export default function PatentList({
         </div>
       </div>
 
+      {/* 상세 모달 */}
       <PatentDetailModal
         patent={selectedPatentDetail}
         isOpen={detailLoading || !!selectedPatentDetail}

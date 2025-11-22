@@ -19,7 +19,6 @@ export default function FavoritesPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
 
-  // 👉 여기서 TS 타입 정확히 맞게 sanitize
   const VALID_STATUS: PatentStatus[] = [
     "등록",
     "공개",
@@ -37,6 +36,7 @@ export default function FavoritesPage() {
       ? (value as PatentStatus)
       : "";
   };
+
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     async function loadFavorites() {
@@ -74,22 +74,6 @@ export default function FavoritesPage() {
     setCurrentPage(1);
   };
 
-  if (isLoading) {
-    return (
-      <ProtectedLayout>
-        <LoadingSpinner message="관심 특허를 불러오는 중..." size="md" />
-      </ProtectedLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <ProtectedLayout>
-        <ErrorState message={error} onRetry={() => window.location.reload()} />
-      </ProtectedLayout>
-    );
-  }
-
   return (
     <ProtectedLayout>
       <div className="w-full bg-gray-50">
@@ -111,7 +95,16 @@ export default function FavoritesPage() {
         </header>
 
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          {favoritePatents.length === 0 ? (
+          {isLoading ? (
+            <div className="bg-white rounded-lg shadow p-10 flex justify-center">
+              <LoadingSpinner message="관심 특허를 불러오는 중..." size="md" />
+            </div>
+          ) : error ? (
+            <ErrorState
+              message={error}
+              onRetry={() => window.location.reload()}
+            />
+          ) : favoritePatents.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 sm:p-10 text-center">
               <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
                 <i className="ri-heart-line text-2xl text-blue-600" />
@@ -122,16 +115,12 @@ export default function FavoritesPage() {
               <p className="text-sm sm:text-base text-gray-600 mb-6">
                 특허 검색 페이지에서 마음에 드는 특허를 즐겨찾기에 추가해보세요.
               </p>
+
               <Link
                 to="/patent-search"
-                className="
-                  inline-flex items-center
-                  px-4 sm:px-5 py-2.5
-                  bg-blue-600 text-white
-                  text-sm sm:text-base
-                  rounded-lg
-                  hover:bg-blue-700
-                  transition-colors duration-200"
+                className="inline-flex items-center px-4 sm:px-5 py-2.5
+                  bg-blue-600 text-white text-sm sm:text-base rounded-lg
+                  hover:bg-blue-700 transition-colors duration-200"
               >
                 <i className="ri-search-line text-base mr-2" />
                 특허 검색하기
