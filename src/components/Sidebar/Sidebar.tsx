@@ -1,4 +1,7 @@
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import LogoutConfirmModal from "../common/LogoutConfirmModal";
+import { toast } from "../../hooks/use-toast";
 
 interface SidebarProps {
   userEmail: string;
@@ -14,6 +17,30 @@ export default function Sidebar({
   onClose,
 }: SidebarProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+
+  const handleLogoutClick = () => {
+    setShowLogoutModal(true);
+  };
+
+  const confirmLogout = () => {
+    onLogout();
+    setShowLogoutModal(false);
+
+    toast({
+      title: "로그아웃되었습니다.",
+      description: "다음에 다시 만나요!",
+    });
+
+    navigate("/login");
+  };
+
+  const isActive = (path: string, exact = false) => {
+    if (exact) return location.pathname === path;
+    return location.pathname.startsWith(path);
+  };
 
   const menuItems = [
     { path: "/", icon: "ri-home-line", label: "홈", exact: true },
@@ -27,11 +54,6 @@ export default function Sidebar({
     },
     { path: "/help", icon: "ri-question-line", label: "도움말" },
   ];
-
-  const isActive = (path: string, exact = false) => {
-    if (exact) return location.pathname === path;
-    return location.pathname.startsWith(path);
-  };
 
   const handleMenuClick = () => {
     if (window.innerWidth < 768) onClose();
@@ -62,7 +84,7 @@ export default function Sidebar({
                 to={item.path}
                 onClick={handleMenuClick}
                 className={`
-                  flex items-center px-4 py-3 rounded-lg transition-colors duration-200 cursor-pointer
+                  flex items-center px-4 py-3 rounded-lg transition-colors
                   ${
                     isActive(item.path, item.exact)
                       ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
@@ -70,9 +92,7 @@ export default function Sidebar({
                   }
                 `}
               >
-                <i
-                  className={`${item.icon} w-5 h-5 flex items-center justify-center mr-3`}
-                />
+                <i className={`${item.icon} w-5 h-5 mr-3`} />
                 {item.label}
               </Link>
             </li>
@@ -93,12 +113,13 @@ export default function Sidebar({
               </p>
             </div>
           </div>
+
           <button
-            onClick={onLogout}
-            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors duration-200 cursor-pointer"
+            onClick={handleLogoutClick}
+            className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition"
             title="로그아웃"
           >
-            <i className="ri-logout-box-line w-4 h-4 flex items-center justify-center" />
+            <i className="ri-logout-box-line w-4 h-4" />
           </button>
         </div>
       </div>
@@ -107,12 +128,11 @@ export default function Sidebar({
 
   return (
     <>
-      {/* 모바일 오버레이 */}
+      {/* 오버레이 */}
       <div
         className={`
           fixed inset-0 z-40 bg-black/40 transition-opacity duration-200
-          md:hidden
-          ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"}
+          md:hidden ${isOpen ? "opacity-100 visible" : "opacity-0 invisible"}
         `}
         onClick={onClose}
       />
@@ -120,20 +140,25 @@ export default function Sidebar({
       {/* 모바일 드로어 */}
       <div
         className={`
-          fixed left-0 top-0 z-50
-          w-64 h-screen bg-white shadow-lg flex flex-col
-          transform transition-transform duration-200
-          md:hidden
+          fixed left-0 top-0 z-50 w-64 h-screen bg-white shadow-lg flex flex-col
+          transform transition-transform duration-200 md:hidden
           ${isOpen ? "translate-x-0" : "-translate-x-full"}
         `}
       >
         {Content}
       </div>
 
-      {/* 데스크탑 사이드바 (항상 노출) */}
+      {/* 데스크탑 */}
       <div className="hidden md:flex fixed left-0 top-0 z-40 w-64 h-screen bg-white shadow-lg flex-col">
         {Content}
       </div>
+
+      {/* 로그아웃 모달 */}
+      <LogoutConfirmModal
+        isOpen={showLogoutModal}
+        onClose={() => setShowLogoutModal(false)}
+        onConfirm={confirmLogout}
+      />
     </>
   );
 }

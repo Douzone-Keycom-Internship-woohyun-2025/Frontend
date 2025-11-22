@@ -56,7 +56,6 @@ export default function SummaryDashboard({
     });
   };
 
-  // 데이터 정제
   const totalPatents = data?.statistics?.totalPatents || 0;
   const ipcData = data?.ipcDistribution || [];
   const monthlyData = data?.monthlyTrend || [];
@@ -69,36 +68,30 @@ export default function SummaryDashboard({
 
   const recentMonths = monthlyData.slice(-6);
 
-  // IPC 파이 차트
   const ipcChartData = {
     labels: topIpcCodes.map((item) => item.ipcCode),
     datasets: [
       {
         data: topIpcCodes.map((item) => item.count),
         backgroundColor: [
-          "#3B82F6",
-          "#10B981",
-          "#F59E0B",
-          "#EF4444",
-          "#8B5CF6",
+          "#1D4ED8", // 진한 블루
+          "#059669", // 에메랄드 그린
+          "#F97316", // 비비드 오렌지
+          "#DC2626", // 강한 레드
+          "#7C3AED", // 퍼플
         ],
         borderWidth: 1,
       },
     ],
   };
 
-  // 월별 색상
   const monthColors = [
-    "#3B82F6",
-    "#10B981",
-    "#F59E0B",
-    "#EF4444",
-    "#8B5CF6",
-    "#14B8A6",
-    "#A855F7",
-    "#F97316",
-    "#6366F1",
-    "#EAB308",
+    "#86EFAC", // light green
+    "#4ADE80",
+    "#22C55E",
+    "#16A34A",
+    "#15803D",
+    "#166534",
   ];
 
   const monthlyBarColors = recentMonths.map(
@@ -118,19 +111,17 @@ export default function SummaryDashboard({
     ],
   };
 
-  // 🔥 등록 상태 도넛 (statusLabel 없이 한글 그대로)
   const statusChartData = {
     labels: statusData.map((s) => s.status || "정보 없음"),
     datasets: [
       {
         data: statusData.map((s) => s.count),
         backgroundColor: [
+          "#22C55E",
           "#3B82F6",
-          "#10B981",
-          "#F59E0B",
+          "#EAB308",
           "#EF4444",
-          "#6B7280",
-          "#8B5CF6",
+          "#9CA3AF",
         ],
         borderWidth: 0,
         hoverOffset: 0,
@@ -342,8 +333,11 @@ export default function SummaryDashboard({
         {renderSection(
           data.recentPatents.length > 0,
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
-            {data.recentPatents.slice(0, 3).map((patent, index) => (
-              <RecentPatentCard key={index} patent={patent} />
+            {data.recentPatents.slice(0, 3).map((patent) => (
+              <RecentPatentCard
+                key={patent.applicationNumber}
+                patent={patent}
+              />
             ))}
           </div>,
           "최근 특허 데이터가 없습니다."

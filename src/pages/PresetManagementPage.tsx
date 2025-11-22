@@ -139,26 +139,9 @@ export default function PresetManagementPage() {
     setEditingPreset(null);
   };
 
-  if (isLoading) {
-    return (
-      <ProtectedLayout>
-        <LoadingSpinner message="프리셋을 불러오는 중..." />
-      </ProtectedLayout>
-    );
-  }
-
-  if (error) {
-    return (
-      <ProtectedLayout>
-        <ErrorState message={error} onRetry={() => window.location.reload()} />
-      </ProtectedLayout>
-    );
-  }
-
   return (
     <ProtectedLayout>
       <div className="w-full bg-gray-50">
-        {/* header */}
         <header className="bg-white shadow-sm border-b">
           <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
@@ -179,9 +162,17 @@ export default function PresetManagementPage() {
           </div>
         </header>
 
-        {/* main */}
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          {presets.length === 0 ? (
+          {isLoading ? (
+            <div className="bg-white rounded-lg shadow p-10 flex justify-center">
+              <LoadingSpinner message="프리셋을 불러오는 중..." size="md" />
+            </div>
+          ) : error ? (
+            <ErrorState
+              message={error}
+              onRetry={() => window.location.reload()}
+            />
+          ) : presets.length === 0 ? (
             <NoData
               message="저장된 프리셋이 없습니다."
               subMessage="자주 사용하는 검색 조건을 프리셋으로 저장해보세요."
