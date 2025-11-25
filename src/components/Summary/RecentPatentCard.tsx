@@ -2,12 +2,11 @@ import { getStatusColor } from "../../utils/statusColor";
 
 export interface RecentPatent {
   applicationNumber: string;
-  inventionTitle: string;
-  applicantName: string;
-  applicationDate: string;
-  ipcCode: string;
-  registerStatus: string;
-  isFavorite: boolean;
+  title: string;
+  date: string;
+  ipcMain: string | null;
+  ipcKorName: string;
+  status: string;
 }
 
 export default function RecentPatentCard({ patent }: { patent: RecentPatent }) {
@@ -33,7 +32,7 @@ export default function RecentPatentCard({ patent }: { patent: RecentPatent }) {
             line-clamp-2
           "
         >
-          {patent.inventionTitle}
+          {patent.title}
         </h4>
         <span
           className={`
@@ -43,29 +42,28 @@ export default function RecentPatentCard({ patent }: { patent: RecentPatent }) {
             text-[9px] sm:text-xs
             font-medium
             whitespace-nowrap
-            ${getStatusColor(patent.registerStatus)}
+            ${getStatusColor(patent.status)}
           `}
         >
-          {patent.registerStatus}
+          {patent.status}
         </span>
       </div>
 
       {/* 상세 정보 */}
       <div className="space-y-1.5 sm:space-y-2 text-[10px] sm:text-xs text-gray-600">
-        <div className="flex items-center gap-1.5">
-          <i className="ri-building-line w-3 h-3 flex items-center justify-center" />
-          <span className="truncate">{patent.applicantName}</span>
-        </div>
-
+        {/* 출원 일자 */}
         <div className="flex items-center gap-1.5">
           <i className="ri-calendar-line w-3 h-3 flex items-center justify-center" />
-          <span>{patent.applicationDate}</span>
+          <span>{patent.date}</span>
         </div>
 
-        {patent.ipcCode && (
+        {/* IPC */}
+        {patent.ipcMain && (
           <div className="flex items-center gap-1.5">
             <i className="ri-code-line w-3 h-3 flex items-center justify-center" />
-            <span className="truncate">{patent.ipcCode}</span>
+            <span className="truncate">
+              {patent.ipcMain} — {patent.ipcKorName}
+            </span>
           </div>
         )}
       </div>
