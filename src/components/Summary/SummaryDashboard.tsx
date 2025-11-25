@@ -56,11 +56,11 @@ export default function SummaryDashboard({
     });
   };
 
-  const totalPatents = data?.statistics?.totalPatents || 0;
-  const ipcData = data?.ipcDistribution || [];
-  const monthlyData = data?.monthlyTrend || [];
-  const statusData = data?.statusDistribution || [];
-  const registrationRate = data?.statistics?.registrationRate ?? 0;
+  const totalPatents = data.statistics.totalPatents;
+  const ipcData = data.ipcDistribution;
+  const monthlyData = data.monthlyTrend;
+  const statusData = data.statusDistribution;
+  const registrationRate = data.statistics.registrationRate;
 
   const topIpcCodes = [...ipcData]
     .sort((a, b) => b.count - a.count)
@@ -68,17 +68,18 @@ export default function SummaryDashboard({
 
   const recentMonths = monthlyData.slice(-6);
 
+  /** 🔥 IPC 파이차트: 라벨에 한글 매핑 포함 */
   const ipcChartData = {
-    labels: topIpcCodes.map((item) => item.ipcCode),
+    labels: topIpcCodes.map((item) => `${item.ipcCode} (${item.ipcKorName})`),
     datasets: [
       {
         data: topIpcCodes.map((item) => item.count),
         backgroundColor: [
-          "#1D4ED8", // 진한 블루
-          "#059669", // 에메랄드 그린
-          "#F97316", // 비비드 오렌지
-          "#DC2626", // 강한 레드
-          "#7C3AED", // 퍼플
+          "#1D4ED8",
+          "#059669",
+          "#F97316",
+          "#DC2626",
+          "#7C3AED",
         ],
         borderWidth: 1,
       },
@@ -86,7 +87,7 @@ export default function SummaryDashboard({
   };
 
   const monthColors = [
-    "#86EFAC", // light green
+    "#86EFAC",
     "#4ADE80",
     "#22C55E",
     "#16A34A",
@@ -187,16 +188,16 @@ export default function SummaryDashboard({
       {/* IPC 분포 */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
         <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-1.5 sm:mb-2">
-          상위 5개 IPC 코드별 기술분야 분포
+          상위 IPC 기술 분야 분포
         </h3>
         <p className="text-xs sm:text-sm text-gray-500 mb-4 sm:mb-6">
-          특허 출원 상위 IPC 코드를 기준으로 비율을 표시합니다.
+          코드뿐 아니라 기술 분야까지 함께 확인하세요.
         </p>
 
         {renderSection(
           ipcData.length > 0 && totalPatents > 0,
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-            <div className="h-56 sm:h-72 relative flex justify-center items-center">
+            <div className="h-56 sm:h-72 flex justify-center items-center">
               <Pie
                 data={ipcChartData}
                 options={{
@@ -222,15 +223,12 @@ export default function SummaryDashboard({
                       }}
                     />
                     <span className="text-xs sm:text-sm text-gray-800 font-medium">
-                      {item.ipcCode}
+                      {item.ipcCode} — {item.ipcKorName}
                     </span>
                   </div>
                   <span className="text-xs sm:text-sm text-gray-600">
                     {item.count}건 (
-                    {totalPatents
-                      ? ((item.count / totalPatents) * 100).toFixed(1)
-                      : 0}
-                    %)
+                    {((item.count / totalPatents) * 100).toFixed(1)}%)
                   </span>
                 </div>
               ))}
@@ -264,15 +262,11 @@ export default function SummaryDashboard({
                   scales: {
                     x: {
                       grid: { display: false },
-                      ticks: { color: "#4B5563", font: { size: 10 } },
+                      ticks: { color: "#4B5563" },
                     },
                     y: {
                       beginAtZero: true,
-                      ticks: {
-                        precision: 0,
-                        color: "#4B5563",
-                        font: { size: 10 },
-                      },
+                      ticks: { precision: 0, color: "#4B5563" },
                     },
                   },
                 }}
@@ -300,8 +294,6 @@ export default function SummaryDashboard({
                   maintainAspectRatio: false,
                 }}
               />
-
-              {/* 중앙 퍼센트 */}
               <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
                 <span className="text-[10px] sm:text-xs text-gray-500 leading-none">
                   등록률

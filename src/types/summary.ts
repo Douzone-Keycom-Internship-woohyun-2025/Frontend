@@ -37,38 +37,41 @@ export interface SummaryApiResponse {
 }
 
 export interface SummaryData {
+  applicant: string;
+
+  period: {
+    startDate: string;
+    endDate: string;
+  };
+
   statistics: {
     totalPatents: number;
-    registrationRate: number;
     monthlyAverage: number;
-    searchPeriod: {
-      startDate: string;
-      endDate: string;
-    };
+    registrationRate: number;
   };
+
   ipcDistribution: Array<{
     ipcCode: string;
-    ipcName: string;
+    ipcKorName: string;
     count: number;
-    percentage: number;
   }>;
-  monthlyTrend: Array<{
-    month: string;
-    count: number;
-    cumulativeCount: number;
-  }>;
+
   statusDistribution: Array<{
     status: string;
     count: number;
-    percentage: number;
   }>;
+
+  monthlyTrend: Array<{
+    month: string;
+    count: number;
+  }>;
+
   recentPatents: Array<{
     applicationNumber: string;
-    inventionTitle: string;
-    applicantName: string;
-    applicationDate: string;
-    ipcCode: string;
-    registerStatus: string;
-    isFavorite: boolean;
+    title: string;
+    date: string;
+    ipcMain: string;
+    ipcKorName: string;
+    status: string;
   }>;
 }
