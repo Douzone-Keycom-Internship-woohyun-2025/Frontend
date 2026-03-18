@@ -1,32 +1,33 @@
-import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import type { SummaryData } from "@/types/summary";
 import { getSummaryApi, type SummaryQuery } from "@/api/summary";
+import { useState } from "react";
 
 export function useSummaryAnalysis() {
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [lastParams, setLastParams] = useState<SummaryQuery | null>(null);
 
-  const analyze = async (params: SummaryQuery) => {
-    try {
-      setLastParams(params);
-      setIsLoading(true);
-      setError(null);
-
-      const data = await getSummaryApi(params);
+  const mutation = useMutation({
+    mutationFn: getSummaryApi,
+    onSuccess: (data) => {
       setSummaryData(data);
-    } catch (err) {
-      console.error(err);
-      setError("요약 데이터를 분석하는 중 오류가 발생했습니다.");
-    } finally {
-      setIsLoading(false);
-    }
+    },
+  });
+
+  const analyze = async (params: SummaryQuery) => {
+    setLastParams(params);
+    await mutation.mutateAsync(params);
   };
 
   const retry = () => {
     if (lastParams) analyze(lastParams);
   };
 
-  return { summaryData, isLoading, error, analyze, retry };
+  return {
+    summaryData,
+    isLoading: mutation.isPending,
+    error: mutation.error ? "요약 데이터를 분석하는 중 오류가 발생했습니다." : null,
+    analyze,
+    retry,
+  };
 }

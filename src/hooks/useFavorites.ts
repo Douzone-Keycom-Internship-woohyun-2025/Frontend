@@ -1,67 +1,65 @@
-import { useEffect, useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getFavoritesApi,
   addFavoriteApi,
   deleteFavoriteApi,
 } from "@/api/favorite";
 
-import type { AddFavoritePayload, FavoriteItem } from "@/types/favorite";
+import type { AddFavoritePayload } from "@/types/favorite";
 
 export function useFavorites() {
-  const [favorites, setFavorites] = useState<string[]>([]);
-  const [favoriteItems, setFavoriteItems] = useState<FavoriteItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const queryClient = useQueryClient();
 
-  const loadFavorites = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  const { data, isLoading: loading, error: queryError } = useQuery({
+    queryKey: ["favorites"],
+    queryFn: async () => {
       const { favorites: list } = await getFavoritesApi();
-      setFavorites(list.map((f) => f.applicationNumber));
-      setFavoriteItems(list);
-    } catch (err) {
-      console.error("관심특허 로딩 실패:", err);
-      setError("관심 특허 목록을 불러오는 중 오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
-    }
-  };
+      return list;
+    },
+  });
 
-  useEffect(() => {
-    loadFavorites();
-  }, []);
+  const favoriteItems = data ?? [];
+  const favorites = favoriteItems.map((f) => f.applicationNumber);
+  const error = queryError ? "관심 특허 목록을 불러오는 중 오류가 발생했습니다." : null;
+
+  const addMutation = useMutation({
+    mutationFn: addFavoriteApi,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteFavoriteApi,
+    onSuccess: (_data, applicationNumber) => {
+      queryClient.setQueryData(
+        ["favorites"],
+        favoriteItems.filter((item) => item.applicationNumber !== applicationNumber)
+      );
+    },
+  });
 
   const toggleFavorite = async (
     applicationNumber: string,
     payload?: AddFavoritePayload
   ) => {
-    try {
-      const isFav = favorites.includes(applicationNumber);
+    const isFav = favorites.includes(applicationNumber);
 
-      if (!isFav) {
-        if (!payload) {
-          console.error("payload 없음 → 즐겨찾기 추가 불가");
-          return;
-        }
-
-        await addFavoriteApi(payload);
-
-        setFavorites((prev) => [...prev, applicationNumber]);
-        await loadFavorites();
+    if (!isFav) {
+      if (!payload) {
+        console.error("payload 없음 → 즐겨찾기 추가 불가");
         return;
       }
-
-      await deleteFavoriteApi(applicationNumber);
-
-      setFavorites((prev) => prev.filter((num) => num !== applicationNumber));
-      setFavoriteItems((prev) =>
-        prev.filter((item) => item.applicationNumber !== applicationNumber)
-      );
-    } catch (err) {
-      console.error("관심특허 토글 실패:", err);
+      await addMutation.mutateAsync(payload);
+      return;
     }
+
+    await deleteMutation.mutateAsync(applicationNumber);
   };
 
-  return { favorites, favoriteItems, toggleFavorite, loading, error, refetch: loadFavorites };
+  const refetch = () => {
+    queryClient.invalidateQueries({ queryKey: ["favorites"] });
+  };
+
+  return { favorites, favoriteItems, toggleFavorite, loading, error, refetch };
 }
