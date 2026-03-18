@@ -1,28 +1,13 @@
 import { useState } from "react";
 import type { PatentListItem, PatentDetail } from "../../../types/patent";
+import type { AddFavoritePayload } from "../../../types/favorite";
 import PatentTable from "./PatentTable";
 import Pagination from "./Pagination";
 import PatentDetailModal from "../PatentDetail/PatentDetailModal";
 import EmptyState from "../../common/EmptyState";
 import { getStatusColor } from "../../../utils/statusColor";
 import { getPatentDetail } from "../../../api/patent";
-
-interface FavoritePayload {
-  applicationNumber: string;
-  inventionTitle: string;
-  applicantName: string;
-  abstract: string | null;
-  applicationDate: string;
-  openNumber: string | null;
-  publicationNumber: string | null;
-  publicationDate: string | null;
-  registerNumber: string | null;
-  registerDate: string | null;
-  registerStatus: string | null;
-  drawingUrl: string | null;
-  ipcNumber: string | null;
-  mainIpcCode: string | null;
-}
+import { toast } from "../../../hooks/use-toast";
 
 interface PatentListProps {
   patents: PatentListItem[];
@@ -30,7 +15,7 @@ interface PatentListProps {
   favorites: string[];
   onToggleFavorite: (
     applicationNumber: string,
-    payload?: FavoritePayload
+    payload?: AddFavoritePayload
   ) => void;
   sortOrder: "asc" | "desc";
   onSortChange: (order: "asc" | "desc") => void;
@@ -65,14 +50,14 @@ export default function PatentList({
       const detail = await getPatentDetail(patent.applicationNumber);
       setSelectedPatentDetail(detail);
     } catch {
-      alert("특허 상세 정보를 가져오지 못했습니다.");
+      toast({ title: "상세 정보 로드 실패", description: "잠시 후 다시 시도해주세요.", variant: "destructive" });
     } finally {
       setDetailLoading(false);
     }
   };
 
   // 즐겨찾기 추가용 payload 생성 (검색 리스트 기반)
-  const buildFavoritePayload = (p: PatentListItem): FavoritePayload => ({
+  const buildAddFavoritePayload = (p: PatentListItem): AddFavoritePayload => ({
     applicationNumber: p.applicationNumber,
     inventionTitle: p.inventionTitle ?? "",
     applicantName: p.applicantName ?? "",
@@ -94,7 +79,7 @@ export default function PatentList({
     patent: PatentListItem
   ) => {
     e.stopPropagation();
-    onToggleFavorite(patent.applicationNumber, buildFavoritePayload(patent));
+    onToggleFavorite(patent.applicationNumber, buildAddFavoritePayload(patent));
   };
 
   const handleSortToggle = () => {
@@ -127,7 +112,7 @@ export default function PatentList({
                 (p) => p.applicationNumber === applicationNumber
               );
               if (!patent) return;
-              onToggleFavorite(applicationNumber, buildFavoritePayload(patent));
+              onToggleFavorite(applicationNumber, buildAddFavoritePayload(patent));
             }}
             sortOrder={sortOrder}
             onSortChange={handleSortToggle}

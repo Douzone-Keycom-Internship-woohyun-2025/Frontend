@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signupApi } from "../../api/auth";
+import { useToast } from "../../hooks/use-toast";
 import axios from "axios";
 
 export default function Signup() {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -34,7 +36,7 @@ export default function Signup() {
     try {
       await signupApi(formData.email, formData.password);
 
-      alert("회원가입 완료! 로그인해주세요.");
+      toast({ title: "회원가입 완료", description: "로그인해주세요." });
       navigate("/login");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {

@@ -38,6 +38,7 @@ export default function PatentSearchPage() {
     sortOrder,
     changeSortOrder,
     filterPatents,
+    retry,
   } = usePatentSearch();
 
   const { favorites, toggleFavorite } = useFavorites();
@@ -130,7 +131,7 @@ export default function PatentSearchPage() {
   if (error) {
     return (
       <ProtectedLayout>
-        <ErrorState message={error} onRetry={() => window.location.reload()} />
+        <ErrorState message={error} onRetry={retry} />
       </ProtectedLayout>
     );
   }
@@ -139,13 +140,13 @@ export default function PatentSearchPage() {
     <ProtectedLayout>
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white shadow-sm border-b">
-          <div className="px-8 py-6 flex justify-between items-center">
+          <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900">특허 검색</h1>
             <div className="text-sm text-gray-500">총 {totalCount}건</div>
           </div>
         </header>
 
-        <main className="px-8 py-8">
+        <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
           <section className="bg-white rounded-lg shadow p-8 mb-10">
             <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit mb-6">
               {[
