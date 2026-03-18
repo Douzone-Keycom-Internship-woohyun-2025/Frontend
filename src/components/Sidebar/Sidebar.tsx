@@ -25,13 +25,14 @@ export default function Sidebar({
   };
 
   const confirmLogout = () => {
-    onLogout();
     setShowLogoutModal(false);
 
     toast({
       title: "로그아웃되었습니다.",
       description: "다음에 다시 만나요!",
     });
+
+    onLogout();
   };
 
   const isActive = (path: string, exact = false) => {
