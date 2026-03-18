@@ -11,7 +11,6 @@ interface PatentTableProps {
   sortOrder: "asc" | "desc";
   onSortChange: () => void;
   onPatentClick: (patent: PatentListItem) => void;
-  currentPage: number;
 }
 
 export default function PatentTable({
