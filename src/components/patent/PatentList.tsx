@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { PatentListItem, PatentDetail } from "@/types/patent";
 import type { AddFavoritePayload } from "@/types/favorite";
+import { buildFavoritePayloadFromList } from "@/utils/favoritePayload";
 import PatentTable from "./PatentTable";
 import Pagination from "./Pagination";
 import PatentDetailModal from "./PatentDetailModal";
@@ -56,30 +57,13 @@ export default function PatentList({
     }
   };
 
-  // 즐겨찾기 추가용 payload 생성 (검색 리스트 기반)
-  const buildAddFavoritePayload = (p: PatentListItem): AddFavoritePayload => ({
-    applicationNumber: p.applicationNumber,
-    inventionTitle: p.inventionTitle ?? "",
-    applicantName: p.applicantName ?? "",
-    abstract: null,
-    applicationDate: p.applicationDate ?? "",
-    openNumber: null,
-    publicationNumber: null,
-    publicationDate: null,
-    registerNumber: null,
-    registerDate: null,
-    registerStatus: p.registerStatus ?? null,
-    drawingUrl: null,
-    ipcNumber: null,
-    mainIpcCode: p.mainIpcCode ?? null,
-  });
 
   const handleFavoriteToggleMobile = (
     e: React.MouseEvent,
     patent: PatentListItem
   ) => {
     e.stopPropagation();
-    onToggleFavorite(patent.applicationNumber, buildAddFavoritePayload(patent));
+    onToggleFavorite(patent.applicationNumber, buildFavoritePayloadFromList(patent));
   };
 
   const handleSortToggle = () => {
@@ -112,7 +96,7 @@ export default function PatentList({
                 (p) => p.applicationNumber === applicationNumber
               );
               if (!patent) return;
-              onToggleFavorite(applicationNumber, buildAddFavoritePayload(patent));
+              onToggleFavorite(applicationNumber, buildFavoritePayloadFromList(patent));
             }}
             sortOrder={sortOrder}
             onSortChange={handleSortToggle}
