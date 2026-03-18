@@ -53,5 +53,17 @@ export function useFavorites() {
     }
   };
 
-  return { favorites, toggleFavorite, loading };
+  const refetch = async () => {
+    try {
+      setLoading(true);
+      const { favorites: list } = await getFavoritesApi();
+      setFavorites(list.map((f) => f.applicationNumber));
+    } catch (err) {
+      console.error("관심특허 로딩 실패:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { favorites, toggleFavorite, loading, refetch };
 }

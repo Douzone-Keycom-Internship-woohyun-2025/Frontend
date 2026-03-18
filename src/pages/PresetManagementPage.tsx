@@ -9,6 +9,7 @@ import NoData from "../components/common/NoData";
 import { usePresets } from "../hooks/usePresets";
 import type { SearchPreset } from "../types/preset";
 import { useToast } from "@/hooks/use-toast";
+import { toInputDateFormat } from "../utils/dateTransform";
 
 export default function PresetManagementPage() {
   const navigate = useNavigate();
@@ -21,6 +22,7 @@ export default function PresetManagementPage() {
     addOrUpdatePreset,
     deletePreset,
     loadPresetDetail,
+    refetch: refetchPresets,
   } = usePresets();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -97,27 +99,11 @@ export default function PresetManagementPage() {
 
       setEditingPreset(target);
 
-      const fmtStart =
-        target.startDate.length === 8
-          ? `${target.startDate.slice(0, 4)}-${target.startDate.slice(
-              4,
-              6
-            )}-${target.startDate.slice(6, 8)}`
-          : target.startDate;
-
-      const fmtEnd =
-        target.endDate.length === 8
-          ? `${target.endDate.slice(0, 4)}-${target.endDate.slice(
-              4,
-              6
-            )}-${target.endDate.slice(6, 8)}`
-          : target.endDate;
-
       setFormData({
         name: target.name,
         applicant: target.applicant,
-        startDate: fmtStart,
-        endDate: fmtEnd,
+        startDate: toInputDateFormat(target.startDate),
+        endDate: toInputDateFormat(target.endDate),
         description: target.description || "",
       });
     } else {
@@ -170,7 +156,7 @@ export default function PresetManagementPage() {
           ) : error ? (
             <ErrorState
               message={error}
-              onRetry={() => window.location.reload()}
+              onRetry={refetchPresets}
             />
           ) : presets.length === 0 ? (
             <NoData

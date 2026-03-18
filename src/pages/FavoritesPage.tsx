@@ -12,7 +12,7 @@ import type { PatentListItem, PatentStatus } from "../types/patent";
 import type { FavoriteItem } from "../types/favorite";
 
 export default function FavoritesPage() {
-  const { favorites, toggleFavorite } = useFavorites();
+  const { favorites, toggleFavorite, refetch } = useFavorites();
   const [favoritePatents, setFavoritePatents] = useState<PatentListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -102,7 +102,7 @@ export default function FavoritesPage() {
           ) : error ? (
             <ErrorState
               message={error}
-              onRetry={() => window.location.reload()}
+              onRetry={refetch}
             />
           ) : favoritePatents.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 sm:p-10 text-center">
