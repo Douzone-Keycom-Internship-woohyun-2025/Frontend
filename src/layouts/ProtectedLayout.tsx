@@ -11,7 +11,7 @@ interface ProtectedLayoutProps {
 
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const navigate = useNavigate();
-  const { logout } = useAuthStore();
+  const { logout, userEmail } = useAuthStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -23,8 +23,6 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     logout();
     navigate("/login");
   };
-
-  const userEmail = localStorage.getItem("userEmail") ?? "";
 
   return (
     <div className="min-h-screen bg-gray-50">

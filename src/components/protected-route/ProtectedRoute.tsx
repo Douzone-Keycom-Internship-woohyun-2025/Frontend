@@ -7,9 +7,8 @@ interface ProtectedRouteProps {
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
   const { isLoggedIn } = useAuthStore();
-  const hasToken = !!localStorage.getItem("accessToken");
 
-  if (!isLoggedIn || !hasToken) {
+  if (!isLoggedIn) {
     return <Navigate to="/login" replace />;
   }
 

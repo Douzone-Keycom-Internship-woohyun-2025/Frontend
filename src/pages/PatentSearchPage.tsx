@@ -106,7 +106,6 @@ export default function PatentSearchPage() {
     );
   };
 
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const state = location.state as
       | {
@@ -128,7 +127,7 @@ export default function PatentSearchPage() {
 
       window.history.replaceState({}, "");
     }
-  }, [location.pathname, location.search]);
+  }, [location.key]);
 
   if (error) {
     return (
