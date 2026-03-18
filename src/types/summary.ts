@@ -30,12 +30,6 @@ export interface BackendSummaryResponse {
   }>;
 }
 
-export interface SummaryApiResponse {
-  status: "success" | "error";
-  message: string;
-  data: BackendSummaryResponse;
-}
-
 export interface SummaryData {
   statistics: {
     totalPatents: number;
