@@ -93,6 +93,7 @@ export function usePresets() {
     } catch (err) {
       console.error(err);
       setError("프리셋 저장 중 오류가 발생했습니다.");
+      throw err;
     }
   };
 
@@ -103,6 +104,7 @@ export function usePresets() {
     } catch (err) {
       console.error(err);
       setError("프리셋 삭제 중 오류가 발생했습니다.");
+      throw err;
     }
   };
 

@@ -1,4 +1,4 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
 import LogoutConfirmModal from "../common/LogoutConfirmModal";
 import { toast } from "../../hooks/use-toast";
@@ -17,7 +17,6 @@ export default function Sidebar({
   onClose,
 }: SidebarProps) {
   const location = useLocation();
-  const navigate = useNavigate();
 
   const [showLogoutModal, setShowLogoutModal] = useState(false);
 
@@ -33,8 +32,6 @@ export default function Sidebar({
       title: "로그아웃되었습니다.",
       description: "다음에 다시 만나요!",
     });
-
-    navigate("/login");
   };
 
   const isActive = (path: string, exact = false) => {
