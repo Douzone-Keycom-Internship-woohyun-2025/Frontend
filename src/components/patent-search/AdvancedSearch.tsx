@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { PatentStatus } from "../../types/patent";
+import type { PatentStatus } from "@/types/patent";
 
 interface AdvancedSearchProps {
   onSearch: (params: {

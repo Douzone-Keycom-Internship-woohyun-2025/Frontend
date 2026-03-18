@@ -1,5 +1,5 @@
 import api from "./axiosInstance";
-import type { SummaryData, BackendSummaryResponse } from "../types/summary";
+import type { SummaryData, BackendSummaryResponse } from "@/types/summary";
 
 export interface SummaryQuery {
   applicant?: string;

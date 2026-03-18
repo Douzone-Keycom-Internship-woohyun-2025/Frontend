@@ -1,7 +1,7 @@
 import { useState } from "react";
-import ProtectedLayout from "../layouts/ProtectedLayout";
-import { helpSections } from "../data/helpSections";
-import { formatContent } from "../utils/formatContent";
+import ProtectedLayout from "@/layouts/ProtectedLayout";
+import { helpSections } from "@/data/helpSections";
+import { formatContent } from "@/utils/formatContent";
 
 export default function HelpPage() {
   const [activeSection, setActiveSection] = useState("patent-dates");

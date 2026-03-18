@@ -1,7 +1,7 @@
-import type { SummaryData } from "../../types/summary";
+import type { SummaryData } from "@/types/summary";
 import { useNavigate } from "react-router-dom";
 import RecentPatentCard from "./RecentPatentCard";
-import NoData from "../common/NoData";
+import EmptyState from "@/components/common/EmptyState";
 
 import {
   Chart as ChartJS,
@@ -29,7 +29,7 @@ const renderSection = (
   condition: boolean,
   content: React.ReactNode,
   message: string
-) => (condition ? content : <NoData message={message} />);
+) => (condition ? content : <EmptyState title={message} />);
 
 interface SummaryDashboardProps {
   data: SummaryData;
