@@ -1,4 +1,5 @@
 import type { SearchPreset } from "@/types/preset";
+import { toInputDateFormat } from "@/utils/dateTransform";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -24,11 +25,6 @@ export default function PresetCard({
   onDelete,
   onUse,
 }: PresetCardProps) {
-  const toInputDate = (str: string) =>
-    str && str.length === 8
-      ? `${str.slice(0, 4)}-${str.slice(4, 6)}-${str.slice(6, 8)}`
-      : str;
-
   return (
     <div className="bg-white rounded-lg shadow hover:shadow-md p-6 transition-all">
       <div className="flex justify-between items-start mb-4">
@@ -84,12 +80,12 @@ export default function PresetCard({
         </div>
         {preset.startDate && (
           <div>
-            <strong>시작일:</strong> {toInputDate(preset.startDate)}
+            <strong>시작일:</strong> {toInputDateFormat(preset.startDate)}
           </div>
         )}
         {preset.endDate && (
           <div>
-            <strong>종료일:</strong> {toInputDate(preset.endDate)}
+            <strong>종료일:</strong> {toInputDateFormat(preset.endDate)}
           </div>
         )}
         <div className="text-gray-500 text-xs">
@@ -101,8 +97,8 @@ export default function PresetCard({
         onClick={() =>
           onUse({
             ...preset,
-            startDate: toInputDate(preset.startDate),
-            endDate: toInputDate(preset.endDate),
+            startDate: toInputDateFormat(preset.startDate),
+            endDate: toInputDateFormat(preset.endDate),
           })
         }
         className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center"
