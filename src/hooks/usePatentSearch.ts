@@ -1,4 +1,5 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
 import { searchPatentBasic, searchPatentAdvanced } from "@/api/patent";
 
 import type {
@@ -34,21 +35,17 @@ export function usePatentSearch() {
   const [totalCount, setTotalCount] = useState(0);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [lastFilters, setLastFilters] = useState<SearchFilters | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const requestIdRef = useRef(0);
 
-  const filterPatents = async (
-    filters: SearchFilters,
-    page: number = 1,
-    sort: "asc" | "desc" = sortOrder
-  ) => {
-    const currentRequestId = ++requestIdRef.current;
-    setIsLoading(true);
-    setError(null);
-    setLastFilters(filters);
-
-    try {
+  const mutation = useMutation({
+    mutationFn: async ({
+      filters,
+      page,
+      sort,
+    }: {
+      filters: SearchFilters;
+      page: number;
+      sort: "asc" | "desc";
+    }) => {
       const isAdvanced =
         "patentName" in filters ||
         "companyName" in filters ||
@@ -58,7 +55,6 @@ export function usePatentSearch() {
 
       if (isAdvanced) {
         const adv = filters as AdvancedSearchFilters;
-
         const mapped: AdvancedPatentSearchParams = {
           inventionTitle: adv.patentName || undefined,
           applicant: adv.companyName || undefined,
@@ -68,11 +64,9 @@ export function usePatentSearch() {
           page,
           sort,
         };
-
         response = await searchPatentAdvanced(mapped);
       } else {
         const basic = filters as BasicSearchFilters;
-
         const mapped: BasicPatentSearchParams = {
           applicant: basic.applicant,
           startDate: basic.startDate,
@@ -80,30 +74,30 @@ export function usePatentSearch() {
           page,
           sort,
         };
-
         response = await searchPatentBasic(mapped);
       }
 
-      if (currentRequestId !== requestIdRef.current) return;
-
+      return response;
+    },
+    onSuccess: (response) => {
       setResults(response.patents);
       setTotalPages(response.totalPages);
       setCurrentPage(response.page);
       setTotalCount(response.total);
-    } catch (e) {
-      if (currentRequestId !== requestIdRef.current) return;
-      console.error(e);
-      setError("검색 중 오류가 발생했습니다.");
-    } finally {
-      if (currentRequestId === requestIdRef.current) {
-        setIsLoading(false);
-      }
-    }
+    },
+  });
+
+  const filterPatents = async (
+    filters: SearchFilters,
+    page: number = 1,
+    sort: "asc" | "desc" = sortOrder
+  ) => {
+    setLastFilters(filters);
+    await mutation.mutateAsync({ filters, page, sort });
   };
 
   const changeSortOrder = async (order: "asc" | "desc") => {
     setSortOrder(order);
-
     if (lastFilters) {
       await filterPatents(lastFilters, 1, order);
     }
@@ -115,8 +109,8 @@ export function usePatentSearch() {
 
   return {
     results,
-    isLoading,
-    error,
+    isLoading: mutation.isPending,
+    error: mutation.error ? "검색 중 오류가 발생했습니다." : null,
     totalPages,
     totalCount,
     currentPage,
