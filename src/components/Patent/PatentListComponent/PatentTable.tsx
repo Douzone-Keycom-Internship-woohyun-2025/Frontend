@@ -1,5 +1,5 @@
 import { getStatusColor } from "../../../utils/statusColor";
-import { formatDate } from "../../../utils/dateFormat";
+import { toInputDateFormat } from "../../../utils/dateTransform";
 import type { PatentListItem } from "../../../types/patent";
 import EmptyState from "../../common/EmptyState";
 import { ArrowUp, ArrowDown, Heart, HeartOff } from "lucide-react";
@@ -11,7 +11,6 @@ interface PatentTableProps {
   sortOrder: "asc" | "desc";
   onSortChange: () => void;
   onPatentClick: (patent: PatentListItem) => void;
-  currentPage: number;
 }
 
 export default function PatentTable({
@@ -97,7 +96,7 @@ export default function PatentTable({
 
                 <td className="px-6 py-4 text-sm text-gray-900">
                   {patent.applicationDate
-                    ? formatDate(patent.applicationDate)
+                    ? toInputDateFormat(patent.applicationDate)
                     : "정보 없음"}
                 </td>
 

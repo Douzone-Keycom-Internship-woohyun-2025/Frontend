@@ -113,5 +113,6 @@ export function usePresets() {
     addOrUpdatePreset,
     deletePreset: removePreset,
     loadPresetDetail,
+    refetch: loadPresets,
   };
 }

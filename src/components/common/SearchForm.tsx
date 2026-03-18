@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from "react";
 import dayjs from "dayjs";
 import { usePresets } from "../../hooks/usePresets";
+import { useToast } from "../../hooks/use-toast";
 import { toInputDateFormat, toApiDateFormat } from "../../utils/dateTransform";
 
 interface SearchFormParams {
@@ -30,6 +31,7 @@ export default function SearchForm({
   onPresetChange,
   showTitle = true,
 }: SearchFormProps) {
+  const { toast } = useToast();
   const { presets, isLoading: presetLoading, error } = usePresets();
 
   const today = useMemo(() => dayjs().format("YYYY-MM-DD"), []);
@@ -103,7 +105,7 @@ export default function SearchForm({
     e.preventDefault();
 
     if (!formData.applicant.trim()) {
-      alert("회사명을 입력하세요!");
+      toast({ title: "회사명을 입력하세요", variant: "destructive" });
       return;
     }
 
