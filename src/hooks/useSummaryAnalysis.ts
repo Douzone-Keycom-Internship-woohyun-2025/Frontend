@@ -20,7 +20,7 @@ export function useSummaryAnalysis() {
   };
 
   const retry = () => {
-    if (lastParams) analyze(lastParams);
+    if (lastParams) mutation.mutate(lastParams);
   };
 
   return {
