@@ -26,20 +26,26 @@ export default function FavoritesPage() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const favoritePatents: PatentListItem[] = useMemo(
-    () =>
-      favoriteItems.map((item) => ({
-        applicationNumber: item.applicationNumber,
-        inventionTitle: item.inventionTitle,
-        applicantName: item.applicantName,
-        applicationDate: item.applicationDate,
-        mainIpcCode: item.mainIpcCode ?? undefined,
-        ipcKorName: undefined,
-        registerStatus: sanitizeStatus(item.registerStatus),
-        isFavorite: true,
-      })),
-    [favoriteItems]
-  );
+  const favoritePatents: PatentListItem[] = useMemo(() => {
+    const mapped = favoriteItems.map((item) => ({
+      applicationNumber: item.applicationNumber,
+      inventionTitle: item.inventionTitle,
+      applicantName: item.applicantName,
+      applicationDate: item.applicationDate,
+      mainIpcCode: item.mainIpcCode ?? undefined,
+      ipcKorName: undefined,
+      registerStatus: sanitizeStatus(item.registerStatus),
+      isFavorite: true,
+    }));
+
+    return mapped.sort((a, b) => {
+      const dateA = a.applicationDate || "";
+      const dateB = b.applicationDate || "";
+      return sortOrder === "asc"
+        ? dateA.localeCompare(dateB)
+        : dateB.localeCompare(dateA);
+    });
+  }, [favoriteItems, sortOrder]);
 
   const handleSortChange = (order: "asc" | "desc") => {
     setSortOrder(order);

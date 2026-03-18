@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import type { SearchPreset } from "../../types/preset";
 
 interface PresetModalProps {
@@ -31,10 +32,26 @@ export default function PresetModal({
   setFormData,
   editingPreset,
 }: PresetModalProps) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div
+      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      onClick={handleBackdropClick}
+    >
       <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
         <div className="flex justify-between mb-4">
           <h2 className="text-xl font-semibold">

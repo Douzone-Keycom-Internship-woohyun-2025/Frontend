@@ -69,9 +69,9 @@ export function usePresets() {
     try {
       setError(null);
 
-      const exists = !isNaN(Number(preset.id)); // 숫자면 존재하는 프리셋
+      const isNew = !preset.id || preset.id.startsWith("temp_");
 
-      if (exists) {
+      if (!isNew) {
         await updatePresetApi(Number(preset.id), {
           presetName: preset.name,
           applicant: preset.applicant,
