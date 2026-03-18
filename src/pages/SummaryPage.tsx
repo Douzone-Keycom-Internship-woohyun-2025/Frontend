@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
-import ProtectedLayout from "../layouts/ProtectedLayout";
-import SearchForm from "../components/common/SearchForm";
-import SummaryDashboard from "../components/Summary/SummaryDashboard";
-import LoadingSpinner from "../components/common/LoadingSpinner";
-import ErrorState from "../components/common/ErrorState";
-import { useSummaryAnalysis } from "../hooks/useSummaryAnalysis";
-import { toInputDateFormat } from "../utils/dateTransform";
+import ProtectedLayout from "@/layouts/ProtectedLayout";
+import SearchForm from "@/components/common/SearchForm";
+import SummaryDashboard from "@/components/summary/SummaryDashboard";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ErrorState from "@/components/common/ErrorState";
+import { useSummaryAnalysis } from "@/hooks/useSummaryAnalysis";
+import { toInputDateFormat } from "@/utils/dateTransform";
 
 export default function SummaryPage() {
   const location = useLocation();

@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import ProtectedLayout from "../layouts/ProtectedLayout";
-import PatentList from "../components/Patent/PatentListComponent/PatentList";
-import LoadingSpinner from "../components/common/LoadingSpinner";
-import ErrorState from "../components/common/ErrorState";
+import ProtectedLayout from "@/layouts/ProtectedLayout";
+import PatentList from "@/components/patent/PatentList";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ErrorState from "@/components/common/ErrorState";
 
-import { useFavorites } from "../hooks/useFavorites";
+import { useFavorites } from "@/hooks/useFavorites";
 
-import type { PatentListItem, PatentStatus } from "../types/patent";
+import type { PatentListItem, PatentStatus } from "@/types/patent";
 
 const VALID_STATUS: PatentStatus[] = [
   "등록", "공개", "취하", "소멸", "포기", "무효", "거절", "",

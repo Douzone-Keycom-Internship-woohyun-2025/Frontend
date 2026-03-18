@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Sidebar from "../components/Sidebar/Sidebar";
-import MobileHeader from "../components/Mobile/MobileHeader";
-import { useAuthStore } from "../store/authStore";
-import { logoutApi } from "../api/auth";
+import Sidebar from "@/components/sidebar/Sidebar";
+import MobileHeader from "@/components/mobile/MobileHeader";
+import { useAuthStore } from "@/store/authStore";
+import { logoutApi } from "@/api/auth";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;

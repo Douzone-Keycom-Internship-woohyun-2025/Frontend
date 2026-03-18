@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginPage from "./pages/LoginPage";
-import ProtectedRoute from "./components/ProtecteedRoute/ProtectedRoute";
-import HomePage from "./pages/HomePage";
-import HelpPage from "./pages/HelpPage";
-import PatentSearchPage from "./pages/PatentSearchPage";
-import SummaryPage from "./pages/SummaryPage";
-import FavoritesPage from "./pages/FavoritesPage";
-import PresetManagementPage from "./pages/PresetManagementPage";
-import SignupPage from "./pages/SignupPage";
+import LoginPage from "@/pages/LoginPage";
+import ProtectedRoute from "@/components/protected-route/ProtectedRoute";
+import HomePage from "@/pages/HomePage";
+import HelpPage from "@/pages/HelpPage";
+import PatentSearchPage from "@/pages/PatentSearchPage";
+import SummaryPage from "@/pages/SummaryPage";
+import FavoritesPage from "@/pages/FavoritesPage";
+import PresetManagementPage from "@/pages/PresetManagementPage";
+import SignupPage from "@/pages/SignupPage";
 import { Toaster } from "@/components/ui/toaster";
 
 function App() {

@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { searchPatentBasic, searchPatentAdvanced } from "../api/patent";
+import { searchPatentBasic, searchPatentAdvanced } from "@/api/patent";
 
 import type {
   PatentListItem,
@@ -7,7 +7,7 @@ import type {
   AdvancedPatentSearchParams,
   PatentListResponse,
   PatentStatus,
-} from "../types/patent";
+} from "@/types/patent";
 
 type BasicSearchFilters = {
   applicant: string;

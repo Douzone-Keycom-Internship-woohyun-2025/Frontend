@@ -1,13 +1,13 @@
 import { useState } from "react";
-import type { PatentListItem, PatentDetail } from "../../../types/patent";
-import type { AddFavoritePayload } from "../../../types/favorite";
+import type { PatentListItem, PatentDetail } from "@/types/patent";
+import type { AddFavoritePayload } from "@/types/favorite";
 import PatentTable from "./PatentTable";
 import Pagination from "./Pagination";
-import PatentDetailModal from "../PatentDetail/PatentDetailModal";
-import EmptyState from "../../common/EmptyState";
-import { getStatusColor } from "../../../utils/statusColor";
-import { getPatentDetail } from "../../../api/patent";
-import { toast } from "../../../hooks/use-toast";
+import PatentDetailModal from "./PatentDetailModal";
+import EmptyState from "@/components/common/EmptyState";
+import { getStatusColor } from "@/utils/statusColor";
+import { getPatentDetail } from "@/api/patent";
+import { toast } from "@/hooks/use-toast";
 
 interface PatentListProps {
   patents: PatentListItem[];

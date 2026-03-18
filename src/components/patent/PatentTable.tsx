@@ -1,7 +1,7 @@
-import { getStatusColor } from "../../../utils/statusColor";
-import { toInputDateFormat } from "../../../utils/dateTransform";
-import type { PatentListItem } from "../../../types/patent";
-import EmptyState from "../../common/EmptyState";
+import { getStatusColor } from "@/utils/statusColor";
+import { toInputDateFormat } from "@/utils/dateTransform";
+import type { PatentListItem } from "@/types/patent";
+import EmptyState from "@/components/common/EmptyState";
 import { ArrowUp, ArrowDown, Heart, HeartOff } from "lucide-react";
 
 interface PatentTableProps {

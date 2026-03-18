@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { signupApi } from "../../api/auth";
-import { useToast } from "../../hooks/use-toast";
+import { signupApi } from "@/api/auth";
+import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 
 export default function Signup() {
