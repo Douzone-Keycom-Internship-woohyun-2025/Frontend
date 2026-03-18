@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import LoginPage from "@/pages/LoginPage";
 import ProtectedRoute from "@/components/protected-route/ProtectedRoute";
 import HomePage from "@/pages/HomePage";
@@ -10,9 +11,19 @@ import PresetManagementPage from "@/pages/PresetManagementPage";
 import SignupPage from "@/pages/SignupPage";
 import { Toaster } from "@/components/ui/toaster";
 
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5,
+      retry: 1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
 function App() {
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Toaster />
       <BrowserRouter>
         <Routes>
@@ -68,7 +79,7 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
-    </>
+    </QueryClientProvider>
   );
 }
 
