@@ -32,6 +32,11 @@ export default function AdvancedSearch({
   const [endDate, setEndDate] = useState("");
   const [status, setStatus] = useState<PatentStatus | "">("");
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleSearch();
+  };
+
   const handleSearch = () => {
     const params: {
       patentName?: string;
@@ -60,7 +65,7 @@ export default function AdvancedSearch({
   };
 
   return (
-    <div className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -136,19 +141,20 @@ export default function AdvancedSearch({
 
       <div className="flex flex-col sm:flex-row gap-3 mt-6">
         <button
-          onClick={handleSearch}
+          type="submit"
           className="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
         >
           검색
         </button>
 
         <button
+          type="button"
           onClick={handleReset}
           className="w-full sm:flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition-colors"
         >
           초기화
         </button>
       </div>
-    </div>
+    </form>
   );
 }
