@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
-import LogoutConfirmModal from "../common/LogoutConfirmModal";
-import { toast } from "../../hooks/use-toast";
+import LogoutConfirmModal from "@/components/common/LogoutConfirmModal";
+import { toast } from "@/hooks/use-toast";
 
 interface SidebarProps {
   userEmail: string;

@@ -3,9 +3,9 @@ import {
   getFavoritesApi,
   addFavoriteApi,
   deleteFavoriteApi,
-} from "../api/favorite";
+} from "@/api/favorite";
 
-import type { AddFavoritePayload, FavoriteItem } from "../types/favorite";
+import type { AddFavoritePayload, FavoriteItem } from "@/types/favorite";
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<string[]>([]);

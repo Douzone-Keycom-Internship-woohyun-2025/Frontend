@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { SummaryData } from "../types/summary";
-import { getSummaryApi, type SummaryQuery } from "../api/summary";
+import type { SummaryData } from "@/types/summary";
+import { getSummaryApi, type SummaryQuery } from "@/api/summary";
 
 export function useSummaryAnalysis() {
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);

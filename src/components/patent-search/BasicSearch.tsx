@@ -1,4 +1,4 @@
-import SearchForm from "../common/SearchForm";
+import SearchForm from "@/components/common/SearchForm";
 
 interface BasicSearchProps {
   onSearch: (params: {
