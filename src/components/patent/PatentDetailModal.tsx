@@ -1,5 +1,6 @@
 import type { PatentDetail } from "@/types/patent";
 import type { AddFavoritePayload } from "@/types/favorite";
+import { buildFavoritePayloadFromDetail } from "@/utils/favoritePayload";
 import { getStatusColor } from "@/utils/statusColor";
 import { toInputDateFormat } from "@/utils/dateTransform";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -30,23 +31,6 @@ export default function PatentDetailModal({
     if (e.target === e.currentTarget) onClose();
   };
 
-  /** ⭐ PatentDetail → AddFavoritePayload 변환 */
-  const buildPayloadFromDetail = (d: PatentDetail): AddFavoritePayload => ({
-    applicationNumber: d.applicationNumber,
-    inventionTitle: d.inventionTitle ?? "",
-    applicantName: d.applicantName ?? "",
-    abstract: d.astrtCont ?? null,
-    applicationDate: d.applicationDate ?? "",
-    openNumber: d.openNumber ?? null,
-    publicationNumber: d.publicationNumber ?? null,
-    publicationDate: d.publicationDate ?? null,
-    registerNumber: d.registerNumber ?? null,
-    registerDate: d.registerDate ?? null,
-    registerStatus: d.registerStatus ?? null,
-    drawingUrl: d.drawing ?? null,
-    ipcNumber: d.ipcNumber ?? null,
-    mainIpcCode: d.mainIpcCode ?? null,
-  });
 
   const ipcList = patent?.ipcNumber?.split("|").map((ipc) => ipc.trim()) ?? [];
 
@@ -85,7 +69,7 @@ export default function PatentDetailModal({
                 {/* ⭐ 좋아요 버튼 */}
                 <button
                   onClick={() => {
-                    const payload = buildPayloadFromDetail(patent);
+                    const payload = buildFavoritePayloadFromDetail(patent);
                     onToggleFavorite(patent.applicationNumber, payload);
                   }}
                   className="p-2 rounded-full hover:bg-gray-100 transition"

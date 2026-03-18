@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import SearchForm from "@/components/common/SearchForm";
 import SummaryDashboard from "@/components/summary/SummaryDashboard";
@@ -10,6 +10,7 @@ import { toInputDateFormat } from "@/utils/dateTransform";
 
 export default function SummaryPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { summaryData, isLoading, error, analyze, retry } = useSummaryAnalysis();
 
   const [initialFilters, setInitialFilters] = useState<{
@@ -20,36 +21,25 @@ export default function SummaryPage() {
 
   const [selectedPresetId, setSelectedPresetId] = useState<string>("");
 
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const preset = location.state?.preset;
-    if (preset) {
-      const presetParams = {
-        applicant: preset.applicant || "",
-        startDate: toInputDateFormat(preset.startDate) || "",
-        endDate: toInputDateFormat(preset.endDate) || "",
-      };
+    if (!preset) return;
 
-      setInitialFilters((prev) => {
-        const changed =
-          !prev ||
-          prev.applicant !== presetParams.applicant ||
-          prev.startDate !== presetParams.startDate ||
-          prev.endDate !== presetParams.endDate;
+    setInitialFilters({
+      applicant: preset.applicant || "",
+      startDate: toInputDateFormat(preset.startDate) || "",
+      endDate: toInputDateFormat(preset.endDate) || "",
+    });
+    setSelectedPresetId(preset.id?.toString() || "");
 
-        if (changed) {
-          analyze({
-            applicant: preset.applicant,
-            startDate: preset.startDate,
-            endDate: preset.endDate,
-          });
-          setSelectedPresetId(preset.id?.toString() || "");
-          return presetParams;
-        }
-        return prev;
-      });
-    }
-  }, []);
+    analyze({
+      applicant: preset.applicant,
+      startDate: preset.startDate,
+      endDate: preset.endDate,
+    });
+
+    navigate(".", { replace: true, state: {} });
+  }, [location.key]);
 
   const handleSearch = async (params: {
     applicant: string;
