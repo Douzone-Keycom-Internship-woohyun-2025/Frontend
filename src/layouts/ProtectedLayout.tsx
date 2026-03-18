@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar/Sidebar";
 import MobileHeader from "../components/Mobile/MobileHeader";
 import { useAuthStore } from "../store/authStore";
+import { logoutApi } from "../api/auth";
 
 interface ProtectedLayoutProps {
   children: React.ReactNode;
@@ -13,7 +14,12 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const { logout } = useAuthStore();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logoutApi();
+    } catch {
+      // 서버 호출 실패해도 클라이언트 로그아웃은 진행
+    }
     logout();
     navigate("/login");
   };
