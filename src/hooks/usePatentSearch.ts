@@ -104,7 +104,7 @@ export function usePatentSearch() {
   };
 
   const retry = () => {
-    if (lastFilters) filterPatents(lastFilters, currentPage, sortOrder);
+    if (lastFilters) mutation.mutate({ filters: lastFilters, page: currentPage, sort: sortOrder });
   };
 
   return {

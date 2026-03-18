@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Sidebar from "@/components/sidebar/Sidebar";
 import MobileHeader from "@/components/mobile/MobileHeader";
 import { useAuthStore } from "@/store/authStore";
+import { useQueryClient } from "@tanstack/react-query";
 import { logoutApi } from "@/api/auth";
 
 interface ProtectedLayoutProps {
@@ -12,6 +13,7 @@ interface ProtectedLayoutProps {
 export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
   const navigate = useNavigate();
   const { logout, userEmail } = useAuthStore();
+  const queryClient = useQueryClient();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleLogout = async () => {
@@ -20,6 +22,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     } catch {
       // 서버 호출 실패해도 클라이언트 로그아웃은 진행
     }
+    queryClient.clear();
     logout();
     navigate("/login");
   };

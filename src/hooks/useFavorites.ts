@@ -34,7 +34,8 @@ export function useFavorites() {
     onSuccess: (_data, applicationNumber) => {
       queryClient.setQueryData(
         ["favorites"],
-        favoriteItems.filter((item) => item.applicationNumber !== applicationNumber)
+        (old: typeof favoriteItems | undefined) =>
+          (old ?? []).filter((item) => item.applicationNumber !== applicationNumber)
       );
     },
   });
