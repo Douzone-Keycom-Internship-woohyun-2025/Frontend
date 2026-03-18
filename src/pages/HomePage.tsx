@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import ProtectedLayout from "../layouts/ProtectedLayout";
+import ProtectedLayout from "@/layouts/ProtectedLayout";
 
 export default function HomePage() {
   const cards = [

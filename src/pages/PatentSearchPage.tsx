@@ -1,16 +1,16 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
-import ProtectedLayout from "../layouts/ProtectedLayout";
-import BasicSearch from "../components/PatentSearch/BasicSearch";
-import AdvancedSearch from "../components/PatentSearch/AdvancedSearch";
-import PatentList from "../components/Patent/PatentListComponent/PatentList";
-import LoadingSpinner from "../components/common/LoadingSpinner";
-import ErrorState from "../components/common/ErrorState";
-import NoData from "../components/common/NoData";
-import { usePatentSearch } from "../hooks/usePatentSearch";
-import { useFavorites } from "../hooks/useFavorites";
-import type { PatentStatus } from "../types/patent";
-import { toApiDateFormat, toInputDateFormat } from "../utils/dateTransform";
+import ProtectedLayout from "@/layouts/ProtectedLayout";
+import BasicSearch from "@/components/patent-search/BasicSearch";
+import AdvancedSearch from "@/components/patent-search/AdvancedSearch";
+import PatentList from "@/components/patent/PatentList";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ErrorState from "@/components/common/ErrorState";
+import EmptyState from "@/components/common/EmptyState";
+import { usePatentSearch } from "@/hooks/usePatentSearch";
+import { useFavorites } from "@/hooks/useFavorites";
+import type { PatentStatus } from "@/types/patent";
+import { toApiDateFormat, toInputDateFormat } from "@/utils/dateTransform";
 
 type FiltersState = {
   applicant?: string;
@@ -197,9 +197,9 @@ export default function PatentSearchPage() {
                 <LoadingSpinner message="검색 중입니다..." size="md" />
               </div>
             ) : results.length === 0 ? (
-              <NoData
-                message="검색 결과가 없습니다."
-                subMessage="다른 조건으로 검색해보세요."
+              <EmptyState
+                title="검색 결과가 없습니다."
+                description="다른 조건으로 검색해보세요."
               />
             ) : (
               <div className="bg-white rounded-lg shadow p-6">

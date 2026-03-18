@@ -3,7 +3,7 @@ import type {
   AddFavoritePayload,
   GetFavoritesResponse,
   FavoriteItem,
-} from "../types/favorite";
+} from "@/types/favorite";
 
 export async function getFavoritesApi(): Promise<GetFavoritesResponse> {
   const res = await api.get("/favorites");

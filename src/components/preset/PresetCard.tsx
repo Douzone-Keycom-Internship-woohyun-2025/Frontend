@@ -1,4 +1,4 @@
-import type { SearchPreset } from "../../types/preset";
+import type { SearchPreset } from "@/types/preset";
 import {
   AlertDialog,
   AlertDialogTrigger,
