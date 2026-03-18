@@ -102,6 +102,10 @@ export function usePatentSearch() {
     }
   };
 
+  const retry = () => {
+    if (lastFilters) filterPatents(lastFilters, currentPage, sortOrder);
+  };
+
   return {
     results,
     isLoading,
@@ -112,5 +116,6 @@ export function usePatentSearch() {
     sortOrder,
     changeSortOrder,
     filterPatents,
+    retry,
   };
 }

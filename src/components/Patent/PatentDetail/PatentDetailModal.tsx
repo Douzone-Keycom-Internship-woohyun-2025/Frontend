@@ -1,7 +1,7 @@
 import type { PatentDetail } from "../../../types/patent";
 import type { AddFavoritePayload } from "../../../types/favorite";
 import { getStatusColor } from "../../../utils/statusColor";
-import { formatDate } from "../../../utils/dateFormat";
+import { toInputDateFormat } from "../../../utils/dateTransform";
 import LoadingSpinner from "../../common/LoadingSpinner";
 
 interface PatentDetailModalProps {
@@ -125,7 +125,7 @@ export default function PatentDetailModal({
                   {patent.applicationDate && (
                     <div className="flex items-center">
                       <i className="ri-calendar-line mr-2"></i>
-                      <span>{formatDate(patent.applicationDate)}</span>
+                      <span>{toInputDateFormat(patent.applicationDate)}</span>
                     </div>
                   )}
                 </div>
@@ -217,7 +217,7 @@ export default function PatentDetailModal({
                         </label>
 
                         <p className="font-bold text-gray-900">
-                          {item.date ? formatDate(item.date) : "정보 없음"}
+                          {item.date ? toInputDateFormat(item.date) : "정보 없음"}
                         </p>
                       </div>
 

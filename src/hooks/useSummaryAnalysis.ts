@@ -6,9 +6,11 @@ export function useSummaryAnalysis() {
   const [summaryData, setSummaryData] = useState<SummaryData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [lastParams, setLastParams] = useState<SummaryQuery | null>(null);
 
   const analyze = async (params: SummaryQuery) => {
     try {
+      setLastParams(params);
       setIsLoading(true);
       setError(null);
 
@@ -22,5 +24,9 @@ export function useSummaryAnalysis() {
     }
   };
 
-  return { summaryData, isLoading, error, analyze };
+  const retry = () => {
+    if (lastParams) analyze(lastParams);
+  };
+
+  return { summaryData, isLoading, error, analyze, retry };
 }
