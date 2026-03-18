@@ -20,36 +20,25 @@ export default function SummaryPage() {
 
   const [selectedPresetId, setSelectedPresetId] = useState<string>("");
 
-  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     const preset = location.state?.preset;
-    if (preset) {
-      const presetParams = {
-        applicant: preset.applicant || "",
-        startDate: toInputDateFormat(preset.startDate) || "",
-        endDate: toInputDateFormat(preset.endDate) || "",
-      };
+    if (!preset) return;
 
-      setInitialFilters((prev) => {
-        const changed =
-          !prev ||
-          prev.applicant !== presetParams.applicant ||
-          prev.startDate !== presetParams.startDate ||
-          prev.endDate !== presetParams.endDate;
+    setInitialFilters({
+      applicant: preset.applicant || "",
+      startDate: toInputDateFormat(preset.startDate) || "",
+      endDate: toInputDateFormat(preset.endDate) || "",
+    });
+    setSelectedPresetId(preset.id?.toString() || "");
 
-        if (changed) {
-          analyze({
-            applicant: preset.applicant,
-            startDate: preset.startDate,
-            endDate: preset.endDate,
-          });
-          setSelectedPresetId(preset.id?.toString() || "");
-          return presetParams;
-        }
-        return prev;
-      });
-    }
-  }, []);
+    analyze({
+      applicant: preset.applicant,
+      startDate: preset.startDate,
+      endDate: preset.endDate,
+    });
+
+    window.history.replaceState({}, "");
+  }, [location.key]);
 
   const handleSearch = async (params: {
     applicant: string;
