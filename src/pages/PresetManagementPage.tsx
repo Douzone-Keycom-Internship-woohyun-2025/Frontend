@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ProtectedLayout from "../layouts/ProtectedLayout";
-import PresetCard from "../components/Preset/PresetCard";
-import PresetModal from "../components/Preset/PresetModal";
-import LoadingSpinner from "../components/common/LoadingSpinner";
-import ErrorState from "../components/common/ErrorState";
-import NoData from "../components/common/NoData";
-import { usePresets } from "../hooks/usePresets";
-import type { SearchPreset } from "../types/preset";
+import ProtectedLayout from "@/layouts/ProtectedLayout";
+import PresetCard from "@/components/preset/PresetCard";
+import PresetModal from "@/components/preset/PresetModal";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import ErrorState from "@/components/common/ErrorState";
+import EmptyState from "@/components/common/EmptyState";
+import { usePresets } from "@/hooks/usePresets";
+import type { SearchPreset } from "@/types/preset";
 import { useToast } from "@/hooks/use-toast";
-import { toInputDateFormat } from "../utils/dateTransform";
+import { toInputDateFormat } from "@/utils/dateTransform";
 
 export default function PresetManagementPage() {
   const navigate = useNavigate();
@@ -159,9 +159,9 @@ export default function PresetManagementPage() {
               onRetry={refetchPresets}
             />
           ) : presets.length === 0 ? (
-            <NoData
-              message="저장된 프리셋이 없습니다."
-              subMessage="자주 사용하는 검색 조건을 프리셋으로 저장해보세요."
+            <EmptyState
+              title="저장된 프리셋이 없습니다."
+              description="자주 사용하는 검색 조건을 프리셋으로 저장해보세요."
             />
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">

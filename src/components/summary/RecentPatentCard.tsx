@@ -1,4 +1,4 @@
-import { getStatusColor } from "../../utils/statusColor";
+import { getStatusColor } from "@/utils/statusColor";
 
 export interface RecentPatent {
   applicationNumber: string;

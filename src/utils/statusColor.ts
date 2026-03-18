@@ -1,4 +1,4 @@
-import type { PatentStatus } from "../types/patent";
+import type { PatentStatus } from "@/types/patent";
 
 const normalizeStatus = (status: PatentStatus | string | undefined): string => {
   if (!status) return "";

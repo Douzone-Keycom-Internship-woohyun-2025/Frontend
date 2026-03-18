@@ -5,8 +5,8 @@ import {
   createPresetApi,
   updatePresetApi,
   deletePresetApi,
-} from "../api/preset";
-import type { SearchPreset, PresetResponse } from "../types/preset";
+} from "@/api/preset";
+import type { SearchPreset, PresetResponse } from "@/types/preset";
 
 export function usePresets() {
   const [presets, setPresets] = useState<SearchPreset[]>([]);
