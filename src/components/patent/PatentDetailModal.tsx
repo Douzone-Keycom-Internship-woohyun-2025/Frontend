@@ -1,8 +1,8 @@
-import type { PatentDetail } from "../../../types/patent";
-import type { AddFavoritePayload } from "../../../types/favorite";
-import { getStatusColor } from "../../../utils/statusColor";
-import { toInputDateFormat } from "../../../utils/dateTransform";
-import LoadingSpinner from "../../common/LoadingSpinner";
+import type { PatentDetail } from "@/types/patent";
+import type { AddFavoritePayload } from "@/types/favorite";
+import { getStatusColor } from "@/utils/statusColor";
+import { toInputDateFormat } from "@/utils/dateTransform";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 interface PatentDetailModalProps {
   patent: PatentDetail | null;

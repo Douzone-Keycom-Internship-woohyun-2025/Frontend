@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import type { SearchPreset } from "../../types/preset";
+import type { SearchPreset } from "@/types/preset";
 
 interface PresetModalProps {
   isOpen: boolean;
