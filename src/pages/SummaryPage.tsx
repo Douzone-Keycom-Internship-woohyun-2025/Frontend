@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import SearchForm from "@/components/common/SearchForm";
 import SummaryDashboard from "@/components/summary/SummaryDashboard";
@@ -10,6 +10,7 @@ import { toInputDateFormat } from "@/utils/dateTransform";
 
 export default function SummaryPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const { summaryData, isLoading, error, analyze, retry } = useSummaryAnalysis();
 
   const [initialFilters, setInitialFilters] = useState<{
@@ -37,7 +38,7 @@ export default function SummaryPage() {
       endDate: preset.endDate,
     });
 
-    window.history.replaceState({}, "");
+    navigate(".", { replace: true, state: {} });
   }, [location.key]);
 
   const handleSearch = async (params: {

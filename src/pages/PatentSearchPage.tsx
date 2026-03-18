@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import BasicSearch from "@/components/patent-search/BasicSearch";
 import AdvancedSearch from "@/components/patent-search/AdvancedSearch";
@@ -24,6 +24,7 @@ type FiltersState = {
 
 export default function PatentSearchPage() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"basic" | "advanced">("basic");
   const [filters, setFilters] = useState<FiltersState>({});
   const [selectedPresetId, setSelectedPresetId] = useState("");
@@ -125,7 +126,7 @@ export default function PatentSearchPage() {
         endDate: toInputDateFormat(state.filters.endDate || ""),
       });
 
-      window.history.replaceState({}, "");
+      navigate(".", { replace: true, state: {} });
     }
   }, [location.key]);
 
