@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ProtectedLayout from "../layouts/ProtectedLayout";
 import PatentList from "../components/Patent/PatentListComponent/PatentList";
@@ -6,68 +6,46 @@ import LoadingSpinner from "../components/common/LoadingSpinner";
 import ErrorState from "../components/common/ErrorState";
 
 import { useFavorites } from "../hooks/useFavorites";
-import { getFavoritesApi } from "../api/favorite";
 
 import type { PatentListItem, PatentStatus } from "../types/patent";
-import type { FavoriteItem } from "../types/favorite";
+
+const VALID_STATUS: PatentStatus[] = [
+  "등록", "공개", "취하", "소멸", "포기", "무효", "거절", "",
+];
+
+const sanitizeStatus = (value: string | null | undefined): PatentStatus => {
+  if (!value) return "";
+  return VALID_STATUS.includes(value as PatentStatus)
+    ? (value as PatentStatus)
+    : "";
+};
 
 export default function FavoritesPage() {
-  const { favorites, toggleFavorite, refetch } = useFavorites();
-  const [favoritePatents, setFavoritePatents] = useState<PatentListItem[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { favorites, favoriteItems, toggleFavorite, loading, error, refetch } =
+    useFavorites();
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const VALID_STATUS: PatentStatus[] = [
-    "등록",
-    "공개",
-    "취하",
-    "소멸",
-    "포기",
-    "무효",
-    "거절",
-    "",
-  ];
+  const favoritePatents: PatentListItem[] = useMemo(() => {
+    const mapped = favoriteItems.map((item) => ({
+      applicationNumber: item.applicationNumber,
+      inventionTitle: item.inventionTitle,
+      applicantName: item.applicantName,
+      applicationDate: item.applicationDate,
+      mainIpcCode: item.mainIpcCode ?? undefined,
+      ipcKorName: undefined,
+      registerStatus: sanitizeStatus(item.registerStatus),
+      isFavorite: true,
+    }));
 
-  const sanitizeStatus = (value: string | null | undefined): PatentStatus => {
-    if (!value) return "";
-    return VALID_STATUS.includes(value as PatentStatus)
-      ? (value as PatentStatus)
-      : "";
-  };
-
-  /* eslint-disable react-hooks/exhaustive-deps */
-  useEffect(() => {
-    async function loadFavorites() {
-      try {
-        setError(null);
-        setIsLoading(true);
-
-        const { favorites: list } = await getFavoritesApi();
-
-        const mapped: PatentListItem[] = list.map((item: FavoriteItem) => ({
-          applicationNumber: item.applicationNumber,
-          inventionTitle: item.inventionTitle,
-          applicantName: item.applicantName,
-          applicationDate: item.applicationDate,
-          mainIpcCode: item.mainIpcCode ?? undefined,
-          ipcKorName: undefined,
-          registerStatus: sanitizeStatus(item.registerStatus),
-          isFavorite: true,
-        }));
-
-        setFavoritePatents(mapped);
-      } catch (err) {
-        console.error(err);
-        setError("관심 특허 목록을 불러오는 중 오류가 발생했습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    loadFavorites();
-  }, []);
+    return mapped.sort((a, b) => {
+      const dateA = a.applicationDate || "";
+      const dateB = b.applicationDate || "";
+      return sortOrder === "asc"
+        ? dateA.localeCompare(dateB)
+        : dateB.localeCompare(dateA);
+    });
+  }, [favoriteItems, sortOrder]);
 
   const handleSortChange = (order: "asc" | "desc") => {
     setSortOrder(order);
@@ -95,7 +73,7 @@ export default function FavoritesPage() {
         </header>
 
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          {isLoading ? (
+          {loading ? (
             <div className="bg-white rounded-lg shadow p-10 flex justify-center">
               <LoadingSpinner message="관심 특허를 불러오는 중..." size="md" />
             </div>
@@ -130,7 +108,7 @@ export default function FavoritesPage() {
             <div className="bg-white rounded-lg shadow p-4 sm:p-6 lg:p-8">
               <PatentList
                 patents={favoritePatents}
-                loading={isLoading}
+                loading={loading}
                 favorites={favorites}
                 onToggleFavorite={toggleFavorite}
                 sortOrder={sortOrder}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { searchPatentBasic, searchPatentAdvanced } from "../api/patent";
 
 import type {
@@ -36,12 +36,14 @@ export function usePatentSearch() {
   const [lastFilters, setLastFilters] = useState<SearchFilters | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const requestIdRef = useRef(0);
 
   const filterPatents = async (
     filters: SearchFilters,
     page: number = 1,
     sort: "asc" | "desc" = sortOrder
   ) => {
+    const currentRequestId = ++requestIdRef.current;
     setIsLoading(true);
     setError(null);
     setLastFilters(filters);
@@ -82,15 +84,20 @@ export function usePatentSearch() {
         response = await searchPatentBasic(mapped);
       }
 
+      if (currentRequestId !== requestIdRef.current) return;
+
       setResults(response.patents);
       setTotalPages(response.totalPages);
       setCurrentPage(response.page);
       setTotalCount(response.total);
     } catch (e) {
+      if (currentRequestId !== requestIdRef.current) return;
       console.error(e);
       setError("검색 중 오류가 발생했습니다.");
     } finally {
-      setIsLoading(false);
+      if (currentRequestId === requestIdRef.current) {
+        setIsLoading(false);
+      }
     }
   };
 

@@ -69,9 +69,9 @@ export function usePresets() {
     try {
       setError(null);
 
-      const exists = !isNaN(Number(preset.id)); // 숫자면 존재하는 프리셋
+      const isNew = !preset.id || preset.id.startsWith("temp_");
 
-      if (exists) {
+      if (!isNew) {
         await updatePresetApi(Number(preset.id), {
           presetName: preset.name,
           applicant: preset.applicant,
@@ -93,6 +93,7 @@ export function usePresets() {
     } catch (err) {
       console.error(err);
       setError("프리셋 저장 중 오류가 발생했습니다.");
+      throw err;
     }
   };
 
@@ -103,6 +104,7 @@ export function usePresets() {
     } catch (err) {
       console.error(err);
       setError("프리셋 삭제 중 오류가 발생했습니다.");
+      throw err;
     }
   };
 
