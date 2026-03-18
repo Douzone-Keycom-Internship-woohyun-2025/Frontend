@@ -241,7 +241,10 @@ export default function PatentList({
         patent={selectedPatentDetail}
         isOpen={detailLoading || !!selectedPatentDetail}
         loading={detailLoading}
-        onClose={() => setSelectedPatentDetail(null)}
+        onClose={() => {
+          setSelectedPatentDetail(null);
+          setDetailLoading(false);
+        }}
         isFavorite={favorites.includes(
           selectedPatentDetail?.applicationNumber ?? ""
         )}
