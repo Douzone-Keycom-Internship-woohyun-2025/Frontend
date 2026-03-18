@@ -132,7 +132,6 @@ export default function PatentList({
             sortOrder={sortOrder}
             onSortChange={handleSortToggle}
             onPatentClick={handlePatentClick}
-            currentPage={currentPage}
           />
         </div>
 
