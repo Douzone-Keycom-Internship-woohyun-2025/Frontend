@@ -16,7 +16,7 @@ export const formatContent = (content: string): React.JSX.Element[] => {
       return (
         <div key={index} className="ml-4 mb-2">
           <span className="font-medium text-gray-900">{parts[1]}</span>
-          <span className="text-gray-700">: {parts[2]}</span>
+          <span className="text-gray-700">{parts[2]}</span>
         </div>
       );
     }

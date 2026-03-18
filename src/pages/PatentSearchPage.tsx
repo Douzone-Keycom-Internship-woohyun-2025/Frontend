@@ -125,6 +125,8 @@ export default function PatentSearchPage() {
         startDate: toInputDateFormat(state.filters.startDate || ""),
         endDate: toInputDateFormat(state.filters.endDate || ""),
       });
+
+      window.history.replaceState({}, "");
     }
   }, [location.pathname, location.search]);
 

@@ -6,8 +6,20 @@ interface AuthState {
   logout: () => void;
 }
 
+function isTokenValid(): boolean {
+  const token = localStorage.getItem("accessToken");
+  if (!token) return false;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    return payload.exp * 1000 > Date.now();
+  } catch {
+    return false;
+  }
+}
+
 export const useAuthStore = create<AuthState>((set) => ({
-  isLoggedIn: !!localStorage.getItem("accessToken"),
+  isLoggedIn: isTokenValid(),
 
   login: (accessToken: string, email: string) => {
     localStorage.setItem("accessToken", accessToken);
