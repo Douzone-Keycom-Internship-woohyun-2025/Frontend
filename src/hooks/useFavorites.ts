@@ -48,6 +48,7 @@ export function useFavorites() {
         await addFavoriteApi(payload);
 
         setFavorites((prev) => [...prev, applicationNumber]);
+        await loadFavorites();
         return;
       }
 
