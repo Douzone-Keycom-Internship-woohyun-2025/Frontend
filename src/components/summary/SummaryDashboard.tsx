@@ -3,6 +3,7 @@ import type { SummaryData } from "@/types/summary";
 import { useNavigate } from "react-router-dom";
 import RecentPatentCard from "./RecentPatentCard";
 import EmptyState from "@/components/common/EmptyState";
+import { Button } from "@/components/ui/button";
 
 import {
   Chart as ChartJS,
@@ -331,12 +332,9 @@ export default function SummaryDashboard({
           <h3 className="text-base sm:text-lg font-semibold text-gray-900">
             최근 주요 특허
           </h3>
-          <button
-            onClick={handleViewPatents}
-            className="px-3 sm:px-4 py-2 bg-blue-600 text-white text-xs sm:text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors duration-200"
-          >
+          <Button size="sm" onClick={handleViewPatents}>
             검색된 특허 보기
-          </button>
+          </Button>
         </div>
 
         {renderSection(

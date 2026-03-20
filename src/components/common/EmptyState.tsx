@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { Search, FolderOpen, HeartOff, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type IconType = "search" | "folder" | "favorite" | "report";
 
@@ -37,12 +38,7 @@ export default memo(function EmptyState({
         {description && <p className="text-gray-600 mb-6">{description}</p>}
 
         {actionLabel && onAction && (
-          <button
-            onClick={onAction}
-            className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            {actionLabel}
-          </button>
+          <Button onClick={onAction}>{actionLabel}</Button>
         )}
       </div>
     </div>
