@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import type { SummaryData } from "@/types/summary";
 import { useNavigate } from "react-router-dom";
 import RecentPatentCard from "./RecentPatentCard";
@@ -62,72 +63,80 @@ export default function SummaryDashboard({
   const statusData = data?.statusDistribution || [];
   const registrationRate = data?.statistics?.registrationRate ?? 0;
 
-  const topIpcCodes = [...ipcData]
-    .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
-
-  const recentMonths = monthlyData.slice(-6);
-
-  const ipcChartData = {
-    labels: topIpcCodes.map((item) => item.ipcCode),
-    datasets: [
-      {
-        data: topIpcCodes.map((item) => item.count),
-        backgroundColor: [
-          "#1D4ED8", // 진한 블루
-          "#059669", // 에메랄드 그린
-          "#F97316", // 비비드 오렌지
-          "#DC2626", // 강한 레드
-          "#7C3AED", // 퍼플
-        ],
-        borderWidth: 1,
-      },
-    ],
-  };
-
-  const monthColors = [
-    "#86EFAC", // light green
-    "#4ADE80",
-    "#22C55E",
-    "#16A34A",
-    "#15803D",
-    "#166534",
-  ];
-
-  const monthlyBarColors = recentMonths.map(
-    (_, i) => monthColors[i % monthColors.length]
+  const topIpcCodes = useMemo(
+    () => [...ipcData].sort((a, b) => b.count - a.count).slice(0, 5),
+    [ipcData]
   );
 
-  const monthlyChartData = {
-    labels: recentMonths.map((m) => m.month),
-    datasets: [
-      {
-        label: "출원 건수",
-        data: recentMonths.map((m) => m.count),
-        backgroundColor: monthlyBarColors,
-        hoverBackgroundColor: monthlyBarColors,
-        borderRadius: 6,
-      },
-    ],
-  };
+  const recentMonths = useMemo(() => monthlyData.slice(-6), [monthlyData]);
 
-  const statusChartData = {
-    labels: statusData.map((s) => s.status || "정보 없음"),
-    datasets: [
-      {
-        data: statusData.map((s) => s.count),
-        backgroundColor: [
-          "#22C55E",
-          "#3B82F6",
-          "#EAB308",
-          "#EF4444",
-          "#9CA3AF",
-        ],
-        borderWidth: 0,
-        hoverOffset: 0,
-      },
-    ],
-  };
+  const ipcChartData = useMemo(
+    () => ({
+      labels: topIpcCodes.map((item) => item.ipcCode),
+      datasets: [
+        {
+          data: topIpcCodes.map((item) => item.count),
+          backgroundColor: [
+            "#1D4ED8",
+            "#059669",
+            "#F97316",
+            "#DC2626",
+            "#7C3AED",
+          ],
+          borderWidth: 1,
+        },
+      ],
+    }),
+    [topIpcCodes]
+  );
+
+  const monthlyChartData = useMemo(() => {
+    const monthColors = [
+      "#86EFAC",
+      "#4ADE80",
+      "#22C55E",
+      "#16A34A",
+      "#15803D",
+      "#166534",
+    ];
+    const barColors = recentMonths.map(
+      (_, i) => monthColors[i % monthColors.length]
+    );
+
+    return {
+      labels: recentMonths.map((m) => m.month),
+      datasets: [
+        {
+          label: "출원 건수",
+          data: recentMonths.map((m) => m.count),
+          backgroundColor: barColors,
+          hoverBackgroundColor: barColors,
+          borderRadius: 6,
+        },
+      ],
+    };
+  }, [recentMonths]);
+
+  const statusChartData = useMemo(
+    () => ({
+      labels: statusData.map((s) => s.status || "정보 없음"),
+      datasets: [
+        {
+          data: statusData.map((s) => s.count),
+          backgroundColor: [
+            "#22C55E",
+            "#3B82F6",
+            "#EAB308",
+            "#EF4444",
+            "#9CA3AF",
+          ],
+          borderWidth: 0,
+          hoverOffset: 0,
+        },
+      ],
+    }),
+    [statusData]
+  );
 
   // 상단 통계 카드
   const statCards = [

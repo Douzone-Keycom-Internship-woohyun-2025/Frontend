@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Loader2 } from "lucide-react";
 
 interface LoadingSpinnerProps {
@@ -6,7 +7,7 @@ interface LoadingSpinnerProps {
   fullscreen?: boolean; // 선택: 전체 화면 로딩 모드
 }
 
-export default function LoadingSpinner({
+export default memo(function LoadingSpinner({
   message = "로딩 중입니다...",
   size = "md",
   fullscreen = false,
@@ -36,4 +37,4 @@ export default function LoadingSpinner({
       </p>
     </div>
   );
-}
+});
