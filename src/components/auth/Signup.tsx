@@ -6,6 +6,8 @@ import { signupSchema, type SignupFormData } from "@/validators/authSchemas";
 import { signupApi } from "@/api/auth";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -76,12 +78,10 @@ export default function Signup() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 이메일
               </label>
-              <input
+              <Input
                 type="email"
                 {...register("email")}
-                className={`w-full px-3 py-2 border rounded-lg
-                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm
-                ${errors.email ? "border-red-500" : "border-gray-300"}`}
+                className={errors.email ? "border-red-500" : ""}
                 placeholder="이메일을 입력하세요"
               />
               {errors.email && (
@@ -93,12 +93,10 @@ export default function Signup() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 비밀번호
               </label>
-              <input
+              <Input
                 type="password"
                 {...register("password")}
-                className={`w-full px-3 py-2 border rounded-lg
-                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm
-                ${errors.password ? "border-red-500" : "border-gray-300"}`}
+                className={errors.password ? "border-red-500" : ""}
                 placeholder="비밀번호를 입력하세요 (최소 8자)"
               />
               {errors.password && (
@@ -110,12 +108,10 @@ export default function Signup() {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 비밀번호 재확인
               </label>
-              <input
+              <Input
                 type="password"
                 {...register("confirmPassword")}
-                className={`w-full px-3 py-2 border rounded-lg
-                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm
-                ${errors.confirmPassword ? "border-red-500" : "border-gray-300"}`}
+                className={errors.confirmPassword ? "border-red-500" : ""}
                 placeholder="비밀번호를 다시 입력하세요"
               />
               {errors.confirmPassword && (
@@ -133,13 +129,7 @@ export default function Signup() {
             </div>
           )}
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 rounded-lg shadow-sm
-            text-sm font-medium text-white bg-blue-600 hover:bg-blue-700
-            disabled:opacity-50 transition-colors duration-200"
-          >
+          <Button type="submit" disabled={isLoading} className="w-full">
             {isLoading ? (
               <div className="flex items-center">
                 <i className="ri-loader-4-line animate-spin mr-2"></i>
@@ -148,7 +138,7 @@ export default function Signup() {
             ) : (
               "회원가입"
             )}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

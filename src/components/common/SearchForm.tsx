@@ -8,6 +8,8 @@ import {
 } from "@/validators/searchSchemas";
 import { usePresets } from "@/hooks/usePresets";
 import { toInputDateFormat, toApiDateFormat } from "@/utils/dateTransform";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface SearchFormParams {
   applicant: string;
@@ -160,12 +162,11 @@ export default function SearchForm({
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium mb-2">회사명</label>
-          <input
+          <Input
             type="text"
             {...register("applicant")}
             onChange={(e) => handleFieldChange("applicant", e.target.value)}
-            className={`w-full px-3 py-2 border rounded-lg
-              ${errors.applicant ? "border-red-500" : ""}`}
+            className={errors.applicant ? "border-red-500" : ""}
             placeholder="예: 삼성, LG, 네이버"
           />
           {errors.applicant && (
@@ -176,12 +177,11 @@ export default function SearchForm({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-medium mb-2">시작 날짜</label>
-            <input
+            <Input
               type="date"
               {...register("startDate")}
               onChange={(e) => handleFieldChange("startDate", e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg
-                ${errors.startDate ? "border-red-500" : ""}`}
+              className={errors.startDate ? "border-red-500" : ""}
             />
             {errors.startDate && (
               <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
@@ -190,12 +190,11 @@ export default function SearchForm({
 
           <div>
             <label className="block text-sm font-medium mb-2">종료 날짜</label>
-            <input
+            <Input
               type="date"
               {...register("endDate")}
               onChange={(e) => handleFieldChange("endDate", e.target.value)}
-              className={`w-full px-3 py-2 border rounded-lg
-                ${errors.endDate ? "border-red-500" : ""}`}
+              className={errors.endDate ? "border-red-500" : ""}
             />
             {errors.endDate && (
               <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
@@ -205,21 +204,18 @@ export default function SearchForm({
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mt-6">
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
+        <Button type="submit" disabled={loading} className="w-full sm:flex-1 h-11">
           {loading ? "검색 중..." : "검색"}
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={handleReset}
-          className="w-full sm:flex-1 px-6 py-3 bg-gray-200 rounded-lg hover:bg-gray-300"
+          className="w-full sm:flex-1 h-11"
         >
           초기화
-        </button>
+        </Button>
       </div>
     </form>
   );
