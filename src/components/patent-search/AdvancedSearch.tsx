@@ -5,6 +5,8 @@ import {
   type AdvancedSearchFormData,
 } from "@/validators/searchSchemas";
 import type { PatentStatus } from "@/types/patent";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 interface AdvancedSearchProps {
   onSearch: (params: {
@@ -77,11 +79,10 @@ export default function AdvancedSearch({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             특허명 <span className="text-gray-400">(선택)</span>
           </label>
-          <input
+          <Input
             type="text"
             placeholder="예: 배터리, 통신, AI"
             {...register("patentName")}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -89,11 +90,10 @@ export default function AdvancedSearch({
           <label className="block text-sm font-medium text-gray-700 mb-2">
             출원인 <span className="text-gray-400">(선택)</span>
           </label>
-          <input
+          <Input
             type="text"
             placeholder="예: 삼성전자, LG전자"
             {...register("companyName")}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
@@ -102,10 +102,9 @@ export default function AdvancedSearch({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               시작 날짜 <span className="text-gray-400">(선택)</span>
             </label>
-            <input
+            <Input
               type="date"
               {...register("startDate")}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
@@ -113,11 +112,10 @@ export default function AdvancedSearch({
             <label className="block text-sm font-medium text-gray-700 mb-2">
               종료 날짜 <span className="text-gray-400">(선택)</span>
             </label>
-            <input
+            <Input
               type="date"
               {...register("endDate")}
-              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500
-                ${errors.endDate ? "border-red-500" : "border-gray-300"}`}
+              className={errors.endDate ? "border-red-500" : ""}
             />
             {errors.endDate && (
               <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
@@ -145,20 +143,18 @@ export default function AdvancedSearch({
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 mt-6">
-        <button
-          type="submit"
-          className="w-full sm:flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors"
-        >
+        <Button type="submit" className="w-full sm:flex-1 h-11">
           검색
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="secondary"
           onClick={handleReset}
-          className="w-full sm:flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 font-medium transition-colors"
+          className="w-full sm:flex-1 h-11"
         >
           초기화
-        </button>
+        </Button>
       </div>
     </form>
   );
