@@ -1,7 +1,12 @@
-import { useState, useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import dayjs from "dayjs";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  basicSearchSchema,
+  type BasicSearchFormData,
+} from "@/validators/searchSchemas";
 import { usePresets } from "@/hooks/usePresets";
-import { useToast } from "@/hooks/use-toast";
 import { toInputDateFormat, toApiDateFormat } from "@/utils/dateTransform";
 
 interface SearchFormParams {
@@ -31,102 +36,94 @@ export default function SearchForm({
   onPresetChange,
   showTitle = true,
 }: SearchFormProps) {
-  const { toast } = useToast();
   const { presets, isLoading: presetLoading, error } = usePresets();
 
   const today = useMemo(() => dayjs().format("YYYY-MM-DD"), []);
-
   const oneMonthAgo = useMemo(
     () => dayjs().subtract(1, "month").format("YYYY-MM-DD"),
     []
   );
 
-  const [formData, setFormData] = useState<SearchFormParams>({
-    applicant: "",
-    startDate: oneMonthAgo,
-    endDate: today,
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+  } = useForm<BasicSearchFormData>({
+    resolver: zodResolver(basicSearchSchema),
+    defaultValues: {
+      applicant: "",
+      startDate: oneMonthAgo,
+      endDate: today,
+    },
   });
+
+  const watchedValues = watch();
 
   useEffect(() => {
     if (initialValues) {
-      setFormData({
+      reset({
         applicant: initialValues.applicant ?? "",
         startDate: toInputDateFormat(initialValues.startDate ?? oneMonthAgo),
         endDate: toInputDateFormat(initialValues.endDate ?? today),
       });
     }
-  }, [initialValues, oneMonthAgo, today]);
+  }, [initialValues, oneMonthAgo, today, reset]);
 
   const handleSelectPreset = (presetId: string) => {
     onPresetChange(presetId);
 
     if (presetId === "") {
-      setFormData({
-        applicant: "",
-        startDate: oneMonthAgo,
-        endDate: today,
-      });
+      reset({ applicant: "", startDate: oneMonthAgo, endDate: today });
       return;
     }
 
     const preset = presets.find((p) => p.id === presetId);
     if (!preset) return;
 
-    setFormData({
+    reset({
       applicant: preset.applicant,
       startDate: toInputDateFormat(preset.startDate),
       endDate: toInputDateFormat(preset.endDate),
     });
   };
 
-  const handleChange = (field: keyof SearchFormParams, value: string) => {
-    setFormData((prev) => {
-      const newData = { ...prev, [field]: value };
+  const handleFieldChange = (field: keyof BasicSearchFormData, value: string) => {
+    setValue(field, value, { shouldValidate: false });
 
-      if (selectedPresetId) {
-        const preset = presets.find((p) => p.id === selectedPresetId);
-        if (preset) {
-          const matches =
-            preset.applicant === newData.applicant &&
-            toInputDateFormat(preset.startDate) === newData.startDate &&
-            toInputDateFormat(preset.endDate) === newData.endDate;
+    if (selectedPresetId) {
+      const preset = presets.find((p) => p.id === selectedPresetId);
+      if (preset) {
+        const newData = { ...watchedValues, [field]: value };
+        const matches =
+          preset.applicant === newData.applicant &&
+          toInputDateFormat(preset.startDate) === newData.startDate &&
+          toInputDateFormat(preset.endDate) === newData.endDate;
 
-          if (!matches) {
-            onPresetChange("");
-          }
+        if (!matches) {
+          onPresetChange("");
         }
       }
-
-      return newData;
-    });
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!formData.applicant.trim()) {
-      toast({ title: "회사명을 입력하세요", variant: "destructive" });
-      return;
-    }
-
+  const onValid = (data: BasicSearchFormData) => {
     onSearch({
-      applicant: formData.applicant.trim(),
-      startDate: toApiDateFormat(formData.startDate),
-      endDate: toApiDateFormat(formData.endDate),
+      applicant: data.applicant.trim(),
+      startDate: toApiDateFormat(data.startDate),
+      endDate: toApiDateFormat(data.endDate),
     });
   };
 
   const handleReset = () => {
     onPresetChange("");
-    setFormData({
-      applicant: "",
-      startDate: oneMonthAgo,
-      endDate: today,
-    });
+    reset({ applicant: "", startDate: oneMonthAgo, endDate: today });
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onValid)} className="space-y-4">
       {showTitle && (
         <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
           {title}
@@ -165,11 +162,15 @@ export default function SearchForm({
           <label className="block text-sm font-medium mb-2">회사명</label>
           <input
             type="text"
-            value={formData.applicant}
-            onChange={(e) => handleChange("applicant", e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg"
+            {...register("applicant")}
+            onChange={(e) => handleFieldChange("applicant", e.target.value)}
+            className={`w-full px-3 py-2 border rounded-lg
+              ${errors.applicant ? "border-red-500" : ""}`}
             placeholder="예: 삼성, LG, 네이버"
           />
+          {errors.applicant && (
+            <p className="mt-1 text-sm text-red-600">{errors.applicant.message}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -177,20 +178,28 @@ export default function SearchForm({
             <label className="block text-sm font-medium mb-2">시작 날짜</label>
             <input
               type="date"
-              value={formData.startDate}
-              onChange={(e) => handleChange("startDate", e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg"
+              {...register("startDate")}
+              onChange={(e) => handleFieldChange("startDate", e.target.value)}
+              className={`w-full px-3 py-2 border rounded-lg
+                ${errors.startDate ? "border-red-500" : ""}`}
             />
+            {errors.startDate && (
+              <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
+            )}
           </div>
 
           <div>
             <label className="block text-sm font-medium mb-2">종료 날짜</label>
             <input
               type="date"
-              value={formData.endDate}
-              onChange={(e) => handleChange("endDate", e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg"
+              {...register("endDate")}
+              onChange={(e) => handleFieldChange("endDate", e.target.value)}
+              className={`w-full px-3 py-2 border rounded-lg
+                ${errors.endDate ? "border-red-500" : ""}`}
             />
+            {errors.endDate && (
+              <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
+            )}
           </div>
         </div>
       </div>
