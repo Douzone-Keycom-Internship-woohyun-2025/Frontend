@@ -33,7 +33,7 @@ export function buildFavoritePayloadFromDetail(d: PatentDetail): AddFavoritePayl
     registerNumber: d.registerNumber ?? null,
     registerDate: d.registerDate ?? null,
     registerStatus: d.registerStatus ?? null,
-    drawingUrl: d.drawing ?? null,
+    drawingUrl: d.drawing || null,
     ipcNumber: d.ipcNumber ?? null,
     mainIpcCode: d.mainIpcCode ?? null,
   };

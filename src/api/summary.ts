@@ -29,24 +29,26 @@ export async function getSummaryApi(
   const res = await api.get("/summary", { params: query });
   const raw: BackendSummaryResponse = res.data.data;
 
+  const totalPatents = raw.statistics.totalPatents;
+
   const statistics: SummaryData["statistics"] = {
-    totalPatents: raw.totalCount,
-    registrationRate: raw.statusPercent?.등록 ?? 0,
-    monthlyAverage: raw.avgMonthlyCount,
+    totalPatents,
+    registrationRate: raw.statistics.registrationRate,
+    monthlyAverage: raw.statistics.monthlyAverage,
     searchPeriod: {
       startDate: raw.period.startDate,
       endDate: raw.period.endDate,
     },
   };
 
-  const ipcDistribution: SummaryData["ipcDistribution"] = raw.topIPC.map(
+  const ipcDistribution: SummaryData["ipcDistribution"] = raw.ipcDistribution.map(
     (item) => ({
-      ipcCode: item.code,
-      ipcName: item.code,
+      ipcCode: item.ipcCode,
+      ipcName: item.ipcKorName,
       count: item.count,
       percentage:
-        raw.totalCount > 0
-          ? Number(((item.count / raw.totalCount) * 100).toFixed(1))
+        totalPatents > 0
+          ? Number(((item.count / totalPatents) * 100).toFixed(1))
           : 0,
     })
   );
@@ -61,13 +63,19 @@ export async function getSummaryApi(
     })
   );
 
-  const statusDistribution: SummaryData["statusDistribution"] = Object.entries(
-    raw.statusCount
-  ).map(([status, count]) => ({
-    status,
-    count: Number(count),
-    percentage: raw.statusPercent?.[status] ?? 0,
-  }));
+  const totalStatusCount = raw.statusDistribution.reduce(
+    (sum, s) => sum + s.count, 0
+  );
+
+  const statusDistribution: SummaryData["statusDistribution"] =
+    raw.statusDistribution.map((item) => ({
+      status: item.status,
+      count: item.count,
+      percentage:
+        totalStatusCount > 0
+          ? Number(((item.count / totalStatusCount) * 100).toFixed(1))
+          : 0,
+    }));
 
   const recentPatents: SummaryData["recentPatents"] = raw.recentPatents.map(
     (p) => ({
@@ -75,7 +83,7 @@ export async function getSummaryApi(
       inventionTitle: p.title,
       applicantName: raw.applicant,
       applicationDate: p.date,
-      ipcCode: p.ipcMain,
+      ipcCode: p.ipcMain ?? "",
       registerStatus: p.status,
       isFavorite: false,
     })
