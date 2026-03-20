@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { getStatusColor } from "@/utils/statusColor";
 
 export interface RecentPatent {
@@ -10,7 +11,7 @@ export interface RecentPatent {
   isFavorite: boolean;
 }
 
-export default function RecentPatentCard({ patent }: { patent: RecentPatent }) {
+export default memo(function RecentPatentCard({ patent }: { patent: RecentPatent }) {
   return (
     <div
       className="
@@ -71,4 +72,4 @@ export default function RecentPatentCard({ patent }: { patent: RecentPatent }) {
       </div>
     </div>
   );
-}
+});

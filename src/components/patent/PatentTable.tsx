@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { getStatusColor } from "@/utils/statusColor";
 import { toInputDateFormat } from "@/utils/dateTransform";
 import type { PatentListItem } from "@/types/patent";
@@ -6,14 +7,14 @@ import { ArrowUp, ArrowDown, Heart, HeartOff } from "lucide-react";
 
 interface PatentTableProps {
   patents: PatentListItem[];
-  favorites: string[];
+  favorites: Set<string>;
   onToggleFavorite: (applicationNumber: string) => void;
   sortOrder: "asc" | "desc";
   onSortChange: () => void;
   onPatentClick: (patent: PatentListItem) => void;
 }
 
-export default function PatentTable({
+export default memo(function PatentTable({
   patents,
   favorites,
   onToggleFavorite,
@@ -73,7 +74,7 @@ export default function PatentTable({
 
         <tbody className="divide-y divide-gray-200">
           {patents.map((patent) => {
-            const isFavorite = favorites.includes(patent.applicationNumber);
+            const isFavorite = favorites.has(patent.applicationNumber);
             const statusText = patent.registerStatus || "정보 없음";
 
             return (
@@ -139,4 +140,4 @@ export default function PatentTable({
       </table>
     </div>
   );
-}
+});

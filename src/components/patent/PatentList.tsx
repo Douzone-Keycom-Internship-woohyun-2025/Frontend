@@ -13,7 +13,7 @@ import { toast } from "@/hooks/use-toast";
 interface PatentListProps {
   patents: PatentListItem[];
   loading: boolean;
-  favorites: string[];
+  favorites: Set<string>;
   onToggleFavorite: (
     applicationNumber: string,
     payload?: AddFavoritePayload
@@ -137,7 +137,7 @@ export default function PatentList({
 
               <div className="space-y-3">
                 {patents.map((patent) => {
-                  const isFavorite = favorites.includes(
+                  const isFavorite = favorites.has(
                     patent.applicationNumber
                   );
 
@@ -229,7 +229,7 @@ export default function PatentList({
           setSelectedPatentDetail(null);
           setDetailLoading(false);
         }}
-        isFavorite={favorites.includes(
+        isFavorite={favorites.has(
           selectedPatentDetail?.applicationNumber ?? ""
         )}
         onToggleFavorite={onToggleFavorite}
