@@ -1,5 +1,6 @@
 import { memo } from "react";
 import { AlertTriangle } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface ErrorStateProps {
   title?: string;
@@ -22,12 +23,7 @@ export default memo(function ErrorState({
         <p className="text-gray-600 mb-6">{message}</p>
 
         {onRetry && (
-          <button
-            onClick={onRetry}
-            className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            다시 시도
-          </button>
+          <Button onClick={onRetry}>다시 시도</Button>
         )}
       </div>
     </div>
