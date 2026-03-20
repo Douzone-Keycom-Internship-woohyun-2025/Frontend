@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signupSchema, type SignupFormData } from "@/validators/authSchemas";
 import { signupApi } from "@/api/auth";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
@@ -7,53 +10,36 @@ import axios from "axios";
 export default function Signup() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-    confirmPassword: "",
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true);
-    setError("");
-
-    if (formData.password !== formData.confirmPassword) {
-      setError("비밀번호가 일치하지 않습니다.");
-      setIsLoading(false);
-      return;
-    }
-
-    if (formData.password.length < 8) {
-      setError("비밀번호는 최소 8자 이상이어야 합니다.");
-      setIsLoading(false);
-      return;
-    }
+    setServerError("");
 
     try {
-      await signupApi(formData.email, formData.password);
+      await signupApi(data.email, data.password);
 
       toast({ title: "회원가입 완료", description: "로그인해주세요." });
       navigate("/login");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "회원가입에 실패했습니다.");
+        setServerError(err.response?.data?.message || "회원가입에 실패했습니다.");
       } else {
-        setError("알 수 없는 에러가 발생했습니다.");
+        setServerError("알 수 없는 에러가 발생했습니다.");
       }
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
   };
 
   return (
@@ -84,22 +70,23 @@ export default function Signup() {
           </Link>
         </p>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 이메일
               </label>
               <input
-                name="email"
                 type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                {...register("email")}
+                className={`w-full px-3 py-2 border rounded-lg
+                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm
+                ${errors.email ? "border-red-500" : "border-gray-300"}`}
                 placeholder="이메일을 입력하세요"
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
@@ -107,15 +94,16 @@ export default function Signup() {
                 비밀번호
               </label>
               <input
-                name="password"
                 type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                {...register("password")}
+                className={`w-full px-3 py-2 border rounded-lg
+                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm
+                ${errors.password ? "border-red-500" : "border-gray-300"}`}
                 placeholder="비밀번호를 입력하세요 (최소 8자)"
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
 
             <div>
@@ -123,23 +111,24 @@ export default function Signup() {
                 비밀번호 재확인
               </label>
               <input
-                name="confirmPassword"
                 type="password"
-                required
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                {...register("confirmPassword")}
+                className={`w-full px-3 py-2 border rounded-lg
+                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm
+                ${errors.confirmPassword ? "border-red-500" : "border-gray-300"}`}
                 placeholder="비밀번호를 다시 입력하세요"
               />
+              {errors.confirmPassword && (
+                <p className="mt-1 text-sm text-red-600">{errors.confirmPassword.message}</p>
+              )}
             </div>
           </div>
 
-          {error && (
+          {serverError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <div className="flex items-center">
                 <i className="ri-error-warning-line text-red-500 mr-2"></i>
-                <span className="text-sm text-red-700">{error}</span>
+                <span className="text-sm text-red-700">{serverError}</span>
               </div>
             </div>
           )}
@@ -147,8 +136,8 @@ export default function Signup() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 rounded-lg shadow-sm 
-            text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 
+            className="w-full flex justify-center py-2 px-4 rounded-lg shadow-sm
+            text-sm font-medium text-white bg-blue-600 hover:bg-blue-700
             disabled:opacity-50 transition-colors duration-200"
           >
             {isLoading ? (
