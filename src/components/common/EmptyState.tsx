@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { Search, FolderOpen, HeartOff, FileText } from "lucide-react";
 
 type IconType = "search" | "folder" | "favorite" | "report";
@@ -17,7 +18,7 @@ const iconMap = {
   report: FileText,
 };
 
-export default function EmptyState({
+export default memo(function EmptyState({
   title = "결과가 없습니다",
   description = "조건을 변경하거나 새로운 검색을 시도해보세요.",
   icon = "search",
@@ -46,4 +47,4 @@ export default function EmptyState({
       </div>
     </div>
   );
-}
+});
