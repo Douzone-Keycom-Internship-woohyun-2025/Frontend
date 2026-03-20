@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
   getFavoritesApi,
@@ -19,7 +20,10 @@ export function useFavorites() {
   });
 
   const favoriteItems = data ?? [];
-  const favorites = favoriteItems.map((f) => f.applicationNumber);
+  const favorites = useMemo(
+    () => new Set(favoriteItems.map((f) => f.applicationNumber)),
+    [favoriteItems]
+  );
   const error = queryError ? "관심 특허 목록을 불러오는 중 오류가 발생했습니다." : null;
 
   const addMutation = useMutation({
@@ -44,7 +48,7 @@ export function useFavorites() {
     applicationNumber: string,
     payload?: AddFavoritePayload
   ) => {
-    const isFav = favorites.includes(applicationNumber);
+    const isFav = favorites.has(applicationNumber);
 
     if (!isFav) {
       if (!payload) {

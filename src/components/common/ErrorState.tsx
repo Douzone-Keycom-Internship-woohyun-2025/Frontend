@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { AlertTriangle } from "lucide-react";
 
 interface ErrorStateProps {
@@ -6,7 +7,7 @@ interface ErrorStateProps {
   onRetry?: () => void;
 }
 
-export default function ErrorState({
+export default memo(function ErrorState({
   title = "문제가 발생했습니다",
   message = "오류가 발생했습니다. 잠시 후 다시 시도해주세요.",
   onRetry,
@@ -31,4 +32,4 @@ export default function ErrorState({
       </div>
     </div>
   );
-}
+});

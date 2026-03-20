@@ -1,3 +1,5 @@
+import { memo } from "react";
+
 interface PaginationProps {
   currentPage: number;
   totalPages: number;
@@ -7,7 +9,7 @@ interface PaginationProps {
   groupSize?: number; // 기본 5개 묶음
 }
 
-export default function Pagination({
+export default memo(function Pagination({
   currentPage,
   totalPages,
   totalCount,
@@ -84,4 +86,4 @@ export default function Pagination({
       </div>
     </div>
   );
-}
+});
