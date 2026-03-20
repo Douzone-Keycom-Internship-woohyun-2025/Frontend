@@ -1,4 +1,9 @@
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  advancedSearchSchema,
+  type AdvancedSearchFormData,
+} from "@/validators/searchSchemas";
 import type { PatentStatus } from "@/types/patent";
 
 interface AdvancedSearchProps {
@@ -26,18 +31,23 @@ export default function AdvancedSearch({
   onSearch,
   onReset,
 }: AdvancedSearchProps) {
-  const [patentName, setPatentName] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [status, setStatus] = useState<PatentStatus | "">("");
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm<AdvancedSearchFormData>({
+    resolver: zodResolver(advancedSearchSchema),
+    defaultValues: {
+      patentName: "",
+      companyName: "",
+      startDate: "",
+      endDate: "",
+      status: "",
+    },
+  });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    handleSearch();
-  };
-
-  const handleSearch = () => {
+  const onValid = (data: AdvancedSearchFormData) => {
     const params: {
       patentName?: string;
       companyName?: string;
@@ -46,26 +56,22 @@ export default function AdvancedSearch({
       status?: PatentStatus;
     } = {};
 
-    if (patentName.trim()) params.patentName = patentName.trim();
-    if (companyName.trim()) params.companyName = companyName.trim();
-    if (startDate) params.startDate = startDate;
-    if (endDate) params.endDate = endDate;
-    if (status) params.status = status;
+    if (data.patentName?.trim()) params.patentName = data.patentName.trim();
+    if (data.companyName?.trim()) params.companyName = data.companyName.trim();
+    if (data.startDate) params.startDate = data.startDate;
+    if (data.endDate) params.endDate = data.endDate;
+    if (data.status) params.status = data.status as PatentStatus;
 
     onSearch(params);
   };
 
   const handleReset = () => {
-    setPatentName("");
-    setCompanyName("");
-    setStartDate("");
-    setEndDate("");
-    setStatus("");
+    reset();
     onReset();
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit(onValid)} className="space-y-4">
       <div className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -74,8 +80,7 @@ export default function AdvancedSearch({
           <input
             type="text"
             placeholder="예: 배터리, 통신, AI"
-            value={patentName}
-            onChange={(e) => setPatentName(e.target.value)}
+            {...register("patentName")}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -87,8 +92,7 @@ export default function AdvancedSearch({
           <input
             type="text"
             placeholder="예: 삼성전자, LG전자"
-            value={companyName}
-            onChange={(e) => setCompanyName(e.target.value)}
+            {...register("companyName")}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           />
         </div>
@@ -100,9 +104,9 @@ export default function AdvancedSearch({
             </label>
             <input
               type="date"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              {...register("startDate")}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500
+                ${errors.endDate ? "border-red-500" : "border-gray-300"}`}
             />
           </div>
 
@@ -112,10 +116,13 @@ export default function AdvancedSearch({
             </label>
             <input
               type="date"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              {...register("endDate")}
+              className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500
+                ${errors.endDate ? "border-red-500" : "border-gray-300"}`}
             />
+            {errors.endDate && (
+              <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
+            )}
           </div>
         </div>
 
@@ -125,8 +132,7 @@ export default function AdvancedSearch({
           </label>
 
           <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as PatentStatus | "")}
+            {...register("status")}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
           >
             <option value="">전체</option>

@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, type LoginFormData } from "@/validators/authSchemas";
 import { loginApi } from "@/api/auth";
 import axios from "axios";
 import { useAuthStore } from "@/store/authStore";
@@ -8,44 +11,38 @@ export default function Login() {
   const navigate = useNavigate();
   const authStore = useAuthStore();
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
-    setError("");
+    setServerError("");
 
     try {
-      const res = await loginApi(formData.email, formData.password);
+      const res = await loginApi(data.email, data.password);
       const { accessToken, refreshToken, user } = res.data;
 
       localStorage.setItem("refreshToken", refreshToken);
       authStore.login(accessToken, user.email);
 
-      // 홈으로 이동
       navigate("/");
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "로그인에 실패했습니다.");
+        setServerError(err.response?.data?.message || "로그인에 실패했습니다.");
       } else {
-        setError("알 수 없는 에러가 발생했습니다.");
+        setServerError("알 수 없는 에러가 발생했습니다.");
       }
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData((prev) => ({
-      ...prev,
-      [e.target.name]: e.target.value,
-    }));
   };
 
   return (
@@ -80,22 +77,23 @@ export default function Login() {
           </p>
         </div>
 
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+        <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 이메일
               </label>
               <input
-                name="email"
                 type="email"
-                required
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                {...register("email")}
+                className={`w-full px-3 py-2 border rounded-lg
+                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm
+                ${errors.email ? "border-red-500" : "border-gray-300"}`}
                 placeholder="이메일을 입력하세요"
               />
+              {errors.email && (
+                <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              )}
             </div>
 
             <div>
@@ -103,23 +101,24 @@ export default function Login() {
                 비밀번호
               </label>
               <input
-                name="password"
                 type="password"
-                required
-                value={formData.password}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                {...register("password")}
+                className={`w-full px-3 py-2 border rounded-lg
+                focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm
+                ${errors.password ? "border-red-500" : "border-gray-300"}`}
                 placeholder="비밀번호를 입력하세요"
               />
+              {errors.password && (
+                <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              )}
             </div>
           </div>
 
-          {error && (
+          {serverError && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-3">
               <div className="flex items-center">
                 <i className="ri-error-warning-line text-red-500 mr-2"></i>
-                <span className="text-sm text-red-700">{error}</span>
+                <span className="text-sm text-red-700">{serverError}</span>
               </div>
             </div>
           )}
@@ -127,8 +126,8 @@ export default function Login() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full flex justify-center py-2 px-4 rounded-lg shadow-sm 
-            text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 
+            className="w-full flex justify-center py-2 px-4 rounded-lg shadow-sm
+            text-sm font-medium text-white bg-blue-600 hover:bg-blue-700
             disabled:opacity-50 transition-colors duration-200"
           >
             {isLoading ? (
