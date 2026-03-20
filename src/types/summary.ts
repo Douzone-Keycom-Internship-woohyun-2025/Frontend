@@ -4,28 +4,30 @@ export interface BackendSummaryResponse {
     startDate: string;
     endDate: string;
   };
-  totalCount: number;
-
-  statusCount: Record<string, number>;
-  statusPercent: Record<string, number>;
-
+  statistics: {
+    totalPatents: number;
+    monthlyAverage: number;
+    registrationRate: number;
+  };
+  ipcDistribution: Array<{
+    ipcCode: string;
+    ipcKorName: string;
+    count: number;
+  }>;
+  statusDistribution: Array<{
+    status: string;
+    count: number;
+  }>;
   monthlyTrend: Array<{
     month: string;
     count: number;
   }>;
-
-  topIPC: Array<{
-    code: string;
-    count: number;
-  }>;
-
-  avgMonthlyCount: number;
-
   recentPatents: Array<{
     applicationNumber: string;
     title: string;
     date: string;
-    ipcMain: string;
+    ipcMain: string | null;
+    ipcKorName: string;
     status: string;
   }>;
 }
