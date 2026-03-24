@@ -4,6 +4,8 @@ import {
   getFavoritesApi,
   addFavoriteApi,
   deleteFavoriteApi,
+  updateFavoriteMemoApi,
+  getFavoriteAnalysisApi,
 } from "@/api/favorite";
 
 import type { AddFavoritePayload } from "@/types/favorite";
@@ -62,9 +64,42 @@ export function useFavorites() {
     await deleteMutation.mutateAsync(applicationNumber);
   };
 
+  const memoMutation = useMutation({
+    mutationFn: ({ applicationNumber, memo }: { applicationNumber: string; memo: string | null }) =>
+      updateFavoriteMemoApi(applicationNumber, memo),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["favorites"] });
+    },
+  });
+
+  const updateMemo = async (applicationNumber: string, memo: string | null) => {
+    await memoMutation.mutateAsync({ applicationNumber, memo });
+  };
+
+  const {
+    data: analysis,
+    isLoading: analysisLoading,
+    refetch: refetchAnalysis,
+  } = useQuery({
+    queryKey: ["favorites", "analysis"],
+    queryFn: getFavoriteAnalysisApi,
+    enabled: favoriteItems.length > 0,
+  });
+
   const refetch = () => {
     queryClient.invalidateQueries({ queryKey: ["favorites"] });
   };
 
-  return { favorites, favoriteItems, toggleFavorite, loading, error, refetch };
+  return {
+    favorites,
+    favoriteItems,
+    toggleFavorite,
+    updateMemo,
+    loading,
+    error,
+    refetch,
+    analysis: analysis ?? null,
+    analysisLoading,
+    refetchAnalysis,
+  };
 }

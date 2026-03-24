@@ -1,5 +1,7 @@
 import { useEffect } from "react";
 import type { SearchPreset } from "@/types/preset";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface PresetModalProps {
   isOpen: boolean;
@@ -49,82 +51,116 @@ export default function PresetModal({
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+      className="fixed inset-0 backdrop-blur-sm bg-black/40 flex items-center justify-center z-50"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
-        <div className="flex justify-between mb-4">
-          <h2 className="text-xl font-semibold">
-            {editingPreset ? "프리셋 편집" : "새 프리셋 만들기"}
-          </h2>
+      <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full mx-4">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
+          <div className="flex items-center gap-2.5">
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-brand-50 text-brand-600">
+              <i className={editingPreset ? "ri-edit-line text-sm" : "ri-add-line text-sm"} />
+            </div>
+            <h2 className="text-base font-semibold text-gray-900">
+              {editingPreset ? "프리셋 편집" : "새 프리셋 만들기"}
+            </h2>
+          </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-600"
+            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
           >
-            <i className="ri-close-line text-xl"></i>
+            <i className="ri-close-line text-lg" />
           </button>
         </div>
 
-        <div className="space-y-4">
-          <input
-            type="text"
-            value={formData.name}
-            onChange={(e) =>
-              setFormData((p) => ({ ...p, name: e.target.value }))
-            }
-            placeholder="프리셋명"
-            className="w-full border rounded-lg px-3 py-2"
-          />
-          <input
-            type="text"
-            value={formData.applicant}
-            onChange={(e) =>
-              setFormData((p) => ({ ...p, applicant: e.target.value }))
-            }
-            placeholder="회사명"
-            className="w-full border rounded-lg px-3 py-2"
-          />
-          <div className="grid grid-cols-2 gap-4">
-            <input
-              type="date"
-              value={formData.startDate}
+        {/* Body */}
+        <div className="px-6 py-5 space-y-5">
+          {/* Preset name */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              프리셋명
+            </label>
+            <Input
+              type="text"
+              value={formData.name}
               onChange={(e) =>
-                setFormData((p) => ({ ...p, startDate: e.target.value }))
+                setFormData((p) => ({ ...p, name: e.target.value }))
               }
-              className="border rounded-lg px-3 py-2"
-            />
-            <input
-              type="date"
-              value={formData.endDate}
-              onChange={(e) =>
-                setFormData((p) => ({ ...p, endDate: e.target.value }))
-              }
-              className="border rounded-lg px-3 py-2"
+              placeholder="프리셋 이름을 입력하세요"
             />
           </div>
-          <textarea
-            value={formData.description}
-            onChange={(e) =>
-              setFormData((p) => ({ ...p, description: e.target.value }))
-            }
-            placeholder="설명 (선택사항)"
-            className="w-full border rounded-lg px-3 py-2 resize-none"
-          />
+
+          {/* Company */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              출원인
+            </label>
+            <Input
+              type="text"
+              value={formData.applicant}
+              onChange={(e) =>
+                setFormData((p) => ({ ...p, applicant: e.target.value }))
+              }
+              placeholder="출원인(회사명)을 입력하세요"
+            />
+          </div>
+
+          {/* Date range */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              기간
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <span className="block text-xs text-gray-500 mb-1">시작일</span>
+                <Input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, startDate: e.target.value }))
+                  }
+                />
+              </div>
+              <div>
+                <span className="block text-xs text-gray-500 mb-1">종료일</span>
+                <Input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={(e) =>
+                    setFormData((p) => ({ ...p, endDate: e.target.value }))
+                  }
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
+              설명
+              <span className="text-xs text-gray-400 font-normal ml-1">선택사항</span>
+            </label>
+            <textarea
+              value={formData.description}
+              onChange={(e) =>
+                setFormData((p) => ({ ...p, description: e.target.value }))
+              }
+              placeholder="프리셋에 대한 간단한 설명을 입력하세요"
+              rows={3}
+              className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring resize-none"
+            />
+          </div>
         </div>
 
-        <div className="flex justify-end space-x-3 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-100 rounded-lg hover:bg-gray-200"
-          >
-            취소
-          </button>
-          <button
-            onClick={onSave}
-            className="px-4 py-2 bg-brand-700 text-white rounded-lg hover:bg-brand-800"
-          >
+        {/* Footer */}
+        <div className="flex flex-col gap-2 px-6 py-4 border-t border-gray-100">
+          <Button onClick={onSave} className="w-full">
+            <i className={editingPreset ? "ri-check-line" : "ri-save-line"} />
             {editingPreset ? "수정" : "저장"}
-          </button>
+          </Button>
+          <Button variant="outline" onClick={onClose} className="w-full">
+            취소
+          </Button>
         </div>
       </div>
     </div>
