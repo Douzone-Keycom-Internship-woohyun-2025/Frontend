@@ -130,7 +130,7 @@ export default function AdvancedSearch({
 
           <select
             {...register("status")}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-600"
           >
             <option value="">전체</option>
             {STATUS_OPTIONS.map((s) => (

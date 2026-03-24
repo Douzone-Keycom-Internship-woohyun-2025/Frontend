@@ -101,7 +101,7 @@ export default function PresetCard({
             endDate: toInputDateFormat(preset.endDate),
           })
         }
-        className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center justify-center"
+        className="w-full px-4 py-2 bg-brand-700 text-white rounded-lg hover:bg-brand-800 flex items-center justify-center"
       >
         <i className="ri-search-line mr-2"></i>이 프리셋으로 분석하기
       </button>
