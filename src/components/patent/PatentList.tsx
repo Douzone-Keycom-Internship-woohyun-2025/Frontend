@@ -50,11 +50,15 @@ export default function PatentList({
     useState<PatentDetail | null>(null);
   const [selectedMemo, setSelectedMemo] = useState<string | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [detailError, setDetailError] = useState(false);
+  const [pendingPatent, setPendingPatent] = useState<PatentListItem | null>(null);
 
   // 상세 정보 모달 열기
   const handlePatentClick = async (patent: PatentListItem) => {
     setSelectedPatentDetail(null);
+    setDetailError(false);
     setDetailLoading(true);
+    setPendingPatent(patent);
     const memo = favoriteItems?.find((f) => f.applicationNumber === patent.applicationNumber)?.memo ?? null;
     setSelectedMemo(memo);
 
@@ -62,6 +66,7 @@ export default function PatentList({
       const detail = await getPatentDetail(patent.applicationNumber);
       setSelectedPatentDetail(detail);
     } catch {
+      setDetailError(true);
       toast({ title: "상세 정보 로드 실패", description: "잠시 후 다시 시도해주세요.", variant: "destructive" });
     } finally {
       setDetailLoading(false);
@@ -261,12 +266,16 @@ export default function PatentList({
       {/* 상세 모달 */}
       <PatentDetailModal
         patent={selectedPatentDetail}
-        isOpen={detailLoading || !!selectedPatentDetail}
+        isOpen={detailLoading || !!selectedPatentDetail || detailError}
         loading={detailLoading}
+        error={detailError}
+        onRetry={pendingPatent ? () => handlePatentClick(pendingPatent) : undefined}
         onClose={() => {
           setSelectedPatentDetail(null);
           setSelectedMemo(null);
           setDetailLoading(false);
+          setDetailError(false);
+          setPendingPatent(null);
         }}
         isFavorite={favorites.has(
           selectedPatentDetail?.applicationNumber ?? ""

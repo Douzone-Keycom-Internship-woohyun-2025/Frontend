@@ -47,8 +47,10 @@ export default memo(function PatentTable({
             </th>
             <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 w-28">
               <button
+                type="button"
                 onClick={onSortChange}
                 className="inline-flex items-center gap-1 hover:text-gray-900 transition-colors"
+                aria-label={`출원일 ${sortOrder === "desc" ? "오름차순" : "내림차순"}으로 정렬`}
               >
                 출원일
                 <i
