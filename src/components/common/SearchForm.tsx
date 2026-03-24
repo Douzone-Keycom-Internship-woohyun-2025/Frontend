@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import dayjs from "dayjs";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -39,6 +39,7 @@ export default function SearchForm({
   showTitle = true,
 }: SearchFormProps) {
   const { presets, isLoading: presetLoading, error } = usePresets();
+  const [presetEverSelected, setPresetEverSelected] = useState(false);
 
   const today = useMemo(() => dayjs().format("YYYY-MM-DD"), []);
   const oneMonthAgo = useMemo(
@@ -76,6 +77,7 @@ export default function SearchForm({
 
   const handleSelectPreset = (presetId: string) => {
     onPresetChange(presetId);
+    if (presetId !== "") setPresetEverSelected(true);
     if (presetId === "") {
       reset({ applicant: "", startDate: oneMonthAgo, endDate: today });
       return;
@@ -131,7 +133,7 @@ export default function SearchForm({
             <label className="block text-sm font-medium text-gray-700">
               저장된 프리셋
             </label>
-            {selectedPresetId === "" && watchedValues.applicant && (
+            {presetEverSelected && selectedPresetId === "" && watchedValues.applicant && (
               <span className="text-xs text-gray-400 flex items-center gap-1">
                 <i className="ri-information-line" />
                 프리셋과 다른 값이 입력되었습니다
