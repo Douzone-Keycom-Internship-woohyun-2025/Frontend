@@ -125,7 +125,7 @@ export default function ComparisonDashboard({ data }: ComparisonDashboardProps) 
   }), [companies, allStatuses]);
 
   const handleExportCsv = () => {
-    const headers = ["회사명", "총 특허", "등록률(%)", "월평균 출원", "상위 IPC"];
+    const headers = ["출원인", "총 특허", "등록률(%)", "월평균 출원", "상위 IPC"];
     const rows = companies.map((c) => [
       c.applicant,
       String(c.statistics.totalPatents),

@@ -93,7 +93,7 @@ export default function PresetModal({
           {/* Company */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1.5">
-              회사명
+              출원인
             </label>
             <Input
               type="text"
@@ -101,7 +101,7 @@ export default function PresetModal({
               onChange={(e) =>
                 setFormData((p) => ({ ...p, applicant: e.target.value }))
               }
-              placeholder="회사명을 입력하세요"
+              placeholder="출원인(회사명)을 입력하세요"
             />
           </div>
 

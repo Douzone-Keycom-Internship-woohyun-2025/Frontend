@@ -158,7 +158,7 @@ export default function ComparisonPage() {
                 경쟁사 비교를 시작하세요
               </h3>
               <p className="text-gray-600">
-                2~5개 회사명과 분석 기간을 입력하여 특허 동향을 비교 분석해보세요.
+                2~5개 출원인과 분석 기간을 입력하여 특허 동향을 비교 분석해보세요.
               </p>
             </div>
           )}

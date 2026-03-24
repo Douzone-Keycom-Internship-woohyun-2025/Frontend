@@ -118,7 +118,7 @@ export default function SummaryPage() {
                 R&D 동향 분석을 시작하세요
               </h3>
               <p className="text-gray-600">
-                회사명과 분석 기간을 입력하여 특허 동향을 시각적으로
+                출원인과 분석 기간을 입력하여 특허 동향을 시각적으로
                 분석해보세요.
               </p>
             </div>

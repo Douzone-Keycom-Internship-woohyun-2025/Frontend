@@ -152,7 +152,7 @@ export default function SearchForm({
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1.5">
-            회사명
+            출원인
           </label>
           <Input
             type="text"

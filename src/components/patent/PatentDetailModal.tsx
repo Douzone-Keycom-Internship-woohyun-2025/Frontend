@@ -34,35 +34,20 @@ export default function PatentDetailModal({
   const ipcList =
     patent?.ipcNumber?.split("|").map((ipc) => ipc.trim()) ?? [];
 
-  const timelineItems = patent
+  const dateItems = patent
     ? [
-        {
-          label: "출원일",
-          date: patent.applicationDate,
-          sub: patent.applicationNumber,
-          icon: "ri-calendar-line",
-        },
-        {
-          label: "공개일",
-          date: patent.openDate,
-          sub: patent.openNumber || "-",
-          icon: "ri-eye-line",
-        },
-        {
-          label: "등록일",
-          date: patent.registerDate,
-          sub: patent.registerNumber || "-",
-          icon: "ri-checkbox-circle-line",
-        },
+        { label: "출원", date: patent.applicationDate, num: patent.applicationNumber, icon: "ri-edit-line", color: "text-brand-600 bg-brand-50 border-brand-200" },
+        { label: "공개", date: patent.openDate, num: patent.openNumber, icon: "ri-eye-line", color: "text-blue-600 bg-blue-50 border-blue-200" },
+        { label: "등록", date: patent.registerDate, num: patent.registerNumber, icon: "ri-checkbox-circle-line", color: "text-green-600 bg-green-50 border-green-200" },
       ]
     : [];
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-3 sm:p-6"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white border border-gray-200 rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col">
+      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
         {loading || !patent ? (
           <div className="p-20 flex justify-center">
             <LoadingSpinner message="상세 정보를 불러오는 중..." size="lg" />
@@ -70,214 +55,163 @@ export default function PatentDetailModal({
         ) : (
           <>
             {/* ── 헤더 ── */}
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-3.5 border-b border-gray-200 bg-white rounded-t-xl">
-              <div className="flex items-center gap-2.5 min-w-0">
-                <i className="ri-file-text-line text-lg text-brand-600" />
-                <h2 className="text-base font-semibold text-gray-900 truncate">
-                  특허 상세
-                </h2>
-                {patent.registerStatus && (
-                  <span
-                    className={`shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
-                      patent.registerStatus
-                    )}`}
+            <div className="shrink-0 px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 mb-2">
+                    {patent.registerStatus && (
+                      <span
+                        className={`shrink-0 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${getStatusColor(
+                          patent.registerStatus
+                        )}`}
+                      >
+                        {patent.registerStatus}
+                      </span>
+                    )}
+                    <span className="text-xs text-gray-400 font-mono">
+                      {patent.applicationNumber}
+                    </span>
+                  </div>
+                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-snug line-clamp-2">
+                    {patent.inventionTitle}
+                  </h2>
+                  <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
+                    <span className="flex items-center gap-1.5">
+                      <i className="ri-building-line text-gray-400" />
+                      {patent.applicantName || "정보 없음"}
+                    </span>
+                    {patent.applicationDate && (
+                      <span className="flex items-center gap-1.5">
+                        <i className="ri-calendar-line text-gray-400" />
+                        {toInputDateFormat(patent.applicationDate)}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => {
+                      const payload = buildFavoritePayloadFromDetail(patent);
+                      onToggleFavorite(patent.applicationNumber, payload);
+                    }}
+                    className={`p-2 rounded-lg transition-colors ${
+                      isFavorite
+                        ? "bg-red-50 text-red-500 hover:bg-red-100"
+                        : "text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                    }`}
+                    aria-label="즐겨찾기"
                   >
-                    {patent.registerStatus}
-                  </span>
-                )}
-              </div>
-
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => {
-                    const payload = buildFavoritePayloadFromDetail(patent);
-                    onToggleFavorite(patent.applicationNumber, payload);
-                  }}
-                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                  aria-label="즐겨찾기"
-                >
-                  {isFavorite ? (
-                    <i className="ri-heart-fill text-red-500 text-lg" />
-                  ) : (
-                    <i className="ri-heart-line text-gray-400 text-lg" />
-                  )}
-                </button>
-
-                <button
-                  onClick={onClose}
-                  className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
-                  aria-label="닫기"
-                >
-                  <i className="ri-close-line text-lg" />
-                </button>
+                    <i className={`${isFavorite ? "ri-heart-fill" : "ri-heart-line"} text-lg`} />
+                  </button>
+                  <button
+                    onClick={onClose}
+                    className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                    aria-label="닫기"
+                  >
+                    <i className="ri-close-line text-lg" />
+                  </button>
+                </div>
               </div>
             </div>
 
             {/* ── 콘텐츠 ── */}
-            <div className="overflow-y-auto flex-1 p-6 space-y-6">
-              {/* 발명 제목 + 출원번호 */}
-              <section>
-                <h3 className="text-lg font-bold text-gray-900 leading-snug mb-2">
-                  {patent.inventionTitle}
-                </h3>
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
-                  <span className="flex items-center gap-1.5">
-                    <i className="ri-hashtag" />
-                    <span className="font-mono">{patent.applicationNumber}</span>
-                  </span>
-                  {patent.applicationDate && (
-                    <span className="flex items-center gap-1.5">
-                      <i className="ri-calendar-line" />
-                      {toInputDateFormat(patent.applicationDate)}
-                    </span>
-                  )}
-                </div>
-              </section>
-
-              {/* 2-column grid */}
-              <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-                {/* ── 좌측: 기본 정보 ── */}
-                <div className="space-y-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                    기본 정보
-                  </h4>
-
-                  {/* 출원인 */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <label className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1.5">
-                      <i className="ri-building-line" />
-                      출원인
-                    </label>
-                    <p className="text-sm font-medium text-gray-900">
-                      {patent.applicantName || "정보 없음"}
+            <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-5">
+              {/* 날짜 카드 3개 가로 */}
+              <div className="grid grid-cols-3 gap-3">
+                {dateItems.map((item) => (
+                  <div
+                    key={item.label}
+                    className={`rounded-lg border p-3 ${item.date ? item.color : "bg-gray-50 border-gray-200 text-gray-400"}`}
+                  >
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <i className={`${item.icon} text-sm`} />
+                      <span className="text-[11px] font-semibold uppercase tracking-wide">
+                        {item.label}
+                      </span>
+                    </div>
+                    <p className={`text-sm font-bold ${item.date ? "text-gray-900" : "text-gray-400"}`}>
+                      {item.date ? toInputDateFormat(item.date) : "-"}
                     </p>
-                  </div>
-
-                  {/* 주요 IPC */}
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <label className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1.5">
-                      <i className="ri-code-line" />
-                      주요 IPC
-                    </label>
-                    <p className="text-sm font-mono font-bold text-gray-900">
-                      {patent.mainIpcCode || "정보 없음"}
-                    </p>
-                    {patent.ipcKorName && (
-                      <p className="text-xs text-gray-500 mt-1">
-                        {patent.ipcKorName}
+                    {item.num && (
+                      <p className="text-[10px] text-gray-400 font-mono mt-0.5 truncate">
+                        {item.num}
                       </p>
                     )}
                   </div>
+                ))}
+              </div>
 
-                  {/* 전체 IPC 목록 */}
-                  {ipcList.length > 0 && (
-                    <div className="bg-gray-50 rounded-lg p-4">
-                      <label className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2">
-                        <i className="ri-list-check" />
-                        전체 IPC 목록
-                      </label>
-                      <div className="flex flex-wrap gap-1.5">
-                        {ipcList.map((ipc, idx) => (
-                          <span
-                            key={idx}
-                            className="text-xs px-2 py-0.5 bg-brand-100 text-brand-700 rounded-md font-mono"
-                          >
-                            {ipc}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
+              {/* IPC 정보 */}
+              <div className="bg-gray-50 rounded-lg p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <i className="ri-code-line" />
+                    IPC 분류
+                  </h4>
+                  {patent.mainIpcCode && (
+                    <span className="text-xs font-mono font-bold text-brand-700 bg-brand-100 px-2 py-0.5 rounded">
+                      {patent.mainIpcCode}
+                    </span>
                   )}
                 </div>
-
-                {/* ── 우측: 날짜 타임라인 ── */}
-                <div className="space-y-4">
-                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-                    일정 정보
-                  </h4>
-
-                  <div className="bg-gray-50 rounded-lg p-4">
-                    <div className="relative space-y-4">
-                      {timelineItems.map((item, idx) => {
-                        const isLast = idx === timelineItems.length - 1;
-                        return (
-                          <div key={idx} className="flex gap-3 relative">
-                            {/* 타임라인 세로선 */}
-                            {!isLast && (
-                              <div className="absolute left-[11px] top-6 bottom-0 w-px bg-gray-200" />
-                            )}
-                            {/* 아이콘 */}
-                            <div className="shrink-0 w-[22px] h-[22px] rounded-full bg-white border-2 border-gray-300 flex items-center justify-center z-[1]">
-                              <i
-                                className={`${item.icon} text-[10px] text-gray-500`}
-                              />
-                            </div>
-                            {/* 내용 */}
-                            <div className="flex-1 min-w-0 pb-1">
-                              <div className="flex items-center justify-between gap-2">
-                                <span className="text-xs font-semibold text-gray-600">
-                                  {item.label}
-                                </span>
-                                <span className="text-sm font-bold text-gray-900">
-                                  {item.date
-                                    ? toInputDateFormat(item.date)
-                                    : "-"}
-                                </span>
-                              </div>
-                              <p className="text-xs text-gray-400 font-mono truncate mt-0.5">
-                                {item.sub}
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                {patent.ipcKorName && (
+                  <p className="text-sm text-gray-700 mb-2">
+                    {patent.ipcKorName}
+                  </p>
+                )}
+                {ipcList.length > 1 && (
+                  <div className="flex flex-wrap gap-1.5 pt-2 border-t border-gray-200">
+                    {ipcList.map((ipc, idx) => (
+                      <span
+                        key={idx}
+                        className={`text-[11px] px-2 py-0.5 rounded font-mono ${
+                          ipc === patent.mainIpcCode
+                            ? "bg-brand-100 text-brand-700 font-semibold"
+                            : "bg-white text-gray-600 border border-gray-200"
+                        }`}
+                      >
+                        {ipc}
+                      </span>
+                    ))}
                   </div>
-                </div>
-              </section>
+                )}
+              </div>
 
               {/* 요약 */}
               {patent.astrtCont && (
-                <section>
-                  <h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+                <div>
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5 mb-2.5">
                     <i className="ri-file-text-line" />
                     발명의 요약
                   </h4>
-                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-brand-200">
-                    <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-[3px] border-brand-300">
+                    <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
                       {patent.astrtCont}
                     </p>
                   </div>
-                </section>
+                </div>
               )}
 
               {/* 도면 */}
               {patent.bigDrawing && (
-                <section>
-                  <h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
-                    <i className="ri-image-line" />
-                    도면
-                  </h4>
-                  <a
-                    href={patent.bigDrawing}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-brand-300 hover:bg-brand-50/50 transition-colors group"
-                  >
-                    <div className="shrink-0 w-9 h-9 rounded-lg bg-brand-100 flex items-center justify-center">
-                      <i className="ri-image-line text-brand-600" />
-                    </div>
-                    <div className="min-w-0 flex-1">
-                      <p className="text-sm font-medium text-gray-900 group-hover:text-brand-700 transition-colors">
-                        특허 도면 원문 보기
-                      </p>
-                      <p className="text-xs text-gray-400">
-                        새 탭에서 열립니다
-                      </p>
-                    </div>
-                    <i className="ri-external-link-line text-gray-300 group-hover:text-brand-400 transition-colors" />
-                  </a>
-                </section>
+                <a
+                  href={patent.bigDrawing}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-3 rounded-lg p-3.5 border border-gray-200 hover:border-brand-300 hover:bg-brand-50/30 transition-all group"
+                >
+                  <div className="shrink-0 w-9 h-9 rounded-lg bg-brand-50 border border-brand-100 flex items-center justify-center">
+                    <i className="ri-image-line text-brand-600" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-gray-900 group-hover:text-brand-700 transition-colors">
+                      특허 도면 원문 보기
+                    </p>
+                    <p className="text-[11px] text-gray-400">새 탭에서 열립니다</p>
+                  </div>
+                  <i className="ri-arrow-right-up-line text-gray-300 group-hover:text-brand-500 transition-colors" />
+                </a>
               )}
             </div>
           </>

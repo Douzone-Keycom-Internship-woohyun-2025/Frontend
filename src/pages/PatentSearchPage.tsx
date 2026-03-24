@@ -120,7 +120,7 @@ export default function PatentSearchPage() {
   const activeFilters = [
     filters.applicant && { label: `출원인: ${filters.applicant}`, key: "applicant" },
     filters.patentName && { label: `특허명: ${filters.patentName}`, key: "patentName" },
-    filters.companyName && { label: `회사명: ${filters.companyName}`, key: "companyName" },
+    filters.companyName && { label: `출원인: ${filters.companyName}`, key: "companyName" },
     filters.startDate && filters.endDate && { label: `${filters.startDate} ~ ${filters.endDate}`, key: "date" },
     filters.status && { label: `상태: ${filters.status}`, key: "status" },
   ].filter(Boolean) as Array<{ label: string; key: string }>;
@@ -246,7 +246,7 @@ export default function PatentSearchPage() {
                   검색 조건을 입력하세요
                 </h3>
                 <p className="text-sm text-gray-500">
-                  출원인, 기간 등 조건을 입력하면 KIPRIS에서 특허를 검색합니다.
+                  출원인(회사명), 기간 등 조건을 입력하면 KIPRIS에서 특허를 검색합니다.
                 </p>
               </div>
             ) : results.length === 0 ? (

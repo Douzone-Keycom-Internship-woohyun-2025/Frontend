@@ -40,7 +40,7 @@ export default function PresetManagementPage() {
     if (!formData.name.trim() || !formData.applicant.trim()) {
       toast({
         title: "필수 입력 누락",
-        description: "프리셋명과 회사명은 필수입니다.",
+        description: "프리셋명과 출원인은 필수입니다.",
         variant: "destructive",
       });
       return;
