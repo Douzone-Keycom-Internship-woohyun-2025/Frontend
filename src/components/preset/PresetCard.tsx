@@ -1,5 +1,6 @@
 import type { SearchPreset } from "@/types/preset";
 import { toInputDateFormat } from "@/utils/dateTransform";
+import { Button } from "@/components/ui/button";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -19,92 +20,122 @@ interface PresetCardProps {
   onUse: (preset: SearchPreset) => void;
 }
 
+function formatDisplayDate(dateStr?: string) {
+  if (!dateStr) return "";
+  const d = toInputDateFormat(dateStr);
+  return d.replace(/-/g, ".");
+}
+
 export default function PresetCard({
   preset,
   onEdit,
   onDelete,
   onUse,
 }: PresetCardProps) {
+  const startDisplay = formatDisplayDate(preset.startDate);
+  const endDisplay = formatDisplayDate(preset.endDate);
+  const hasDates = startDisplay || endDisplay;
+
   return (
-    <div className="bg-white rounded-lg shadow hover:shadow-md p-6 transition-all">
-      <div className="flex justify-between items-start mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">{preset.name}</h3>
-          {preset.description && (
-            <p className="text-sm text-gray-600">{preset.description}</p>
+    <div className="bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md hover:border-brand-200 transition-all overflow-hidden">
+      {/* Top accent stripe */}
+      <div className="h-1 bg-brand-600" />
+
+      <div className="p-5">
+        {/* Header row */}
+        <div className="flex items-start justify-between gap-3 mb-3">
+          <div className="min-w-0">
+            <h3 className="text-base font-semibold text-gray-900 truncate">
+              {preset.name}
+            </h3>
+            {preset.description && (
+              <p className="text-sm text-gray-500 mt-0.5 line-clamp-2">
+                {preset.description}
+              </p>
+            )}
+          </div>
+
+          {/* Action icons */}
+          <div className="flex items-center gap-1 shrink-0">
+            <button
+              onClick={() => onEdit(preset)}
+              className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600 transition-colors"
+              title="편집"
+            >
+              <i className="ri-edit-line text-sm" />
+            </button>
+
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button
+                  className="rounded-lg p-1.5 text-gray-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+                  title="삭제"
+                >
+                  <i className="ri-delete-bin-line text-sm" />
+                </button>
+              </AlertDialogTrigger>
+
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>정말 삭제하시겠습니까?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    삭제된 프리셋은 복구할 수 없습니다.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+
+                <AlertDialogFooter>
+                  <AlertDialogCancel>취소</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => onDelete(preset.id)}
+                    className="bg-red-600 text-white hover:bg-red-700"
+                  >
+                    삭제
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </div>
+        </div>
+
+        {/* Info section */}
+        <div className="flex flex-col gap-1.5 mb-4">
+          <div className="flex items-center gap-1.5 text-sm text-gray-600">
+            <i className="ri-building-line text-gray-400 text-sm" />
+            <span>{preset.applicant}</span>
+          </div>
+
+          {hasDates && (
+            <div className="flex items-center gap-1.5 text-sm text-gray-600">
+              <i className="ri-calendar-line text-gray-400 text-sm" />
+              <span>
+                {startDisplay}
+                {startDisplay && endDisplay && " ~ "}
+                {endDisplay}
+              </span>
+            </div>
           )}
         </div>
 
-        <div className="flex space-x-2">
-          <button
-            onClick={() => onEdit(preset)}
-            className="text-gray-400 hover:text-gray-600"
-            title="편집"
-          >
-            <i className="ri-edit-line"></i>
-          </button>
+        {/* Analyze button */}
+        <Button
+          className="w-full"
+          onClick={() =>
+            onUse({
+              ...preset,
+              startDate: toInputDateFormat(preset.startDate),
+              endDate: toInputDateFormat(preset.endDate),
+            })
+          }
+        >
+          <i className="ri-search-line" />
+          분석하기
+        </Button>
 
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className="text-gray-400 hover:text-red-600" title="삭제">
-                <i className="ri-delete-bin-line"></i>
-              </button>
-            </AlertDialogTrigger>
-
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>정말 삭제하시겠습니까?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  삭제된 프리셋은 복구할 수 없습니다.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-
-              <AlertDialogFooter>
-                <AlertDialogCancel>취소</AlertDialogCancel>
-
-                <AlertDialogAction
-                  onClick={() => onDelete(preset.id)}
-                  className="bg-red-600 text-white hover:bg-red-700"
-                >
-                  삭제
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-        </div>
+        {/* Created date */}
+        <p className="text-xs text-gray-400 text-center mt-3">
+          {new Date(preset.createdAt).toLocaleDateString("ko-KR")} 생성
+        </p>
       </div>
-
-      <div className="text-sm text-gray-600 space-y-1 mb-4">
-        <div>
-          <strong>회사:</strong> {preset.applicant}
-        </div>
-        {preset.startDate && (
-          <div>
-            <strong>시작일:</strong> {toInputDateFormat(preset.startDate)}
-          </div>
-        )}
-        {preset.endDate && (
-          <div>
-            <strong>종료일:</strong> {toInputDateFormat(preset.endDate)}
-          </div>
-        )}
-        <div className="text-gray-500 text-xs">
-          생성일: {new Date(preset.createdAt).toLocaleDateString()}
-        </div>
-      </div>
-
-      <button
-        onClick={() =>
-          onUse({
-            ...preset,
-            startDate: toInputDateFormat(preset.startDate),
-            endDate: toInputDateFormat(preset.endDate),
-          })
-        }
-        className="w-full px-4 py-2 bg-brand-700 text-white rounded-lg hover:bg-brand-800 flex items-center justify-center"
-      >
-        <i className="ri-search-line mr-2"></i>이 프리셋으로 분석하기
-      </button>
     </div>
   );
 }

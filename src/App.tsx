@@ -14,6 +14,7 @@ const SummaryPage = lazy(() => import("@/pages/SummaryPage"));
 const FavoritesPage = lazy(() => import("@/pages/FavoritesPage"));
 const PresetManagementPage = lazy(() => import("@/pages/PresetManagementPage"));
 const HelpPage = lazy(() => import("@/pages/HelpPage"));
+const ComparisonPage = lazy(() => import("@/pages/ComparisonPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -56,6 +57,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <SummaryPage />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/comparison"
+              element={
+                <ProtectedRoute>
+                  <ComparisonPage />
                 </ProtectedRoute>
               }
             />

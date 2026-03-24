@@ -3,6 +3,7 @@ import type {
   AddFavoritePayload,
   GetFavoritesResponse,
   FavoriteItem,
+  FavoriteAnalysis,
 } from "@/types/favorite";
 
 export async function getFavoritesApi(): Promise<GetFavoritesResponse> {
@@ -22,4 +23,16 @@ export async function deleteFavoriteApi(
 ): Promise<{ success: boolean }> {
   const res = await api.delete(`/favorites/${applicationNumber}`);
   return res.data.data as { success: boolean };
+}
+
+export async function updateFavoriteMemoApi(
+  applicationNumber: string,
+  memo: string | null
+): Promise<void> {
+  await api.patch(`/favorites/${applicationNumber}`, { memo });
+}
+
+export async function getFavoriteAnalysisApi(): Promise<FavoriteAnalysis> {
+  const res = await api.get("/favorites/analysis");
+  return res.data.data;
 }
