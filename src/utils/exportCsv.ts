@@ -13,5 +13,5 @@ export function downloadCsv(filename: string, headers: string[], rows: string[][
   link.href = url;
   link.download = `${filename}_${new Date().toISOString().slice(0, 10)}.csv`;
   link.click();
-  URL.revokeObjectURL(url);
+  setTimeout(() => URL.revokeObjectURL(url), 200);
 }

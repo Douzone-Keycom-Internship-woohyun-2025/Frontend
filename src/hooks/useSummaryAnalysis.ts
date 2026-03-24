@@ -16,7 +16,11 @@ export function useSummaryAnalysis() {
 
   const analyze = async (params: SummaryQuery) => {
     setLastParams(params);
-    await mutation.mutateAsync(params);
+    try {
+      await mutation.mutateAsync(params);
+    } catch {
+      // mutation.error가 상태를 관리하므로 여기서는 무시
+    }
   };
 
   const retry = () => {
