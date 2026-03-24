@@ -317,7 +317,7 @@ export default function SummaryDashboard({
 
         {monthlyData.length > 0 ? (
           <>
-            <div className="h-56 mt-4">
+            <div className="h-44 sm:h-56 mt-4">
               <Bar
                 data={monthlyBarData}
                 options={{
@@ -362,7 +362,7 @@ export default function SummaryDashboard({
 
         {statusData.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
-            <div className="relative h-52 flex items-center justify-center">
+            <div className="relative h-44 sm:h-52 flex items-center justify-center">
               <Doughnut
                 data={statusChartData}
                 options={{

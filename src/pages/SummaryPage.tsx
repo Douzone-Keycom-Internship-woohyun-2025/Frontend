@@ -60,8 +60,8 @@ export default function SummaryPage() {
         <header className="bg-white shadow-sm border-b">
           <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">요약분석</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">요약분석</h1>
+              <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">
                 회사의 R&D 동향을 한눈에 파악하고 특허 현황을 시각적으로
                 분석하세요.
               </p>
@@ -74,7 +74,7 @@ export default function SummaryPage() {
         </header>
 
         <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-          <div className="bg-white rounded-lg shadow p-8 mb-8">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
             <SearchForm
               enablePresets
               title="요약분석"
@@ -94,7 +94,7 @@ export default function SummaryPage() {
               onRetry={retry}
             />
           ) : summaryData ? (
-            <div className="bg-white rounded-lg shadow p-8">
+            <div className="bg-white rounded-lg shadow p-4 sm:p-6 lg:p-8">
               <SummaryDashboard
                 data={summaryData}
                 presetFilters={
@@ -107,7 +107,7 @@ export default function SummaryPage() {
               />
             </div>
           ) : (
-            <div className="bg-white rounded-lg shadow p-12 text-center">
+            <div className="bg-white rounded-lg shadow p-8 sm:p-12 text-center">
               <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4 bg-brand-100 rounded-full">
                 <i className="ri-bar-chart-box-line text-2xl text-brand-700"></i>
               </div>

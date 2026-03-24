@@ -302,7 +302,7 @@ export default function ComparisonDashboard({ data }: ComparisonDashboardProps) 
           <p className="text-xs text-gray-400 mt-0.5">각 출원인의 월별 특허 출원 건수 추이를 비교합니다</p>
         </div>
         {allMonths.length > 0 ? (
-          <div className="h-64 relative">
+          <div className="h-48 sm:h-64 relative">
             <Line
               data={monthlyLineData}
               options={{
@@ -316,7 +316,7 @@ export default function ComparisonDashboard({ data }: ComparisonDashboardProps) 
                 scales: {
                   x: {
                     grid: { display: false },
-                    ticks: { color: "#9CA3AF", font: { size: 10 }, maxRotation: 45 },
+                    ticks: { color: "#9CA3AF", font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 6 },
                   },
                   y: {
                     beginAtZero: true,
@@ -363,7 +363,7 @@ export default function ComparisonDashboard({ data }: ComparisonDashboardProps) 
                       const pct = maxPerCompany > 0 ? (count / maxPerCompany) * 100 : 0;
                       return (
                         <div key={company.applicant} className="flex items-center gap-2">
-                          <span className="text-xs text-gray-500 w-20 shrink-0 truncate">{company.applicant}</span>
+                          <span className="text-xs text-gray-500 w-14 sm:w-20 shrink-0 truncate">{company.applicant}</span>
                           <div className="flex-1 bg-gray-100 rounded-full h-1.5">
                             <div
                               className="h-1.5 rounded-full transition-all duration-500"
@@ -394,7 +394,7 @@ export default function ComparisonDashboard({ data }: ComparisonDashboardProps) 
           <p className="text-xs text-gray-400 mt-0.5">각 출원인의 특허 법적 상태를 비교합니다</p>
         </div>
         {allStatuses.length > 0 ? (
-          <div className="h-64 relative">
+          <div className="h-48 sm:h-64 relative">
             <Bar
               data={statusBarData}
               options={{
@@ -428,7 +428,9 @@ export default function ComparisonDashboard({ data }: ComparisonDashboardProps) 
           <h3 className="text-base font-semibold text-gray-900">비교 요약</h3>
           <p className="text-xs text-gray-400 mt-0.5">주요 지표 한눈에 비교</p>
         </div>
-        <div className="overflow-x-auto">
+
+        {/* 데스크탑 테이블 */}
+        <div className="hidden sm:block overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-gray-200">
@@ -496,6 +498,46 @@ export default function ComparisonDashboard({ data }: ComparisonDashboardProps) 
               })}
             </tbody>
           </table>
+        </div>
+
+        {/* 모바일 카드형 */}
+        <div className="sm:hidden space-y-3">
+          {companies.map((company, i) => (
+            <div
+              key={company.applicant}
+              className="rounded-lg border border-gray-100 p-4"
+              style={{ borderLeftColor: COMPANY_COLORS[i % COMPANY_COLORS.length].bg, borderLeftWidth: 3 }}
+            >
+              <p
+                className="text-sm font-bold mb-3"
+                style={{ color: COMPANY_COLORS[i % COMPANY_COLORS.length].bg }}
+              >
+                {company.applicant}
+              </p>
+              <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-xs">
+                <div>
+                  <span className="text-gray-400 block mb-0.5">총 특허</span>
+                  <span className="font-semibold text-gray-900">{company.statistics.totalPatents.toLocaleString()}건</span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block mb-0.5">등록률</span>
+                  <span className="font-semibold text-gray-900">{company.statistics.registrationRate}%</span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block mb-0.5">월평균 출원</span>
+                  <span className="font-semibold text-gray-900">{company.statistics.monthlyAverage}건</span>
+                </div>
+                <div>
+                  <span className="text-gray-400 block mb-0.5">기술 다양성</span>
+                  <span className="font-semibold text-gray-900">{company.ipcDistribution.length}개 분야</span>
+                </div>
+                <div className="col-span-2">
+                  <span className="text-gray-400 block mb-0.5">주력 기술분야</span>
+                  <span className="font-semibold text-gray-900 line-clamp-1">{company.ipcDistribution[0]?.ipcKorName ?? "-"}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

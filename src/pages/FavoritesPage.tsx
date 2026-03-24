@@ -112,7 +112,7 @@ export default function FavoritesPage() {
 
                 {/* Inline stat strip */}
                 {hasData && (
-                  <div className="flex items-center gap-1 mt-3 ml-[38px]">
+                  <div className="flex flex-wrap items-center gap-1 mt-3 ml-[38px]">
                     <span className="text-xs font-semibold text-gray-700 bg-gray-100 px-2.5 py-1 rounded-md">
                       총 {favoritePatents.length}건
                     </span>

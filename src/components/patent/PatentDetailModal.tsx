@@ -74,10 +74,10 @@ export default function PatentDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-3 sm:p-6"
+      className="fixed inset-0 z-50 flex flex-col justify-end sm:flex-row sm:items-center sm:justify-center bg-black/40 backdrop-blur-sm sm:p-6"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl max-h-[90vh] sm:max-h-[90vh] flex flex-col overflow-hidden">
         {error ? (
           <div className="flex flex-col items-center justify-center gap-4 p-12 text-center">
             <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
@@ -111,11 +111,16 @@ export default function PatentDetailModal({
           <SkeletonPatentDetail />
         ) : (
           <>
+            {/* 모바일 드래그 핸들 */}
+            <div className="sm:hidden flex justify-center pt-2.5 pb-1 shrink-0">
+              <div className="w-10 h-1 bg-gray-300 rounded-full" />
+            </div>
+
             {/* ── 헤더 ── */}
-            <div className="shrink-0 px-5 sm:px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <div className="shrink-0 px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-100 bg-gray-50/50">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-1.5 sm:mb-2">
                     {patent.registerStatus && (
                       <span
                         className={`shrink-0 px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${getStatusColor(
@@ -125,14 +130,14 @@ export default function PatentDetailModal({
                         {patent.registerStatus}
                       </span>
                     )}
-                    <span className="text-xs text-gray-400 font-mono">
+                    <span className="text-xs text-gray-400 font-mono truncate">
                       {patent.applicationNumber}
                     </span>
                   </div>
-                  <h2 className="text-lg sm:text-xl font-bold text-gray-900 leading-snug line-clamp-2">
+                  <h2 className="text-base sm:text-xl font-bold text-gray-900 leading-snug line-clamp-2">
                     {patent.inventionTitle}
                   </h2>
-                  <div className="flex items-center gap-3 mt-2 text-sm text-gray-500">
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1.5 sm:mt-2 text-xs sm:text-sm text-gray-500">
                     <span className="flex items-center gap-1.5">
                       <i className="ri-building-line text-gray-400" />
                       {patent.applicantName || "정보 없음"}
@@ -173,25 +178,25 @@ export default function PatentDetailModal({
             </div>
 
             {/* ── 콘텐츠 ── */}
-            <div className="overflow-y-auto flex-1 p-5 sm:p-6 space-y-5">
+            <div className="overflow-y-auto flex-1 p-4 sm:p-6 space-y-4 sm:space-y-5">
               {/* 날짜 카드 3개 가로 */}
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
                 {dateItems.map((item) => (
                   <div
                     key={item.label}
-                    className={`rounded-lg border p-3 ${item.date ? item.color : "bg-gray-50 border-gray-200 text-gray-400"}`}
+                    className={`rounded-lg border p-2.5 sm:p-3 ${item.date ? item.color : "bg-gray-50 border-gray-200 text-gray-400"}`}
                   >
-                    <div className="flex items-center gap-1.5 mb-1.5">
-                      <i className={`${item.icon} text-sm`} />
-                      <span className="text-[11px] font-semibold uppercase tracking-wide">
+                    <div className="flex items-center gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
+                      <i className={`${item.icon} text-xs sm:text-sm`} />
+                      <span className="text-[10px] sm:text-[11px] font-semibold uppercase tracking-wide">
                         {item.label}
                       </span>
                     </div>
-                    <p className={`text-sm font-bold ${item.date ? "text-gray-900" : "text-gray-400"}`}>
+                    <p className={`text-xs sm:text-sm font-bold ${item.date ? "text-gray-900" : "text-gray-400"}`}>
                       {item.date ? toInputDateFormat(item.date) : "-"}
                     </p>
                     {item.num && (
-                      <p className="text-[10px] text-gray-400 font-mono mt-0.5 truncate">
+                      <p className="text-[9px] sm:text-[10px] text-gray-400 font-mono mt-0.5 truncate">
                         {item.num}
                       </p>
                     )}
