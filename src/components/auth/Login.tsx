@@ -179,10 +179,10 @@ export default function Login() {
             <div className="mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-gray-200" />
+                  <div className="w-full border-t border-brand-100" />
                 </div>
                 <div className="relative flex justify-center">
-                  <span className="bg-gray-50 px-3 text-xs text-gray-400">
+                  <span className="bg-gray-50 px-3 text-xs text-brand-600 font-medium">
                     포트폴리오 방문자
                   </span>
                 </div>
@@ -192,11 +192,11 @@ export default function Login() {
                 type="button"
                 onClick={handleDemoLogin}
                 disabled={isDemoLoading || isLoading}
-                className="mt-4 w-full h-10 rounded-xl border border-gray-300 bg-white text-sm text-gray-600 font-medium hover:border-brand-400 hover:text-brand-700 hover:bg-brand-50/40 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="mt-4 w-full h-10 rounded-xl border border-brand-300 bg-brand-50 text-sm text-brand-800 font-medium hover:bg-brand-700 hover:text-white hover:border-brand-700 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {isDemoLoading ? (
                   <>
-                    <i className="ri-loader-4-line animate-spin text-brand-600" />
+                    <i className="ri-loader-4-line animate-spin" />
                     로그인 중...
                   </>
                 ) : (
