@@ -44,8 +44,8 @@ export default function ComparisonPage() {
         <header className="bg-white shadow-sm border-b">
           <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex justify-between items-center">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">경쟁사 비교</h1>
-              <p className="mt-2 text-gray-600">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">경쟁사 비교</h1>
+              <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">
                 여러 회사의 특허 동향을 비교 분석하여 기술 경쟁력을 파악하세요.
               </p>
             </div>
@@ -58,7 +58,7 @@ export default function ComparisonPage() {
 
         <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
           {/* Search Form */}
-          <div className="bg-white rounded-lg shadow p-6 sm:p-8 mb-8">
+          <div className="bg-white rounded-lg shadow p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
               비교 대상 설정
             </h2>
@@ -152,14 +152,14 @@ export default function ComparisonPage() {
           ) : comparisonData ? (
             <ComparisonDashboard data={comparisonData} />
           ) : (
-            <div className="bg-white rounded-lg shadow p-12 text-center">
+            <div className="bg-white rounded-lg shadow p-8 sm:p-12 text-center">
               <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4 bg-brand-100 rounded-full">
                 <i className="ri-scales-line text-2xl text-brand-700" />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                 경쟁사 비교를 시작하세요
               </h3>
-              <p className="text-gray-600">
+              <p className="text-sm sm:text-base text-gray-600">
                 2~5개 출원인과 분석 기간을 입력하여 특허 동향을 비교 분석해보세요.
               </p>
             </div>
