@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import SearchForm from "@/components/common/SearchForm";
 import SummaryDashboard from "@/components/summary/SummaryDashboard";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { SkeletonSummaryDashboard } from "@/components/common/Skeleton";
 import ErrorState from "@/components/common/ErrorState";
 import { useSummaryAnalysis } from "@/hooks/useSummaryAnalysis";
 import { toInputDateFormat } from "@/utils/dateTransform";
@@ -87,10 +87,7 @@ export default function SummaryPage() {
           </div>
 
           {isLoading ? (
-            <LoadingSpinner
-              message="요약 데이터를 분석 중입니다..."
-              size="md"
-            />
+            <SkeletonSummaryDashboard />
           ) : error ? (
             <ErrorState
               message={error}

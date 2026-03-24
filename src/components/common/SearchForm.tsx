@@ -131,7 +131,7 @@ export default function SearchForm({
             저장된 프리셋
           </label>
           {presetLoading ? (
-            <p className="text-sm text-gray-400">프리셋 로딩 중...</p>
+            <div className="h-9 w-full rounded-md bg-gray-100 animate-pulse border border-gray-200" />
           ) : error ? (
             <p className="text-sm text-red-500">{error}</p>
           ) : (

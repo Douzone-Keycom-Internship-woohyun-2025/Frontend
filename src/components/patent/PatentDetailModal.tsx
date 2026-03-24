@@ -1,9 +1,10 @@
+import { useState, useEffect } from "react";
 import type { PatentDetail } from "@/types/patent";
 import type { AddFavoritePayload } from "@/types/favorite";
 import { buildFavoritePayloadFromDetail } from "@/utils/favoritePayload";
 import { getStatusColor } from "@/utils/statusColor";
 import { toInputDateFormat } from "@/utils/dateTransform";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { SkeletonPatentDetail } from "@/components/common/Skeleton";
 
 interface PatentDetailModalProps {
   patent: PatentDetail | null;
@@ -15,6 +16,8 @@ interface PatentDetailModalProps {
     applicationNumber: string,
     payload?: AddFavoritePayload
   ) => void;
+  memo?: string | null;
+  onMemoSave?: (memo: string | null) => void;
 }
 
 export default function PatentDetailModal({
@@ -24,11 +27,34 @@ export default function PatentDetailModal({
   loading,
   isFavorite,
   onToggleFavorite,
+  memo,
+  onMemoSave,
 }: PatentDetailModalProps) {
+  const [editMemo, setEditMemo] = useState(memo ?? "");
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Sync memo when patent changes
+  useEffect(() => {
+    setEditMemo(memo ?? "");
+    setIsEditing(false);
+  }, [memo, patent?.applicationNumber]);
+
   if (!isOpen) return null;
 
   const handleBackdropClick = (e: React.MouseEvent) => {
     if (e.target === e.currentTarget) onClose();
+  };
+
+  const handleMemoSave = async () => {
+    if (!onMemoSave) return;
+    setIsSaving(true);
+    try {
+      await onMemoSave(editMemo.trim() || null);
+      setIsEditing(false);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const ipcList =
@@ -49,9 +75,7 @@ export default function PatentDetailModal({
     >
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
         {loading || !patent ? (
-          <div className="p-20 flex justify-center">
-            <LoadingSpinner message="상세 정보를 불러오는 중..." size="lg" />
-          </div>
+          <SkeletonPatentDetail />
         ) : (
           <>
             {/* ── 헤더 ── */}
@@ -190,6 +214,73 @@ export default function PatentDetailModal({
                       {patent.astrtCont}
                     </p>
                   </div>
+                </div>
+              )}
+
+              {/* 메모 — 관심특허에 저장된 경우에만 표시 */}
+              {isFavorite && onMemoSave && (
+                <div>
+                  <div className="flex items-center justify-between mb-2.5">
+                    <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wider flex items-center gap-1.5">
+                      <i className="ri-sticky-note-line text-amber-400" />
+                      메모
+                    </h4>
+                    {!isEditing && (
+                      <button
+                        onClick={() => setIsEditing(true)}
+                        className="text-xs text-brand-700 hover:text-brand-800 font-medium flex items-center gap-1"
+                      >
+                        <i className="ri-edit-line" />
+                        {editMemo ? "편집" : "메모 추가"}
+                      </button>
+                    )}
+                  </div>
+
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <textarea
+                        value={editMemo}
+                        onChange={(e) => setEditMemo(e.target.value)}
+                        placeholder="이 특허에 대한 메모를 입력하세요..."
+                        rows={4}
+                        className="w-full text-sm text-gray-700 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2.5 resize-none focus:outline-none focus:ring-2 focus:ring-brand-300 focus:border-transparent placeholder:text-gray-400"
+                        autoFocus
+                      />
+                      <div className="flex items-center gap-2 justify-end">
+                        <button
+                          onClick={() => {
+                            setEditMemo(memo ?? "");
+                            setIsEditing(false);
+                          }}
+                          className="px-3 py-1.5 text-xs text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                        >
+                          취소
+                        </button>
+                        <button
+                          onClick={handleMemoSave}
+                          disabled={isSaving}
+                          className="px-3 py-1.5 text-xs font-medium text-white bg-brand-700 hover:bg-brand-800 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-1"
+                        >
+                          {isSaving && <i className="ri-loader-4-line animate-spin" />}
+                          저장
+                        </button>
+                      </div>
+                    </div>
+                  ) : editMemo ? (
+                    <div className="bg-amber-50 border border-amber-100 rounded-lg px-4 py-3">
+                      <p className="text-sm text-gray-700 leading-relaxed whitespace-pre-wrap">
+                        {editMemo}
+                      </p>
+                    </div>
+                  ) : (
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      className="w-full flex items-center justify-center gap-2 py-3 text-sm text-gray-400 border border-dashed border-gray-200 rounded-lg hover:border-brand-300 hover:text-brand-600 hover:bg-brand-50/30 transition-all"
+                    >
+                      <i className="ri-add-line" />
+                      메모 추가
+                    </button>
+                  )}
                 </div>
               )}
 

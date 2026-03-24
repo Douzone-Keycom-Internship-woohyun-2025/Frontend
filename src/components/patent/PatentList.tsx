@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { PatentListItem, PatentDetail } from "@/types/patent";
-import type { AddFavoritePayload } from "@/types/favorite";
+import type { AddFavoritePayload, FavoriteItem } from "@/types/favorite";
 import { buildFavoritePayloadFromList } from "@/utils/favoritePayload";
 import PatentTable from "./PatentTable";
 import Pagination from "./Pagination";
@@ -24,6 +24,10 @@ interface PatentListProps {
   totalPages: number;
   totalCount: number;
   onPageChange: (page: number) => void;
+  onExportCsv?: () => void;
+  isExporting?: boolean;
+  favoriteItems?: FavoriteItem[];
+  onMemoSave?: (applicationNumber: string, memo: string | null) => void;
 }
 
 export default function PatentList({
@@ -37,15 +41,22 @@ export default function PatentList({
   totalPages,
   totalCount,
   onPageChange,
+  onExportCsv,
+  isExporting,
+  favoriteItems,
+  onMemoSave,
 }: PatentListProps) {
   const [selectedPatentDetail, setSelectedPatentDetail] =
     useState<PatentDetail | null>(null);
+  const [selectedMemo, setSelectedMemo] = useState<string | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
   // 상세 정보 모달 열기
   const handlePatentClick = async (patent: PatentListItem) => {
     setSelectedPatentDetail(null);
     setDetailLoading(true);
+    const memo = favoriteItems?.find((f) => f.applicationNumber === patent.applicationNumber)?.memo ?? null;
+    setSelectedMemo(memo);
 
     try {
       const detail = await getPatentDetail(patent.applicationNumber);
@@ -90,10 +101,22 @@ export default function PatentList({
       <div className="flex items-center justify-between px-1 mb-3">
         <div className="flex items-center gap-2">
           <h3 className="text-base font-semibold text-gray-900">검색 결과</h3>
-          <span className="text-xs text-gray-400 tabular-nums">
-            {totalCount.toLocaleString()}건
-          </span>
+          {totalCount > 0 && (
+            <span className="text-xs text-gray-400 tabular-nums">
+              총 {totalCount.toLocaleString()}건
+            </span>
+          )}
         </div>
+        {onExportCsv && totalCount > 0 && (
+          <button
+            onClick={onExportCsv}
+            disabled={isExporting}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <i className={isExporting ? "ri-loader-4-line animate-spin" : "ri-download-2-line"} />
+            {isExporting ? "내보내는 중..." : "CSV 내보내기"}
+          </button>
+        )}
       </div>
 
       {/* 데스크탑 테이블 */}
@@ -242,12 +265,19 @@ export default function PatentList({
         loading={detailLoading}
         onClose={() => {
           setSelectedPatentDetail(null);
+          setSelectedMemo(null);
           setDetailLoading(false);
         }}
         isFavorite={favorites.has(
           selectedPatentDetail?.applicationNumber ?? ""
         )}
         onToggleFavorite={onToggleFavorite}
+        memo={selectedMemo}
+        onMemoSave={
+          onMemoSave && selectedPatentDetail
+            ? (m) => onMemoSave(selectedPatentDetail.applicationNumber, m)
+            : undefined
+        }
       />
     </>
   );

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import PresetCard from "@/components/preset/PresetCard";
 import PresetModal from "@/components/preset/PresetModal";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { SkeletonPresetCards } from "@/components/common/Skeleton";
 import ErrorState from "@/components/common/ErrorState";
 import { usePresets } from "@/hooks/usePresets";
 import type { SearchPreset } from "@/types/preset";
@@ -138,9 +138,7 @@ export default function PresetManagementPage() {
 
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {isLoading ? (
-            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-10 flex justify-center">
-              <LoadingSpinner message="프리셋을 불러오는 중..." size="md" />
-            </div>
+            <SkeletonPresetCards count={3} />
           ) : error ? (
             <ErrorState message={error} onRetry={refetchPresets} />
           ) : presets.length === 0 ? (

@@ -4,7 +4,7 @@ import ProtectedLayout from "@/layouts/ProtectedLayout";
 import BasicSearch from "@/components/patent-search/BasicSearch";
 import AdvancedSearch from "@/components/patent-search/AdvancedSearch";
 import PatentList from "@/components/patent/PatentList";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { SkeletonPatentRows } from "@/components/common/Skeleton";
 import ErrorState from "@/components/common/ErrorState";
 import { usePatentSearch } from "@/hooks/usePatentSearch";
 import { useFavorites } from "@/hooks/useFavorites";
@@ -37,8 +37,10 @@ export default function PatentSearchPage() {
     currentPage,
     totalCount,
     sortOrder,
+    isExporting,
     changeSortOrder,
     filterPatents,
+    fetchAllResults,
     retry,
   } = usePatentSearch();
 
@@ -125,17 +127,23 @@ export default function PatentSearchPage() {
     filters.status && { label: `상태: ${filters.status}`, key: "status" },
   ].filter(Boolean) as Array<{ label: string; key: string }>;
 
-  const handleExportCsv = () => {
+  const handleExportCsv = async () => {
+    const allResults = await fetchAllResults();
     const headers = ["출원번호", "발명명칭", "출원인", "출원일", "IPC코드", "상태"];
-    const rows = results.map((p) => [
+    const rows = allResults.map((p) => [
       p.applicationNumber,
       p.inventionTitle || "",
       p.applicantName || "",
-      p.applicationDate || "",
+      toInputDateFormat(p.applicationDate || ""),
       p.mainIpcCode || "",
       p.registerStatus || "",
     ]);
-    downloadCsv("특허검색결과", headers, rows);
+    const applicant = filters.applicant || filters.companyName || filters.patentName || "";
+    const parts = ["특허검색결과"];
+    if (applicant) parts.push(applicant);
+    if (filters.startDate) parts.push(filters.startDate);
+    if (filters.endDate) parts.push(filters.endDate);
+    downloadCsv(parts.join("_"), headers, rows);
   };
 
   if (error) {
@@ -158,21 +166,6 @@ export default function PatentSearchPage() {
               <p className="mt-1 text-sm text-gray-500 hidden sm:block">
                 KIPRIS 공공데이터 기반 특허 검색
               </p>
-            </div>
-            <div className="flex items-center gap-2">
-              {results.length > 0 && (
-                <button
-                  onClick={handleExportCsv}
-                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                >
-                  <i className="ri-download-2-line text-base" />
-                  <span className="hidden sm:inline">CSV</span>
-                </button>
-              )}
-              <div className="hidden md:flex items-center text-gray-500 text-sm">
-                <i className="ri-search-line text-brand-700 mr-2" />
-                총 {totalCount.toLocaleString()}건
-              </div>
             </div>
           </div>
         </header>
@@ -234,9 +227,7 @@ export default function PatentSearchPage() {
           {/* Results */}
           <section>
             {isLoading ? (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
-                <LoadingSpinner message="검색 중입니다..." size="md" />
-              </div>
+              <SkeletonPatentRows count={8} />
             ) : results.length === 0 && totalCount === 0 && !activeFilters.length ? (
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
                 <div className="w-16 h-16 mx-auto mb-4 bg-brand-50 rounded-full flex items-center justify-center">
@@ -273,6 +264,8 @@ export default function PatentSearchPage() {
                 totalPages={totalPages}
                 totalCount={totalCount}
                 onPageChange={handlePageChange}
+                onExportCsv={handleExportCsv}
+                isExporting={isExporting}
               />
             )}
           </section>
