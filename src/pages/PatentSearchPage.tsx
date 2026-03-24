@@ -6,7 +6,6 @@ import AdvancedSearch from "@/components/patent-search/AdvancedSearch";
 import PatentList from "@/components/patent/PatentList";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import ErrorState from "@/components/common/ErrorState";
-import EmptyState from "@/components/common/EmptyState";
 import { usePatentSearch } from "@/hooks/usePatentSearch";
 import { useFavorites } from "@/hooks/useFavorites";
 import type { PatentStatus } from "@/types/patent";
@@ -55,9 +54,7 @@ export default function PatentSearchPage() {
       startDate: toInputDateFormat(params.startDate),
       endDate: toInputDateFormat(params.endDate),
     };
-
     setFilters(uiFilters);
-
     await filterPatents(
       {
         applicant: params.applicant,
@@ -80,9 +77,7 @@ export default function PatentSearchPage() {
       startDate: toInputDateFormat(params.startDate),
       endDate: toInputDateFormat(params.endDate),
     };
-
     setFilters(uiFilters);
-
     await filterPatents(
       {
         ...params,
@@ -93,9 +88,7 @@ export default function PatentSearchPage() {
     );
   };
 
-  const handleResetFilters = () => {
-    setFilters({});
-  };
+  const handleResetFilters = () => setFilters({});
 
   const handlePageChange = (page: number) => {
     filterPatents(
@@ -110,14 +103,7 @@ export default function PatentSearchPage() {
 
   useEffect(() => {
     const state = location.state as
-      | {
-          fromSummary?: boolean;
-          filters?: {
-            applicant?: string;
-            startDate?: string;
-            endDate?: string;
-          };
-        }
+      | { fromSummary?: boolean; filters?: { applicant?: string; startDate?: string; endDate?: string } }
       | undefined;
 
     if (state?.fromSummary && state.filters) {
@@ -126,10 +112,31 @@ export default function PatentSearchPage() {
         startDate: toInputDateFormat(state.filters.startDate || ""),
         endDate: toInputDateFormat(state.filters.endDate || ""),
       });
-
       navigate(".", { replace: true, state: {} });
     }
   }, [location.key]);
+
+  // Active filter chips
+  const activeFilters = [
+    filters.applicant && { label: `출원인: ${filters.applicant}`, key: "applicant" },
+    filters.patentName && { label: `특허명: ${filters.patentName}`, key: "patentName" },
+    filters.companyName && { label: `회사명: ${filters.companyName}`, key: "companyName" },
+    filters.startDate && filters.endDate && { label: `${filters.startDate} ~ ${filters.endDate}`, key: "date" },
+    filters.status && { label: `상태: ${filters.status}`, key: "status" },
+  ].filter(Boolean) as Array<{ label: string; key: string }>;
+
+  const handleExportCsv = () => {
+    const headers = ["출원번호", "발명명칭", "출원인", "출원일", "IPC코드", "상태"];
+    const rows = results.map((p) => [
+      p.applicationNumber,
+      p.inventionTitle || "",
+      p.applicantName || "",
+      p.applicationDate || "",
+      p.mainIpcCode || "",
+      p.registerStatus || "",
+    ]);
+    downloadCsv("특허검색결과", headers, rows);
+  };
 
   if (error) {
     return (
@@ -144,54 +151,50 @@ export default function PatentSearchPage() {
       <div className="min-h-screen bg-gray-50">
         <header className="bg-white shadow-sm border-b">
           <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-gray-900">특허 검색</h1>
-            <div className="flex items-center gap-3">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                특허 검색
+              </h1>
+              <p className="mt-1 text-sm text-gray-500 hidden sm:block">
+                KIPRIS 공공데이터 기반 특허 검색
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
               {results.length > 0 && (
                 <button
-                  onClick={() => {
-                    const headers = ["출원번호", "발명명칭", "출원인", "출원일", "IPC코드", "상태"];
-                    const rows = results.map((p) => [
-                      p.applicationNumber,
-                      p.inventionTitle || "",
-                      p.applicantName || "",
-                      p.applicationDate || "",
-                      p.mainIpcCode || "",
-                      p.registerStatus || "",
-                    ]);
-                    downloadCsv("특허검색결과", headers, rows);
-                  }}
+                  onClick={handleExportCsv}
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
                 >
-                  <i className="ri-download-2-line" />
-                  CSV
+                  <i className="ri-download-2-line text-base" />
+                  <span className="hidden sm:inline">CSV</span>
                 </button>
               )}
-              <div className="text-sm text-gray-500">총 {totalCount}건</div>
+              <div className="hidden md:flex items-center text-gray-500 text-sm">
+                <i className="ri-search-line text-brand-700 mr-2" />
+                총 {totalCount.toLocaleString()}건
+              </div>
             </div>
           </div>
         </header>
 
-        <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
-          <section className="bg-white rounded-lg shadow p-8 mb-10">
-            <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit mb-6">
+        <main className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8 space-y-6">
+          {/* Search Form */}
+          <section className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 sm:p-6">
+            <nav className="flex space-x-1 bg-gray-100 p-1 rounded-lg w-fit mb-5">
               {[
                 { key: "basic", label: "기본 검색", icon: "ri-search-line" },
-                {
-                  key: "advanced",
-                  label: "상세 검색",
-                  icon: "ri-settings-3-line",
-                },
+                { key: "advanced", label: "상세 검색", icon: "ri-equalizer-line" },
               ].map(({ key, label, icon }) => (
                 <button
                   key={key}
                   onClick={() => setActiveTab(key as "basic" | "advanced")}
-                  className={`px-6 py-3 rounded-md text-sm font-medium ${
+                  className={`flex items-center gap-1.5 px-4 py-2 rounded-md text-sm font-medium transition-all ${
                     activeTab === key
                       ? "bg-white text-brand-700 shadow-sm"
-                      : "text-gray-600 hover:text-gray-900"
+                      : "text-gray-500 hover:text-gray-700"
                   }`}
                 >
-                  <i className={`${icon} mr-2`} />
+                  <i className={`${icon} text-base`} />
                   {label}
                 </button>
               ))}
@@ -205,7 +208,6 @@ export default function PatentSearchPage() {
                 onPresetChange={setSelectedPresetId}
               />
             </div>
-
             <div className={activeTab === "advanced" ? "block" : "hidden"}>
               <AdvancedSearch
                 onSearch={handleAdvancedSearch}
@@ -214,31 +216,64 @@ export default function PatentSearchPage() {
             </div>
           </section>
 
+          {/* Active Filter Chips */}
+          {activeFilters.length > 0 && (
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs text-gray-400 font-medium">검색 조건:</span>
+              {activeFilters.map((filter) => (
+                <span
+                  key={filter.key}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-brand-50 text-brand-700 text-xs font-medium rounded-md border border-brand-100"
+                >
+                  {filter.label}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Results */}
           <section>
             {isLoading ? (
-              <div className="bg-white rounded-lg shadow p-12">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12">
                 <LoadingSpinner message="검색 중입니다..." size="md" />
               </div>
-            ) : results.length === 0 ? (
-              <EmptyState
-                title="검색 결과가 없습니다."
-                description="다른 조건으로 검색해보세요."
-              />
-            ) : (
-              <div className="bg-white rounded-lg shadow p-6">
-                <PatentList
-                  patents={results}
-                  loading={isLoading}
-                  favorites={favorites}
-                  onToggleFavorite={toggleFavorite}
-                  sortOrder={sortOrder}
-                  onSortChange={changeSortOrder}
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  totalCount={totalCount}
-                  onPageChange={handlePageChange}
-                />
+            ) : results.length === 0 && totalCount === 0 && !activeFilters.length ? (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-brand-50 rounded-full flex items-center justify-center">
+                  <i className="ri-search-line text-2xl text-brand-600" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1.5">
+                  검색 조건을 입력하세요
+                </h3>
+                <p className="text-sm text-gray-500">
+                  출원인, 기간 등 조건을 입력하면 KIPRIS에서 특허를 검색합니다.
+                </p>
               </div>
+            ) : results.length === 0 ? (
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+                <div className="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-full flex items-center justify-center">
+                  <i className="ri-file-search-line text-2xl text-gray-400" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1.5">
+                  검색 결과가 없습니다
+                </h3>
+                <p className="text-sm text-gray-500">
+                  다른 조건으로 검색해보세요.
+                </p>
+              </div>
+            ) : (
+              <PatentList
+                patents={results}
+                loading={isLoading}
+                favorites={favorites}
+                onToggleFavorite={toggleFavorite}
+                sortOrder={sortOrder}
+                onSortChange={changeSortOrder}
+                currentPage={currentPage}
+                totalPages={totalPages}
+                totalCount={totalCount}
+                onPageChange={handlePageChange}
+              />
             )}
           </section>
         </main>

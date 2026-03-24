@@ -76,15 +76,12 @@ export default function SearchForm({
 
   const handleSelectPreset = (presetId: string) => {
     onPresetChange(presetId);
-
     if (presetId === "") {
       reset({ applicant: "", startDate: oneMonthAgo, endDate: today });
       return;
     }
-
     const preset = presets.find((p) => p.id === presetId);
     if (!preset) return;
-
     reset({
       applicant: preset.applicant,
       startDate: toInputDateFormat(preset.startDate),
@@ -94,7 +91,6 @@ export default function SearchForm({
 
   const handleFieldChange = (field: keyof BasicSearchFormData, value: string) => {
     setValue(field, value, { shouldValidate: false });
-
     if (selectedPresetId) {
       const preset = presets.find((p) => p.id === selectedPresetId);
       if (preset) {
@@ -103,10 +99,7 @@ export default function SearchForm({
           preset.applicant === newData.applicant &&
           toInputDateFormat(preset.startDate) === newData.startDate &&
           toInputDateFormat(preset.endDate) === newData.endDate;
-
-        if (!matches) {
-          onPresetChange("");
-        }
+        if (!matches) onPresetChange("");
       }
     }
   };
@@ -127,41 +120,40 @@ export default function SearchForm({
   return (
     <form onSubmit={handleSubmit(onValid)} className="space-y-4">
       {showTitle && (
-        <h3 className="text-lg font-semibold text-gray-900 mb-4 sm:mb-6">
+        <h3 className="text-base font-semibold text-gray-900 mb-4">
           {title}
         </h3>
       )}
 
       {enablePresets && (
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
             저장된 프리셋
           </label>
-
           {presetLoading ? (
-            <p className="text-sm text-gray-500">프리셋 로딩 중...</p>
+            <p className="text-sm text-gray-400">프리셋 로딩 중...</p>
           ) : error ? (
             <p className="text-sm text-red-500">{error}</p>
           ) : (
             <select
               value={selectedPresetId}
               onChange={(e) => handleSelectPreset(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
             >
               <option value="">프리셋 선택</option>
               {presets.map((p) => (
-                <option key={p.id} value={p.id}>
-                  {p.name}
-                </option>
+                <option key={p.id} value={p.id}>{p.name}</option>
               ))}
             </select>
           )}
         </div>
       )}
 
-      <div className="space-y-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-2">회사명</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            회사명
+          </label>
           <Input
             type="text"
             {...register("applicant")}
@@ -170,50 +162,57 @@ export default function SearchForm({
             placeholder="예: 삼성, LG, 네이버"
           />
           {errors.applicant && (
-            <p className="mt-1 text-sm text-red-600">{errors.applicant.message}</p>
+            <p className="mt-1 text-xs text-red-600">{errors.applicant.message}</p>
           )}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">시작 날짜</label>
-            <Input
-              type="date"
-              {...register("startDate")}
-              onChange={(e) => handleFieldChange("startDate", e.target.value)}
-              className={errors.startDate ? "border-red-500" : ""}
-            />
-            {errors.startDate && (
-              <p className="mt-1 text-sm text-red-600">{errors.startDate.message}</p>
-            )}
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            시작일
+          </label>
+          <Input
+            type="date"
+            {...register("startDate")}
+            onChange={(e) => handleFieldChange("startDate", e.target.value)}
+            className={errors.startDate ? "border-red-500" : ""}
+          />
+          {errors.startDate && (
+            <p className="mt-1 text-xs text-red-600">{errors.startDate.message}</p>
+          )}
+        </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-2">종료 날짜</label>
-            <Input
-              type="date"
-              {...register("endDate")}
-              onChange={(e) => handleFieldChange("endDate", e.target.value)}
-              className={errors.endDate ? "border-red-500" : ""}
-            />
-            {errors.endDate && (
-              <p className="mt-1 text-sm text-red-600">{errors.endDate.message}</p>
-            )}
-          </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1.5">
+            종료일
+          </label>
+          <Input
+            type="date"
+            {...register("endDate")}
+            onChange={(e) => handleFieldChange("endDate", e.target.value)}
+            className={errors.endDate ? "border-red-500" : ""}
+          />
+          {errors.endDate && (
+            <p className="mt-1 text-xs text-red-600">{errors.endDate.message}</p>
+          )}
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 mt-6">
-        <Button type="submit" disabled={loading} className="w-full sm:flex-1 h-11">
-          {loading ? "검색 중..." : "검색"}
+      <div className="flex gap-3 pt-2">
+        <Button type="submit" disabled={loading} className="h-10 px-6">
+          {loading ? (
+            <>
+              <i className="ri-loader-4-line animate-spin mr-1.5" />
+              검색 중...
+            </>
+          ) : (
+            <>
+              <i className="ri-search-line mr-1.5" />
+              검색
+            </>
+          )}
         </Button>
-
-        <Button
-          type="button"
-          variant="secondary"
-          onClick={handleReset}
-          className="w-full sm:flex-1 h-11"
-        >
+        <Button type="button" variant="outline" onClick={handleReset} className="h-10 px-6">
+          <i className="ri-refresh-line mr-1.5" />
           초기화
         </Button>
       </div>

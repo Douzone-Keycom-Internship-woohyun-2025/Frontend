@@ -31,32 +31,54 @@ export default function PatentDetailModal({
     if (e.target === e.currentTarget) onClose();
   };
 
+  const ipcList =
+    patent?.ipcNumber?.split("|").map((ipc) => ipc.trim()) ?? [];
 
-  const ipcList = patent?.ipcNumber?.split("|").map((ipc) => ipc.trim()) ?? [];
+  const timelineItems = patent
+    ? [
+        {
+          label: "출원일",
+          date: patent.applicationDate,
+          sub: patent.applicationNumber,
+          icon: "ri-calendar-line",
+        },
+        {
+          label: "공개일",
+          date: patent.openDate,
+          sub: patent.openNumber || "-",
+          icon: "ri-eye-line",
+        },
+        {
+          label: "등록일",
+          date: patent.registerDate,
+          sub: patent.registerNumber || "-",
+          icon: "ri-checkbox-circle-line",
+        },
+      ]
+    : [];
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto border border-gray-200">
+      <div className="bg-white border border-gray-200 rounded-xl shadow-2xl max-w-5xl w-full max-h-[90vh] flex flex-col">
         {loading || !patent ? (
-          <div className="p-24 flex justify-center">
+          <div className="p-20 flex justify-center">
             <LoadingSpinner message="상세 정보를 불러오는 중..." size="lg" />
           </div>
         ) : (
           <>
-            {/* 헤더 */}
-            <div className="sticky top-0 flex justify-between items-center px-6 py-4 border-b bg-white z-10">
-              <div className="flex items-center space-x-3">
-                <i className="ri-file-text-line text-xl text-brand-700"></i>
-                <h2 className="text-xl font-bold text-gray-900">
-                  특허 상세정보
+            {/* ── 헤더 ── */}
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-3.5 border-b border-gray-200 bg-white rounded-t-xl">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <i className="ri-file-text-line text-lg text-brand-600" />
+                <h2 className="text-base font-semibold text-gray-900 truncate">
+                  특허 상세
                 </h2>
-
                 {patent.registerStatus && (
                   <span
-                    className={`ml-2 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(
+                    className={`shrink-0 px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
                       patent.registerStatus
                     )}`}
                   >
@@ -65,100 +87,100 @@ export default function PatentDetailModal({
                 )}
               </div>
 
-              <div className="flex items-center space-x-2">
-                {/* ⭐ 좋아요 버튼 */}
+              <div className="flex items-center gap-1">
                 <button
                   onClick={() => {
                     const payload = buildFavoritePayloadFromDetail(patent);
                     onToggleFavorite(patent.applicationNumber, payload);
                   }}
-                  className="p-2 rounded-full hover:bg-gray-100 transition"
+                  className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                  aria-label="즐겨찾기"
                 >
                   {isFavorite ? (
-                    <i className="ri-heart-fill text-red-500 text-xl"></i>
+                    <i className="ri-heart-fill text-red-500 text-lg" />
                   ) : (
-                    <i className="ri-heart-line text-gray-500 text-xl"></i>
+                    <i className="ri-heart-line text-gray-400 text-lg" />
                   )}
                 </button>
 
-                {/* 닫기 */}
                 <button
                   onClick={onClose}
-                  className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition"
+                  className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+                  aria-label="닫기"
                 >
-                  <i className="ri-close-line text-lg"></i>
+                  <i className="ri-close-line text-lg" />
                 </button>
               </div>
             </div>
 
-            {/* 내용 */}
-            <div className="p-8 space-y-10">
+            {/* ── 콘텐츠 ── */}
+            <div className="overflow-y-auto flex-1 p-6 space-y-6">
+              {/* 발명 제목 + 출원번호 */}
               <section>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3 leading-snug">
+                <h3 className="text-lg font-bold text-gray-900 leading-snug mb-2">
                   {patent.inventionTitle}
                 </h3>
-
-                <div className="flex flex-wrap gap-6 text-sm text-gray-600">
-                  <div className="flex items-center">
-                    <i className="ri-hashtag mr-2"></i>
-                    <span className="font-mono">
-                      {patent.applicationNumber}
-                    </span>
-                  </div>
-
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                  <span className="flex items-center gap-1.5">
+                    <i className="ri-hashtag" />
+                    <span className="font-mono">{patent.applicationNumber}</span>
+                  </span>
                   {patent.applicationDate && (
-                    <div className="flex items-center">
-                      <i className="ri-calendar-line mr-2"></i>
-                      <span>{toInputDateFormat(patent.applicationDate)}</span>
-                    </div>
+                    <span className="flex items-center gap-1.5">
+                      <i className="ri-calendar-line" />
+                      {toInputDateFormat(patent.applicationDate)}
+                    </span>
                   )}
                 </div>
               </section>
 
-              {/* 좌측 · 우측 정보 */}
-              <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="space-y-6">
+              {/* 2-column grid */}
+              <section className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+                {/* ── 좌측: 기본 정보 ── */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    기본 정보
+                  </h4>
+
                   {/* 출원인 */}
-                  <div className="bg-gray-50 p-5 rounded-lg border">
-                    <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
-                      <i className="ri-building-line mr-2"></i>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1.5">
+                      <i className="ri-building-line" />
                       출원인
                     </label>
-                    <p className="text-lg font-medium text-gray-900 ml-6">
+                    <p className="text-sm font-medium text-gray-900">
                       {patent.applicantName || "정보 없음"}
                     </p>
                   </div>
 
                   {/* 주요 IPC */}
-                  <div className="bg-gray-50 p-5 rounded-lg border">
-                    <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
-                      <i className="ri-code-line mr-2"></i>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <label className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-1.5">
+                      <i className="ri-code-line" />
                       주요 IPC
                     </label>
-
-                    <div className="ml-6">
-                      <p className="text-gray-900 font-mono font-bold">
-                        {patent.mainIpcCode || "정보 없음"}
+                    <p className="text-sm font-mono font-bold text-gray-900">
+                      {patent.mainIpcCode || "정보 없음"}
+                    </p>
+                    {patent.ipcKorName && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        {patent.ipcKorName}
                       </p>
-                      <p className="text-gray-600 text-sm mt-1">
-                        {patent.ipcKorName || ""}
-                      </p>
-                    </div>
+                    )}
                   </div>
 
                   {/* 전체 IPC 목록 */}
                   {ipcList.length > 0 && (
-                    <div className="bg-gray-50 p-5 rounded-lg border">
-                      <label className="flex items-center text-sm font-semibold text-gray-700 mb-2">
-                        <i className="ri-list-check mr-2"></i>
+                    <div className="bg-gray-50 rounded-lg p-4">
+                      <label className="flex items-center gap-2 text-xs font-semibold text-gray-500 mb-2">
+                        <i className="ri-list-check" />
                         전체 IPC 목록
                       </label>
-
-                      <div className="ml-6 flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {ipcList.map((ipc, idx) => (
                           <span
                             key={idx}
-                            className="px-2 py-1 text-xs bg-brand-100 text-brand-700 rounded-md font-mono"
+                            className="text-xs px-2 py-0.5 bg-brand-100 text-brand-700 rounded-md font-mono"
                           >
                             {ipc}
                           </span>
@@ -168,59 +190,61 @@ export default function PatentDetailModal({
                   )}
                 </div>
 
-                {/* 날짜 정보 */}
-                <div className="space-y-5">
-                  {[
-                    {
-                      label: "출원일",
-                      date: patent.applicationDate,
-                      sub: `출원번호: ${patent.applicationNumber}`,
-                      icon: "ri-calendar-line",
-                    },
-                    {
-                      label: "공개일",
-                      date: patent.openDate,
-                      sub: `공개번호: ${patent.openNumber || "정보 없음"}`,
-                      icon: "ri-eye-line",
-                    },
-                    {
-                      label: "등록일",
-                      date: patent.registerDate,
-                      sub: `등록번호: ${patent.registerNumber || "정보 없음"}`,
-                      icon: "ri-checkbox-circle-line",
-                    },
-                  ].map((item, idx) => (
-                    <div
-                      key={idx}
-                      className="bg-gray-50 p-5 rounded-lg border border-gray-200"
-                    >
-                      <div className="flex justify-between items-center mb-1">
-                        <label className="flex items-center text-sm font-semibold text-gray-700">
-                          <i className={`${item.icon} mr-2`}></i>
-                          {item.label}
-                        </label>
+                {/* ── 우측: 날짜 타임라인 ── */}
+                <div className="space-y-4">
+                  <h4 className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    일정 정보
+                  </h4>
 
-                        <p className="font-bold text-gray-900">
-                          {item.date ? toInputDateFormat(item.date) : "정보 없음"}
-                        </p>
-                      </div>
-
-                      <p className="text-xs text-gray-600 ml-6">{item.sub}</p>
+                  <div className="bg-gray-50 rounded-lg p-4">
+                    <div className="relative space-y-4">
+                      {timelineItems.map((item, idx) => {
+                        const isLast = idx === timelineItems.length - 1;
+                        return (
+                          <div key={idx} className="flex gap-3 relative">
+                            {/* 타임라인 세로선 */}
+                            {!isLast && (
+                              <div className="absolute left-[11px] top-6 bottom-0 w-px bg-gray-200" />
+                            )}
+                            {/* 아이콘 */}
+                            <div className="shrink-0 w-[22px] h-[22px] rounded-full bg-white border-2 border-gray-300 flex items-center justify-center z-[1]">
+                              <i
+                                className={`${item.icon} text-[10px] text-gray-500`}
+                              />
+                            </div>
+                            {/* 내용 */}
+                            <div className="flex-1 min-w-0 pb-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="text-xs font-semibold text-gray-600">
+                                  {item.label}
+                                </span>
+                                <span className="text-sm font-bold text-gray-900">
+                                  {item.date
+                                    ? toInputDateFormat(item.date)
+                                    : "-"}
+                                </span>
+                              </div>
+                              <p className="text-xs text-gray-400 font-mono truncate mt-0.5">
+                                {item.sub}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
-                  ))}
+                  </div>
                 </div>
               </section>
 
               {/* 요약 */}
               {patent.astrtCont && (
                 <section>
-                  <label className="flex items-center text-lg font-bold text-gray-900 mb-3">
-                    <i className="ri-file-text-line mr-3 text-brand-700"></i>
+                  <h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+                    <i className="ri-file-text-line" />
                     발명의 요약
-                  </label>
-
-                  <div className="bg-gray-50 p-6 rounded-lg border">
-                    <p className="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                  </h4>
+                  <div className="bg-gray-50 rounded-lg p-4 border-l-4 border-brand-200">
+                    <p className="text-sm text-gray-800 leading-relaxed whitespace-pre-wrap">
                       {patent.astrtCont}
                     </p>
                   </div>
@@ -230,34 +254,31 @@ export default function PatentDetailModal({
               {/* 도면 */}
               {patent.bigDrawing && (
                 <section>
-                  <label className="flex items-center text-lg font-bold text-gray-900 mb-3">
-                    <i className="ri-image-line mr-3 text-brand-700"></i>
-                    도면 보기
-                  </label>
-
+                  <h4 className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-gray-400 mb-3">
+                    <i className="ri-image-line" />
+                    도면
+                  </h4>
                   <a
                     href={patent.bigDrawing}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center p-5 border border-gray-200 rounded-lg hover:border-brand-400 hover:bg-brand-50 transition-all"
+                    className="flex items-center gap-3 bg-gray-50 rounded-lg p-4 border border-gray-200 hover:border-brand-300 hover:bg-brand-50/50 transition-colors group"
                   >
-                    <i className="ri-image-line text-gray-600 text-lg mr-3"></i>
-                    <p className="text-sm text-gray-900 font-semibold">
-                      특허 도면 원문 보기
-                    </p>
+                    <div className="shrink-0 w-9 h-9 rounded-lg bg-brand-100 flex items-center justify-center">
+                      <i className="ri-image-line text-brand-600" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-medium text-gray-900 group-hover:text-brand-700 transition-colors">
+                        특허 도면 원문 보기
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        새 탭에서 열립니다
+                      </p>
+                    </div>
+                    <i className="ri-external-link-line text-gray-300 group-hover:text-brand-400 transition-colors" />
                   </a>
                 </section>
               )}
-
-              {/* 닫기 버튼 */}
-              <div className="flex justify-end pt-4 border-t">
-                <button
-                  onClick={onClose}
-                  className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-900 font-medium rounded-lg transition-colors"
-                >
-                  닫기
-                </button>
-              </div>
             </div>
           </>
         )}
