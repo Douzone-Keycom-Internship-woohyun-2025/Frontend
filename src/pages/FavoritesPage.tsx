@@ -2,7 +2,6 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import PatentList from "@/components/patent/PatentList";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { SkeletonPatentRows } from "@/components/common/Skeleton";
 import ErrorState from "@/components/common/ErrorState";
 import { downloadCsv } from "@/utils/exportCsv";

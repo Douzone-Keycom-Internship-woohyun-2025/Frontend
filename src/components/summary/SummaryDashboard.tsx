@@ -102,19 +102,6 @@ export default function SummaryDashboard({
     return monthlyData.reduce((max, m) => (m.count > max.count ? m : max), monthlyData[0]);
   }, [monthlyData]);
 
-  // 기술 분야 가로 바 차트
-  const ipcBarData = useMemo(() => ({
-    labels: displayedIpc.map((item) => item.ipcName || item.ipcCode),
-    datasets: [
-      {
-        data: displayedIpc.map((item) => item.count),
-        backgroundColor: IPC_COLORS.slice(0, displayedIpc.length),
-        borderRadius: 4,
-        borderSkipped: false,
-      },
-    ],
-  }), [displayedIpc]);
-
   // 월별 바 차트 (단일 Y축)
   const monthlyBarData = useMemo(() => ({
     labels: monthlyData.map((m) => m.month),
