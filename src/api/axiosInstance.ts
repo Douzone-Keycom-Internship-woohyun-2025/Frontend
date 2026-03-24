@@ -31,6 +31,14 @@ api.interceptors.response.use(
       _retry?: boolean;
     };
 
+    if (error.response?.status === 429) {
+      const msg =
+        (error.response.data as { message?: string })?.message ||
+        "요청 한도에 도달했습니다. 잠시 후 다시 시도해주세요.";
+      window.dispatchEvent(new CustomEvent("api:rateLimit", { detail: { message: msg } }));
+      return Promise.reject(error);
+    }
+
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
 
