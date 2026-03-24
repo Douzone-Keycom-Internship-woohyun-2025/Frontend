@@ -111,43 +111,6 @@ export default function Login() {
             <p className="text-sm text-gray-500">특허 인텔리전스 플랫폼</p>
           </div>
 
-          {/* 데모 로그인 배너 */}
-          {DEMO_EMAIL && DEMO_PASSWORD && (
-            <div className="mb-4 bg-brand-50 border border-brand-200 rounded-xl p-4">
-              <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-lg bg-brand-700 flex items-center justify-center shrink-0 mt-0.5">
-                  <i className="ri-eye-line text-white text-sm" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-brand-900 mb-0.5">
-                    포트폴리오 데모
-                  </p>
-                  <p className="text-xs text-brand-700 leading-relaxed mb-3">
-                    회원가입 없이 모든 기능을 바로 체험해보세요.
-                  </p>
-                  <button
-                    type="button"
-                    onClick={handleDemoLogin}
-                    disabled={isDemoLoading || isLoading}
-                    className="w-full h-9 bg-brand-700 hover:bg-brand-800 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
-                  >
-                    {isDemoLoading ? (
-                      <>
-                        <i className="ri-loader-4-line animate-spin" />
-                        로그인 중...
-                      </>
-                    ) : (
-                      <>
-                        <i className="ri-play-circle-line" />
-                        데모 계정으로 체험하기
-                      </>
-                    )}
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">로그인</h2>
 
@@ -211,6 +174,43 @@ export default function Login() {
               회원가입
             </Link>
           </p>
+
+          {DEMO_EMAIL && DEMO_PASSWORD && (
+            <div className="mt-6">
+              <div className="relative">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-200" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-gray-50 px-3 text-xs text-gray-400">
+                    포트폴리오 방문자
+                  </span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={handleDemoLogin}
+                disabled={isDemoLoading || isLoading}
+                className="mt-4 w-full h-10 rounded-xl border border-gray-300 bg-white text-sm text-gray-600 font-medium hover:border-brand-400 hover:text-brand-700 hover:bg-brand-50/40 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                {isDemoLoading ? (
+                  <>
+                    <i className="ri-loader-4-line animate-spin text-brand-600" />
+                    로그인 중...
+                  </>
+                ) : (
+                  <>
+                    <i className="ri-play-circle-line text-base" />
+                    데모 계정으로 체험하기
+                  </>
+                )}
+              </button>
+              <p className="mt-2 text-center text-xs text-gray-400">
+                회원가입 없이 모든 기능 체험 가능
+              </p>
+            </div>
+          )}
         </div>
       </div>
     </div>
