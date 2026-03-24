@@ -154,7 +154,7 @@ export default function Signup() {
                     onChange={(e) => setAgreeTerms(e.target.checked)}
                     className="mt-0.5 w-4 h-4 rounded border-gray-300 text-brand-800 focus:ring-brand-700"
                   />
-                  <span className="text-sm text-gray-600">
+                  <label htmlFor="agreeTerms" className="text-sm text-gray-600">
                     <button
                       type="button"
                       onClick={() => setOpenModal("terms")}
@@ -163,7 +163,7 @@ export default function Signup() {
                       서비스 이용약관
                     </button>
                     에 동의합니다 <span className="text-red-500">*</span>
-                  </span>
+                  </label>
                 </div>
                 <div className="flex items-start gap-2">
                   <input
@@ -173,7 +173,7 @@ export default function Signup() {
                     onChange={(e) => setAgreePrivacy(e.target.checked)}
                     className="mt-0.5 w-4 h-4 rounded border-gray-300 text-brand-800 focus:ring-brand-700"
                   />
-                  <span className="text-sm text-gray-600">
+                  <label htmlFor="agreePrivacy" className="text-sm text-gray-600">
                     <button
                       type="button"
                       onClick={() => setOpenModal("privacy")}
@@ -182,7 +182,7 @@ export default function Signup() {
                       개인정보 처리방침
                     </button>
                     에 동의합니다 <span className="text-red-500">*</span>
-                  </span>
+                  </label>
                 </div>
               </div>
 
