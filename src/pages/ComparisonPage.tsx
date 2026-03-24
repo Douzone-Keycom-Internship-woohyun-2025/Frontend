@@ -65,8 +65,8 @@ export default function ComparisonPage() {
 
             <div className="space-y-3 mb-6">
               {applicants.map((applicant, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <span className="text-sm font-medium text-gray-500 w-16 shrink-0">
+                <div key={index} className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+                  <span className="text-sm font-medium text-gray-500 shrink-0 sm:w-16">
                     회사 {index + 1}
                   </span>
                   <Input
@@ -75,21 +75,23 @@ export default function ComparisonPage() {
                     placeholder="출원인/회사명 입력"
                     className="flex-1"
                   />
-                  {applicants.length > 2 && (
-                    <button
-                      onClick={() => removeApplicant(index)}
-                      className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <i className="ri-delete-bin-line text-lg" />
-                    </button>
-                  )}
+                  <button
+                    type="button"
+                    onClick={() => removeApplicant(index)}
+                    disabled={applicants.length <= 2}
+                    className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:text-gray-400 disabled:hover:bg-transparent self-end sm:self-auto"
+                    aria-label={`회사 ${index + 1} 삭제`}
+                  >
+                    <i className="ri-delete-bin-line text-lg" />
+                  </button>
                 </div>
               ))}
 
               {applicants.length < 5 && (
                 <button
+                  type="button"
                   onClick={addApplicant}
-                  className="flex items-center gap-2 text-sm text-brand-700 hover:text-brand-800 font-medium ml-16 pl-1"
+                  className="flex items-center gap-2 text-sm text-brand-700 hover:text-brand-800 font-medium sm:ml-16 pl-1"
                 >
                   <i className="ri-add-circle-line text-lg" />
                   회사 추가 (최대 5개)

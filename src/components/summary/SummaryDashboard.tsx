@@ -330,7 +330,7 @@ export default function SummaryDashboard({
                   scales: {
                     x: {
                       grid: { display: false },
-                      ticks: { color: "#9CA3AF", font: { size: 10 }, maxRotation: 45 },
+                      ticks: { color: "#9CA3AF", font: { size: 10 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
                     },
                     y: {
                       beginAtZero: true,

@@ -11,6 +11,8 @@ interface PatentDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
   loading: boolean;
+  error?: boolean;
+  onRetry?: () => void;
   isFavorite: boolean;
   onToggleFavorite: (
     applicationNumber: string,
@@ -25,6 +27,8 @@ export default function PatentDetailModal({
   isOpen,
   onClose,
   loading,
+  error,
+  onRetry,
   isFavorite,
   onToggleFavorite,
   memo,
@@ -74,7 +78,36 @@ export default function PatentDetailModal({
       onClick={handleBackdropClick}
     >
       <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[92vh] flex flex-col overflow-hidden">
-        {loading || !patent ? (
+        {error ? (
+          <div className="flex flex-col items-center justify-center gap-4 p-12 text-center">
+            <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
+              <i className="ri-error-warning-line text-xl text-red-500" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-gray-800">상세 정보를 불러오지 못했습니다</p>
+              <p className="text-xs text-gray-500 mt-1">잠시 후 다시 시도해주세요.</p>
+            </div>
+            <div className="flex gap-2">
+              {onRetry && (
+                <button
+                  type="button"
+                  onClick={onRetry}
+                  className="px-4 py-2 text-sm font-medium text-white bg-brand-700 rounded-lg hover:bg-brand-800 transition-colors"
+                >
+                  <i className="ri-refresh-line mr-1.5" />
+                  다시 시도
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                닫기
+              </button>
+            </div>
+          </div>
+        ) : loading || !patent ? (
           <SkeletonPatentDetail />
         ) : (
           <>

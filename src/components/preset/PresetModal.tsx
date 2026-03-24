@@ -112,8 +112,9 @@ export default function PresetModal({
             </label>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <span className="block text-xs text-gray-500 mb-1">시작일</span>
+                <label htmlFor="preset-startDate" className="block text-xs text-gray-500 mb-1">시작일</label>
                 <Input
+                  id="preset-startDate"
                   type="date"
                   value={formData.startDate}
                   onChange={(e) =>
@@ -122,8 +123,9 @@ export default function PresetModal({
                 />
               </div>
               <div>
-                <span className="block text-xs text-gray-500 mb-1">종료일</span>
+                <label htmlFor="preset-endDate" className="block text-xs text-gray-500 mb-1">종료일</label>
                 <Input
+                  id="preset-endDate"
                   type="date"
                   value={formData.endDate}
                   onChange={(e) =>
