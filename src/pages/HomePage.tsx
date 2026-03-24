@@ -15,6 +15,12 @@ const quickActions = [
     link: "/patent-search",
   },
   {
+    title: "경쟁사 비교",
+    desc: "여러 회사의 특허 동향을 나란히 비교하여 기술 경쟁력을 파악합니다.",
+    icon: "ri-scales-line",
+    link: "/comparison",
+  },
+  {
     title: "관심특허",
     desc: "중요한 특허를 즐겨찾기로 저장하고 한곳에서 관리합니다.",
     icon: "ri-heart-line",
@@ -30,7 +36,8 @@ const quickActions = [
 
 const features = [
   { icon: "ri-database-2-line", label: "KIPRIS 공공데이터 기반" },
-  { icon: "ri-bar-chart-box-line", label: "IPC·추이·상태 3종 차트" },
+  { icon: "ri-bar-chart-box-line", label: "IPC·추이·상태 시각화 차트" },
+  { icon: "ri-scales-line", label: "경쟁사 비교 분석" },
   { icon: "ri-filter-3-line", label: "5가지 상세 검색 필터" },
   { icon: "ri-bookmark-line", label: "프리셋 저장 및 재사용" },
 ];

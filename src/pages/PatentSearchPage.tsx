@@ -11,6 +11,7 @@ import { usePatentSearch } from "@/hooks/usePatentSearch";
 import { useFavorites } from "@/hooks/useFavorites";
 import type { PatentStatus } from "@/types/patent";
 import { toApiDateFormat, toInputDateFormat } from "@/utils/dateTransform";
+import { downloadCsv } from "@/utils/exportCsv";
 
 type FiltersState = {
   applicant?: string;
@@ -144,7 +145,29 @@ export default function PatentSearchPage() {
         <header className="bg-white shadow-sm border-b">
           <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex justify-between items-center">
             <h1 className="text-3xl font-bold text-gray-900">특허 검색</h1>
-            <div className="text-sm text-gray-500">총 {totalCount}건</div>
+            <div className="flex items-center gap-3">
+              {results.length > 0 && (
+                <button
+                  onClick={() => {
+                    const headers = ["출원번호", "발명명칭", "출원인", "출원일", "IPC코드", "상태"];
+                    const rows = results.map((p) => [
+                      p.applicationNumber,
+                      p.inventionTitle || "",
+                      p.applicantName || "",
+                      p.applicationDate || "",
+                      p.mainIpcCode || "",
+                      p.registerStatus || "",
+                    ]);
+                    downloadCsv("특허검색결과", headers, rows);
+                  }}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <i className="ri-download-2-line" />
+                  CSV
+                </button>
+              )}
+              <div className="text-sm text-gray-500">총 {totalCount}건</div>
+            </div>
           </div>
         </header>
 
