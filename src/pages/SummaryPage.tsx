@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import SearchForm from "@/components/common/SearchForm";
 import SummaryDashboard from "@/components/summary/SummaryDashboard";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { SkeletonSummaryDashboard } from "@/components/common/Skeleton";
 import ErrorState from "@/components/common/ErrorState";
 import { useSummaryAnalysis } from "@/hooks/useSummaryAnalysis";
 import { toInputDateFormat } from "@/utils/dateTransform";
@@ -87,10 +87,7 @@ export default function SummaryPage() {
           </div>
 
           {isLoading ? (
-            <LoadingSpinner
-              message="요약 데이터를 분석 중입니다..."
-              size="md"
-            />
+            <SkeletonSummaryDashboard />
           ) : error ? (
             <ErrorState
               message={error}
@@ -118,7 +115,7 @@ export default function SummaryPage() {
                 R&D 동향 분석을 시작하세요
               </h3>
               <p className="text-gray-600">
-                회사명과 분석 기간을 입력하여 특허 동향을 시각적으로
+                출원인과 분석 기간을 입력하여 특허 동향을 시각적으로
                 분석해보세요.
               </p>
             </div>

@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import ProtectedLayout from "@/layouts/ProtectedLayout";
 import PresetCard from "@/components/preset/PresetCard";
 import PresetModal from "@/components/preset/PresetModal";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { SkeletonPresetCards } from "@/components/common/Skeleton";
 import ErrorState from "@/components/common/ErrorState";
-import EmptyState from "@/components/common/EmptyState";
 import { usePresets } from "@/hooks/usePresets";
 import type { SearchPreset } from "@/types/preset";
 import { useToast } from "@/hooks/use-toast";
 import { toInputDateFormat } from "@/utils/dateTransform";
+import { Button } from "@/components/ui/button";
 
 export default function PresetManagementPage() {
   const navigate = useNavigate();
@@ -40,7 +40,7 @@ export default function PresetManagementPage() {
     if (!formData.name.trim() || !formData.applicant.trim()) {
       toast({
         title: "필수 입력 누락",
-        description: "프리셋명과 회사명은 필수입니다.",
+        description: "프리셋명과 출원인은 필수입니다.",
         variant: "destructive",
       });
       return;
@@ -58,14 +58,12 @@ export default function PresetManagementPage() {
 
     try {
       await addOrUpdatePreset(preset);
-
       toast({
         title: editingPreset ? "수정 완료" : "생성 완료",
         description: editingPreset
           ? "프리셋이 성공적으로 수정되었습니다."
           : "새 프리셋이 생성되었습니다.",
       });
-
       handleCloseModal();
     } catch {
       toast({
@@ -79,10 +77,7 @@ export default function PresetManagementPage() {
   const handleDeletePreset = async (id: string) => {
     try {
       await deletePreset(id);
-      toast({
-        title: "삭제 완료",
-        description: "프리셋이 성공적으로 삭제되었습니다.",
-      });
+      toast({ title: "삭제 완료", description: "프리셋이 삭제되었습니다." });
     } catch {
       toast({
         title: "삭제 실패",
@@ -96,9 +91,7 @@ export default function PresetManagementPage() {
     if (preset) {
       const fullPreset = await loadPresetDetail(preset.id);
       const target = fullPreset ?? preset;
-
       setEditingPreset(target);
-
       setFormData({
         name: target.name,
         applicant: target.applicant,
@@ -108,15 +101,8 @@ export default function PresetManagementPage() {
       });
     } else {
       setEditingPreset(null);
-      setFormData({
-        name: "",
-        applicant: "",
-        startDate: "",
-        endDate: "",
-        description: "",
-      });
+      setFormData({ name: "", applicant: "", startDate: "", endDate: "", description: "" });
     }
-
     setIsModalOpen(true);
   };
 
@@ -127,44 +113,52 @@ export default function PresetManagementPage() {
 
   return (
     <ProtectedLayout>
-      <div className="w-full bg-gray-50">
+      <div className="w-full bg-gray-50 min-h-screen">
         <header className="bg-white shadow-sm border-b">
           <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                 프리셋 관리
               </h1>
-              <p className="mt-1.5 sm:mt-2 text-sm sm:text-base text-gray-600">
+              <p className="mt-1 text-sm text-gray-500">
                 자주 사용하는 검색 조건을 프리셋으로 저장하고 관리하세요.
               </p>
             </div>
-
-            <button
-              onClick={() => handleOpenModal()}
-              className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 bg-brand-700 text-white text-sm font-medium rounded-lg hover:bg-brand-800"
-            >
-              <i className="ri-add-line mr-2" />새 프리셋
-            </button>
+            <div className="flex items-center gap-3">
+              <span className="hidden md:inline text-xs text-gray-400">
+                {presets.length}개 프리셋
+              </span>
+              <Button onClick={() => handleOpenModal()} className="h-9">
+                <i className="ri-add-line mr-1.5" />
+                새 프리셋
+              </Button>
+            </div>
           </div>
         </header>
 
         <main className="px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
           {isLoading ? (
-            <div className="bg-white rounded-lg shadow p-10 flex justify-center">
-              <LoadingSpinner message="프리셋을 불러오는 중..." size="md" />
-            </div>
+            <SkeletonPresetCards count={3} />
           ) : error ? (
-            <ErrorState
-              message={error}
-              onRetry={refetchPresets}
-            />
+            <ErrorState message={error} onRetry={refetchPresets} />
           ) : presets.length === 0 ? (
-            <EmptyState
-              title="저장된 프리셋이 없습니다."
-              description="자주 사용하는 검색 조건을 프리셋으로 저장해보세요."
-            />
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 bg-brand-50 rounded-full flex items-center justify-center">
+                <i className="ri-bookmark-line text-2xl text-brand-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-1.5">
+                저장된 프리셋이 없습니다
+              </h3>
+              <p className="text-sm text-gray-500 mb-6">
+                자주 사용하는 검색 조건을 프리셋으로 저장해보세요.
+              </p>
+              <Button onClick={() => handleOpenModal()}>
+                <i className="ri-add-line mr-1.5" />
+                첫 프리셋 만들기
+              </Button>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
               {presets.map((preset) => (
                 <PresetCard
                   key={preset.id}

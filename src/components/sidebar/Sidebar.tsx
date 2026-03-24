@@ -14,6 +14,7 @@ const mainMenu = [
   { path: "/", icon: "ri-home-line", activeIcon: "ri-home-fill", label: "홈", exact: true },
   { path: "/patent-search", icon: "ri-search-line", activeIcon: "ri-search-line", label: "특허검색" },
   { path: "/summary", icon: "ri-pie-chart-line", activeIcon: "ri-pie-chart-fill", label: "요약분석" },
+  { path: "/comparison", icon: "ri-scales-line", activeIcon: "ri-scales-fill", label: "경쟁사 비교" },
   { path: "/favorites", icon: "ri-heart-line", activeIcon: "ri-heart-fill", label: "관심특허" },
   { path: "/preset-management", icon: "ri-bookmark-line", activeIcon: "ri-bookmark-fill", label: "프리셋 관리" },
 ];

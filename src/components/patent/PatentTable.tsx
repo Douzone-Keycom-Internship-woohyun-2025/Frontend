@@ -3,7 +3,6 @@ import { getStatusColor } from "@/utils/statusColor";
 import { toInputDateFormat } from "@/utils/dateTransform";
 import type { PatentListItem } from "@/types/patent";
 import EmptyState from "@/components/common/EmptyState";
-import { ArrowUp, ArrowDown, Heart, HeartOff } from "lucide-react";
 
 interface PatentTableProps {
   patents: PatentListItem[];
@@ -33,46 +32,47 @@ export default memo(function PatentTable({
   }
 
   return (
-    <div className="overflow-x-auto bg-white border border-gray-200 rounded-xl shadow-sm">
-      <table className="w-full">
-        <thead className="bg-gray-50 border-b border-gray-200">
-          <tr>
-            {[
-              "출원번호",
-              "출원인",
-              "발명명칭",
-              "출원일",
-              "IPC",
-              "상태",
-              "관심",
-            ].map((header, idx) => (
-              <th
-                key={idx}
-                className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider"
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm">
+        <thead className="bg-gray-50 sticky top-0 z-10">
+          <tr className="border-b border-gray-200">
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 w-36">
+              출원번호
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 w-40">
+              출원인
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500">
+              발명명칭
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 w-28">
+              <button
+                onClick={onSortChange}
+                className="inline-flex items-center gap-1 hover:text-gray-900 transition-colors"
               >
-                {header === "출원일" ? (
-                  <div className="flex items-center space-x-1">
-                    <span>출원일</span>
-                    <button
-                      onClick={onSortChange}
-                      className="p-1 rounded hover:bg-gray-200 transition-colors"
-                    >
-                      {sortOrder === "desc" ? (
-                        <ArrowDown className="w-4 h-4 text-gray-600" />
-                      ) : (
-                        <ArrowUp className="w-4 h-4 text-gray-600" />
-                      )}
-                    </button>
-                  </div>
-                ) : (
-                  header
-                )}
-              </th>
-            ))}
+                출원일
+                <i
+                  className={`${
+                    sortOrder === "desc"
+                      ? "ri-arrow-down-s-line"
+                      : "ri-arrow-up-s-line"
+                  } text-sm`}
+                />
+              </button>
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 w-28">
+              IPC
+            </th>
+            <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 w-20">
+              상태
+            </th>
+            <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 w-14">
+              관심
+            </th>
           </tr>
         </thead>
 
-        <tbody className="divide-y divide-gray-200">
+        <tbody className="divide-y divide-gray-100">
           {patents.map((patent) => {
             const isFavorite = favorites.has(patent.applicationNumber);
             const statusText = patent.registerStatus || "정보 없음";
@@ -81,36 +81,42 @@ export default memo(function PatentTable({
               <tr
                 key={patent.applicationNumber}
                 onClick={() => onPatentClick(patent)}
-                className="hover:bg-gray-50 cursor-pointer transition-colors"
+                className="hover:bg-brand-50/50 cursor-pointer transition-colors"
               >
-                <td className="px-6 py-4 text-sm text-gray-900">
+                <td className="px-4 py-3 text-gray-600 font-mono text-xs whitespace-nowrap">
                   {patent.applicationNumber}
                 </td>
 
-                <td className="px-6 py-4 text-sm text-gray-900">
+                <td className="px-4 py-3 text-gray-700 whitespace-nowrap">
                   {patent.applicantName || "정보 없음"}
                 </td>
 
-                <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                  {patent.inventionTitle || "정보 없음"}
+                <td className="px-4 py-3 font-medium text-gray-900">
+                  <span className="block max-w-xs truncate">
+                    {patent.inventionTitle || "정보 없음"}
+                  </span>
                 </td>
 
-                <td className="px-6 py-4 text-sm text-gray-900">
+                <td className="px-4 py-3 text-gray-600 whitespace-nowrap tabular-nums">
                   {patent.applicationDate
                     ? toInputDateFormat(patent.applicationDate)
                     : "정보 없음"}
                 </td>
 
-                <td className="px-6 py-4 text-sm text-gray-900">
-                  {patent.mainIpcCode || "-"}
-                  <div className="text-gray-500 text-xs">
-                    {patent.ipcKorName || ""}
-                  </div>
+                <td className="px-4 py-3">
+                  <span className="text-gray-700">
+                    {patent.mainIpcCode || "-"}
+                  </span>
+                  {patent.ipcKorName && (
+                    <span className="block text-xs text-gray-400 truncate max-w-[7rem]">
+                      {patent.ipcKorName}
+                    </span>
+                  )}
                 </td>
 
-                <td className="px-6 py-4 whitespace-nowrap">
+                <td className="px-4 py-3 whitespace-nowrap">
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(
                       statusText
                     )}`}
                   >
@@ -118,18 +124,18 @@ export default memo(function PatentTable({
                   </span>
                 </td>
 
-                <td className="px-6 py-4">
+                <td className="px-4 py-3 text-center">
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onToggleFavorite(patent.applicationNumber);
                     }}
-                    className="p-2 rounded-full hover:bg-gray-100 transition-colors"
+                    className="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
                   >
                     {isFavorite ? (
-                      <Heart className="w-5 h-5 text-red-500 fill-red-500" />
+                      <i className="ri-heart-fill text-red-500 text-base" />
                     ) : (
-                      <HeartOff className="w-5 h-5 text-gray-400" />
+                      <i className="ri-heart-line text-gray-300 text-base hover:text-gray-400" />
                     )}
                   </button>
                 </td>
