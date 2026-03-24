@@ -67,7 +67,7 @@ export default function SummaryPage() {
               </p>
             </div>
             <div className="hidden md:flex items-center text-gray-500 text-sm">
-              <i className="ri-bar-chart-line text-blue-600 mr-2"></i>
+              <i className="ri-bar-chart-line text-brand-700 mr-2"></i>
               대시보드 요약 모드
             </div>
           </div>
@@ -111,8 +111,8 @@ export default function SummaryPage() {
             </div>
           ) : (
             <div className="bg-white rounded-lg shadow p-12 text-center">
-              <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4 bg-blue-100 rounded-full">
-                <i className="ri-bar-chart-box-line text-2xl text-blue-600"></i>
+              <div className="w-16 h-16 flex items-center justify-center mx-auto mb-4 bg-brand-100 rounded-full">
+                <i className="ri-bar-chart-box-line text-2xl text-brand-700"></i>
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 R&D 동향 분석을 시작하세요

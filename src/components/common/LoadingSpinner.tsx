@@ -23,7 +23,7 @@ export default memo(function LoadingSpinner({
     <div className={containerClass}>
       {/* 아이콘 */}
       <Loader2
-        className={`animate-spin text-blue-600 ${sizeClass} mb-4`}
+        className={`animate-spin text-brand-700 ${sizeClass} mb-4`}
         strokeWidth={2.5}
       />
 

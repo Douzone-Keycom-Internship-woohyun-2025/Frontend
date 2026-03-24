@@ -18,8 +18,8 @@ export default function MobileHeader({ onMenuClick }: MobileHeaderProps) {
         to="/"
         className="flex items-center text-lg font-semibold text-gray-900"
       >
-        <span className="text-blue-600">T</span>ech
-        <span className="text-blue-600">L</span>ens
+        <span className="text-brand-800">T</span>ech
+        <span className="text-brand-800">L</span>ens
       </Link>
       <div className="w-8" />
     </header>

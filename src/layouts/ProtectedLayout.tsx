@@ -45,7 +45,7 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
         className="
           h-screen overflow-auto
           pt-14 md:pt-0
-          md:ml-64
+          md:ml-60
         "
       >
         {children}
