@@ -9,6 +9,9 @@ import { useAuthStore } from "@/store/authStore";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+const DEMO_EMAIL = import.meta.env.VITE_DEMO_EMAIL as string | undefined;
+const DEMO_PASSWORD = import.meta.env.VITE_DEMO_PASSWORD as string | undefined;
+
 export default function Login() {
   const navigate = useNavigate();
   const authStore = useAuthStore();
@@ -22,20 +25,22 @@ export default function Login() {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isDemoLoading, setIsDemoLoading] = useState(false);
   const [serverError, setServerError] = useState("");
+
+  const doLogin = async (email: string, password: string) => {
+    const res = await loginApi(email, password);
+    const { accessToken, refreshToken, user } = res.data;
+    localStorage.setItem("refreshToken", refreshToken);
+    authStore.login(accessToken, user.email);
+    navigate("/");
+  };
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
     setServerError("");
-
     try {
-      const res = await loginApi(data.email, data.password);
-      const { accessToken, refreshToken, user } = res.data;
-
-      localStorage.setItem("refreshToken", refreshToken);
-      authStore.login(accessToken, user.email);
-
-      navigate("/");
+      await doLogin(data.email, data.password);
     } catch (err: unknown) {
       if (axios.isAxiosError(err)) {
         setServerError(err.response?.data?.message || "로그인에 실패했습니다.");
@@ -44,6 +49,19 @@ export default function Login() {
       }
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleDemoLogin = async () => {
+    if (!DEMO_EMAIL || !DEMO_PASSWORD) return;
+    setIsDemoLoading(true);
+    setServerError("");
+    try {
+      await doLogin(DEMO_EMAIL, DEMO_PASSWORD);
+    } catch {
+      setServerError("데모 계정 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } finally {
+      setIsDemoLoading(false);
     }
   };
 
@@ -93,6 +111,43 @@ export default function Login() {
             <p className="text-sm text-gray-500">특허 인텔리전스 플랫폼</p>
           </div>
 
+          {/* 데모 로그인 배너 */}
+          {DEMO_EMAIL && DEMO_PASSWORD && (
+            <div className="mb-4 bg-brand-50 border border-brand-200 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="w-8 h-8 rounded-lg bg-brand-700 flex items-center justify-center shrink-0 mt-0.5">
+                  <i className="ri-eye-line text-white text-sm" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-brand-900 mb-0.5">
+                    포트폴리오 데모
+                  </p>
+                  <p className="text-xs text-brand-700 leading-relaxed mb-3">
+                    회원가입 없이 모든 기능을 바로 체험해보세요.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleDemoLogin}
+                    disabled={isDemoLoading || isLoading}
+                    className="w-full h-9 bg-brand-700 hover:bg-brand-800 text-white text-sm font-medium rounded-lg transition-colors disabled:opacity-60 flex items-center justify-center gap-2"
+                  >
+                    {isDemoLoading ? (
+                      <>
+                        <i className="ri-loader-4-line animate-spin" />
+                        로그인 중...
+                      </>
+                    ) : (
+                      <>
+                        <i className="ri-play-circle-line" />
+                        데모 계정으로 체험하기
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-6">로그인</h2>
 
@@ -134,7 +189,7 @@ export default function Login() {
                 </div>
               )}
 
-              <Button type="submit" disabled={isLoading} className="w-full h-11">
+              <Button type="submit" disabled={isLoading || isDemoLoading} className="w-full h-11">
                 {isLoading ? (
                   <span className="flex items-center gap-2">
                     <i className="ri-loader-4-line animate-spin" />
