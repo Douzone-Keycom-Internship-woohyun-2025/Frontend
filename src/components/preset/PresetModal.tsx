@@ -121,7 +121,7 @@ export default function PresetModal({
           </button>
           <button
             onClick={onSave}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="px-4 py-2 bg-brand-700 text-white rounded-lg hover:bg-brand-800"
           >
             {editingPreset ? "수정" : "저장"}
           </button>

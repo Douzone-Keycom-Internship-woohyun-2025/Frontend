@@ -62,7 +62,7 @@ export default memo(function Pagination({
             className={`min-w-[32px] h-8 px-2 flex items-center justify-center rounded text-sm border transition
               ${
                 p === currentPage
-                  ? "bg-blue-600 text-white border-blue-600 shadow"
+                  ? "bg-brand-700 text-white border-brand-700 shadow"
                   : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
               }`}
           >

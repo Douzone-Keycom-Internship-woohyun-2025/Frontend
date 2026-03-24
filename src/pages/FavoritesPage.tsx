@@ -66,7 +66,7 @@ export default function FavoritesPage() {
               </p>
             </div>
             <div className="hidden md:flex items-center text-gray-500 text-sm">
-              <i className="ri-heart-line text-blue-600 mr-2" />
+              <i className="ri-heart-line text-brand-700 mr-2" />
               즐겨찾기 목록
             </div>
           </div>
@@ -84,8 +84,8 @@ export default function FavoritesPage() {
             />
           ) : favoritePatents.length === 0 ? (
             <div className="bg-white rounded-lg shadow p-8 sm:p-10 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
-                <i className="ri-heart-line text-2xl text-blue-600" />
+              <div className="w-16 h-16 mx-auto mb-4 bg-brand-100 rounded-full flex items-center justify-center">
+                <i className="ri-heart-line text-2xl text-brand-700" />
               </div>
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">
                 관심특허가 없습니다
@@ -97,8 +97,8 @@ export default function FavoritesPage() {
               <Link
                 to="/patent-search"
                 className="inline-flex items-center px-4 sm:px-5 py-2.5
-                  bg-blue-600 text-white text-sm sm:text-base rounded-lg
-                  hover:bg-blue-700 transition-colors duration-200"
+                  bg-brand-700 text-white text-sm sm:text-base rounded-lg
+                  hover:bg-brand-800 transition-colors duration-200"
               >
                 <i className="ri-search-line text-base mr-2" />
                 특허 검색하기
