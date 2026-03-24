@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import ProtectedRoute from "@/components/protected-route/ProtectedRoute";
+import ErrorBoundary from "@/components/common/ErrorBoundary";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import { Toaster } from "@/components/ui/toaster";
 
@@ -29,6 +30,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <Toaster />
       <BrowserRouter>
+        <ErrorBoundary>
         <Suspense fallback={<LoadingSpinner message="페이지 로딩 중..." />}>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
@@ -83,6 +85,7 @@ function App() {
             />
           </Routes>
         </Suspense>
+        </ErrorBoundary>
       </BrowserRouter>
     </QueryClientProvider>
   );
