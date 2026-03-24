@@ -78,7 +78,7 @@ export default function SummaryDashboard({
         {
           data: topIpcCodes.map((item) => item.count),
           backgroundColor: [
-            "#1D4ED8",
+            "#003675",
             "#059669",
             "#F97316",
             "#DC2626",
@@ -126,7 +126,7 @@ export default function SummaryDashboard({
           data: statusData.map((s) => s.count),
           backgroundColor: [
             "#22C55E",
-            "#3B82F6",
+            "#003f9e",
             "#EAB308",
             "#EF4444",
             "#9CA3AF",
@@ -145,8 +145,8 @@ export default function SummaryDashboard({
       label: "총 특허 건수",
       value: totalPatents.toLocaleString(),
       icon: "ri-file-text-line",
-      iconBg: "bg-blue-100",
-      iconColor: "text-blue-600",
+      iconBg: "bg-brand-100",
+      iconColor: "text-brand-700",
     },
     {
       label: "등록률",

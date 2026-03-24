@@ -67,8 +67,8 @@ export default function Sidebar({
             onClick={handleMenuClick}
             className="text-xl font-bold text-gray-900 flex items-center cursor-pointer"
           >
-            <span className="text-blue-600">T</span>ech
-            <span className="text-blue-600">L</span>ens
+            <span className="text-brand-800">T</span>ech
+            <span className="text-brand-800">L</span>ens
           </Link>
         </h1>
       </div>
@@ -85,7 +85,7 @@ export default function Sidebar({
                   flex items-center px-4 py-3 rounded-lg transition-colors
                   ${
                     isActive(item.path, item.exact)
-                      ? "bg-blue-50 text-blue-700 border-r-2 border-blue-700"
+                      ? "bg-brand-50 text-brand-700 border-r-2 border-brand-700"
                       : "text-gray-700 hover:bg-gray-50"
                   }
                 `}
@@ -102,8 +102,8 @@ export default function Sidebar({
       <div className="p-4 border-t border-gray-200">
         <div className="flex items-center justify-between">
           <div className="flex items-center min-w-0">
-            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <i className="ri-user-line text-blue-600" />
+            <div className="w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center">
+              <i className="ri-user-line text-brand-800" />
             </div>
             <div className="ml-3 min-w-0">
               <p className="text-sm font-medium text-gray-900 truncate">

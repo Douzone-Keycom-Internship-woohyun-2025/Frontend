@@ -49,7 +49,7 @@ export default function PatentDetailModal({
             {/* 헤더 */}
             <div className="sticky top-0 flex justify-between items-center px-6 py-4 border-b bg-white z-10">
               <div className="flex items-center space-x-3">
-                <i className="ri-file-text-line text-xl text-blue-600"></i>
+                <i className="ri-file-text-line text-xl text-brand-700"></i>
                 <h2 className="text-xl font-bold text-gray-900">
                   특허 상세정보
                 </h2>
@@ -158,7 +158,7 @@ export default function PatentDetailModal({
                         {ipcList.map((ipc, idx) => (
                           <span
                             key={idx}
-                            className="px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-md font-mono"
+                            className="px-2 py-1 text-xs bg-brand-100 text-brand-700 rounded-md font-mono"
                           >
                             {ipc}
                           </span>
@@ -215,7 +215,7 @@ export default function PatentDetailModal({
               {patent.astrtCont && (
                 <section>
                   <label className="flex items-center text-lg font-bold text-gray-900 mb-3">
-                    <i className="ri-file-text-line mr-3 text-blue-600"></i>
+                    <i className="ri-file-text-line mr-3 text-brand-700"></i>
                     발명의 요약
                   </label>
 
@@ -231,7 +231,7 @@ export default function PatentDetailModal({
               {patent.bigDrawing && (
                 <section>
                   <label className="flex items-center text-lg font-bold text-gray-900 mb-3">
-                    <i className="ri-image-line mr-3 text-blue-600"></i>
+                    <i className="ri-image-line mr-3 text-brand-700"></i>
                     도면 보기
                   </label>
 
@@ -239,7 +239,7 @@ export default function PatentDetailModal({
                     href={patent.bigDrawing}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center p-5 border border-gray-200 rounded-lg hover:border-blue-400 hover:bg-blue-50 transition-all"
+                    className="flex items-center p-5 border border-gray-200 rounded-lg hover:border-brand-400 hover:bg-brand-50 transition-all"
                   >
                     <i className="ri-image-line text-gray-600 text-lg mr-3"></i>
                     <p className="text-sm text-gray-900 font-semibold">

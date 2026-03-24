@@ -164,7 +164,7 @@ export default function PatentSearchPage() {
                   onClick={() => setActiveTab(key as "basic" | "advanced")}
                   className={`px-6 py-3 rounded-md text-sm font-medium ${
                     activeTab === key
-                      ? "bg-white text-blue-600 shadow-sm"
+                      ? "bg-white text-brand-700 shadow-sm"
                       : "text-gray-600 hover:text-gray-900"
                   }`}
                 >

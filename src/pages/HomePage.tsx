@@ -20,10 +20,10 @@ export default function HomePage() {
       icon: "ri-search-line",
       link: "/patent-search",
       button: "검색하기",
-      iconBg: "bg-blue-100",
-      iconHoverBg: "group-hover:bg-blue-200",
-      iconColor: "text-blue-600",
-      accent: "text-blue-600",
+      iconBg: "bg-brand-100",
+      iconHoverBg: "group-hover:bg-brand-200",
+      iconColor: "text-brand-700",
+      accent: "text-brand-700",
     },
     {
       title: "관심특허",
@@ -41,7 +41,7 @@ export default function HomePage() {
   const features = [
     {
       icon: "ri-building-line",
-      color: "text-blue-500",
+      color: "text-brand-600",
       title: "회사별 검색",
       desc: "기업명으로 특허를 빠르게 찾아 관련 기술 동향을 파악할 수 있습니다.",
     },
@@ -65,8 +65,8 @@ export default function HomePage() {
         {/* 헤더 섹션 */}
         <div className="text-center mb-8 sm:mb-10 lg:mb-12">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-2 sm:mb-3 tracking-tight leading-tight">
-            <span className="text-blue-600">T</span>ech
-            <span className="text-blue-600">L</span>ens 특허 관리 시스템
+            <span className="text-brand-800">T</span>ech
+            <span className="text-brand-800">L</span>ens 특허 관리 시스템
           </h1>
           <p className="text-sm sm:text-base text-gray-600">
             효율적인 특허 검색과 분석을 위한 통합 플랫폼

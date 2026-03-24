@@ -32,7 +32,7 @@ export const getStatusColor = (status: PatentStatus | string): string => {
     case "등록":
       return "bg-green-100 text-green-800";
     case "출원":
-      return "bg-blue-100 text-blue-800";
+      return "bg-brand-100 text-brand-800";
     case "심사중":
       return "bg-yellow-100 text-yellow-800";
     case "거절":

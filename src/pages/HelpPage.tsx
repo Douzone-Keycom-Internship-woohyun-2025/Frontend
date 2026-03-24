@@ -37,7 +37,7 @@ export default function HelpPage() {
                     whitespace-nowrap
                     ${
                       activeSection === section.id
-                        ? "border-blue-500 text-blue-600"
+                        ? "border-brand-600 text-brand-700"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                     }
                   `}
@@ -65,9 +65,9 @@ export default function HelpPage() {
                 `}
               >
                 <div className="flex items-center mb-4 sm:mb-6">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-blue-100 rounded-lg mr-3 sm:mr-4">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center bg-brand-100 rounded-lg mr-3 sm:mr-4">
                     <i
-                      className={`${section.icon} text-lg sm:text-xl text-blue-600`}
+                      className={`${section.icon} text-lg sm:text-xl text-brand-700`}
                     />
                   </div>
                   <h2 className="text-lg sm:text-2xl font-bold text-gray-900">
@@ -81,16 +81,16 @@ export default function HelpPage() {
             ))}
           </div>
 
-          <div className="mt-6 sm:mt-8 bg-blue-50 rounded-lg p-4 sm:p-6">
+          <div className="mt-6 sm:mt-8 bg-brand-50 rounded-lg p-4 sm:p-6">
             <div className="flex items-start">
-              <div className="w-8 h-8 flex items-center justify-center bg-blue-100 rounded-lg mr-3 sm:mr-4 mt-0.5">
-                <i className="ri-lightbulb-line text-blue-600" />
+              <div className="w-8 h-8 flex items-center justify-center bg-brand-100 rounded-lg mr-3 sm:mr-4 mt-0.5">
+                <i className="ri-lightbulb-line text-brand-700" />
               </div>
               <div>
-                <h3 className="text-base sm:text-lg font-semibold text-blue-900 mb-1.5 sm:mb-2">
+                <h3 className="text-base sm:text-lg font-semibold text-brand-900 mb-1.5 sm:mb-2">
                   더 많은 도움이 필요하신가요?
                 </h3>
-                <p className="text-xs sm:text-sm text-blue-800 mb-3 sm:mb-4">
+                <p className="text-xs sm:text-sm text-brand-800 mb-3 sm:mb-4">
                   특허 검색이나 분석에 대해 더 자세한 정보가 필요하시면 아래
                   리소스를 참고하세요.
                 </p>
@@ -102,10 +102,10 @@ export default function HelpPage() {
                     className="
                       inline-flex items-center
                       px-3 sm:px-4 py-2
-                      bg-blue-600 text-white
+                      bg-brand-700 text-white
                       text-xs sm:text-sm
                       rounded-lg
-                      hover:bg-blue-700
+                      hover:bg-brand-800
                       transition-colors duration-200
                     "
                   >
@@ -119,11 +119,11 @@ export default function HelpPage() {
                     className="
                       inline-flex items-center
                       px-3 sm:px-4 py-2
-                      bg-white text-blue-600
+                      bg-white text-brand-700
                       text-xs sm:text-sm
-                      border border-blue-600
+                      border border-brand-700
                       rounded-lg
-                      hover:bg-blue-50
+                      hover:bg-brand-50
                       transition-colors duration-200
                     "
                   >

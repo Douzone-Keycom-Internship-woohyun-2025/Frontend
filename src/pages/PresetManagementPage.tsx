@@ -141,7 +141,7 @@ export default function PresetManagementPage() {
 
             <button
               onClick={() => handleOpenModal()}
-              className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
+              className="w-full md:w-auto inline-flex items-center justify-center px-4 py-2 bg-brand-700 text-white text-sm font-medium rounded-lg hover:bg-brand-800"
             >
               <i className="ri-add-line mr-2" />새 프리셋
             </button>
