@@ -77,7 +77,7 @@ export default function PatentDetailModal({
       className="fixed inset-0 z-50 flex flex-col justify-end sm:flex-row sm:items-center sm:justify-center bg-black/40 backdrop-blur-sm sm:p-6"
       onClick={handleBackdropClick}
     >
-      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl max-h-[90vh] sm:max-h-[90vh] flex flex-col overflow-hidden">
+      <div className="bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl max-h-[85vh] sm:max-h-[90vh] flex flex-col overflow-hidden">
         {error ? (
           <div className="flex flex-col items-center justify-center gap-4 p-12 text-center">
             <div className="w-12 h-12 rounded-full bg-red-50 flex items-center justify-center">
@@ -112,7 +112,11 @@ export default function PatentDetailModal({
         ) : (
           <>
             {/* 모바일 드래그 핸들 */}
-            <div className="sm:hidden flex justify-center pt-2.5 pb-1 shrink-0">
+            <div
+              className="sm:hidden flex justify-center pt-2.5 pb-1 shrink-0 cursor-pointer"
+              onClick={onClose}
+              aria-label="닫기"
+            >
               <div className="w-10 h-1 bg-gray-300 rounded-full" />
             </div>
 
@@ -196,7 +200,7 @@ export default function PatentDetailModal({
                       {item.date ? toInputDateFormat(item.date) : "-"}
                     </p>
                     {item.num && (
-                      <p className="text-[9px] sm:text-[10px] text-gray-400 font-mono mt-0.5 truncate">
+                      <p className="text-[10px] text-gray-400 font-mono mt-0.5 truncate">
                         {item.num}
                       </p>
                     )}

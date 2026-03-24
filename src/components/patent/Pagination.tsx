@@ -39,7 +39,8 @@ export default memo(function Pagination({
       </div>
 
       {/* 페이지네이션 */}
-      <div className="flex items-center space-x-1 overflow-x-auto no-scrollbar">
+      <div className="overflow-x-auto no-scrollbar">
+      <div className="flex items-center space-x-1 w-max">
         {/* 이전 그룹 */}
         <button
           disabled={groupStart === 1}
@@ -83,6 +84,7 @@ export default memo(function Pagination({
         >
           <i className="ri-arrow-right-s-line text-lg"></i>
         </button>
+      </div>
       </div>
     </div>
   );
