@@ -138,6 +138,23 @@ export default function ComparisonDashboard({ data }: ComparisonDashboardProps) 
 
   return (
     <div className="space-y-6 sm:space-y-8">
+      {/* 부분 실패 경고 */}
+      {data.failed && data.failed.length > 0 && (
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 flex items-start gap-3">
+          <i className="ri-error-warning-line text-orange-500 text-lg mt-0.5" />
+          <div>
+            <p className="text-sm font-medium text-orange-800">
+              일부 회사의 분석에 실패했습니다
+            </p>
+            <ul className="mt-1 text-sm text-orange-700">
+              {data.failed.map((f) => (
+                <li key={f.applicant}>{f.applicant}: {f.reason}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
+
       {/* Header with export */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

@@ -26,4 +26,5 @@ export interface CompanyComparisonData {
 export interface ComparisonResponse {
   period: { startDate: string; endDate: string };
   companies: CompanyComparisonData[];
+  failed?: Array<{ applicant: string; reason: string }>;
 }
