@@ -59,12 +59,12 @@ export default function Sidebar({
             group flex items-center gap-3 px-3 py-2.5 rounded-lg text-[13px] font-medium
             transition-all duration-150
             ${active
-              ? "bg-brand-800 text-white shadow-sm"
+              ? "bg-brand-50 text-brand-800 font-semibold"
               : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
             }
           `}
         >
-          <i className={`${active ? item.activeIcon : item.icon} text-base ${active ? "text-white" : "text-gray-400 group-hover:text-gray-600"}`} />
+          <i className={`${active ? item.activeIcon : item.icon} text-base ${active ? "text-brand-700" : "text-gray-400 group-hover:text-gray-600"}`} />
           {item.label}
         </Link>
       </li>
@@ -80,9 +80,7 @@ export default function Sidebar({
           onClick={handleMenuClick}
           className="flex items-center gap-2"
         >
-          <div className="w-8 h-8 bg-brand-800 rounded-lg flex items-center justify-center">
-            <span className="text-white text-sm font-bold">T</span>
-          </div>
+          <img src="/favicon.svg" alt="TechLens" className="w-8 h-8" />
           <div>
             <span className="text-[15px] font-bold text-gray-900 tracking-tight">
               TechLens
