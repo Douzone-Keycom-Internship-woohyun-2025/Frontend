@@ -15,7 +15,7 @@ export default function MobileHeader({ onMenuClick }: MobileHeaderProps) {
       </button>
 
       <Link
-        to="/"
+        to="/home"
         className="flex items-center text-lg font-semibold text-gray-900"
       >
         <span className="text-brand-800">T</span>ech

@@ -80,16 +80,20 @@ export async function getSummaryApi(
   const recentPatents: SummaryData["recentPatents"] = raw.recentPatents.map(
     (p) => ({
       applicationNumber: p.applicationNumber,
-      inventionTitle: p.title,
-      applicantName: raw.applicant,
-      applicationDate: p.date,
-      ipcCode: p.ipcMain ?? "",
-      registerStatus: p.status,
-      isFavorite: false,
+      title: p.title,
+      date: p.date,
+      ipcMain: p.ipcMain,
+      ipcKorName: p.ipcKorName,
+      status: p.status,
     })
   );
 
   return {
+    applicant: raw.applicant,
+    period: {
+      startDate: raw.period.startDate,
+      endDate: raw.period.endDate,
+    },
     statistics,
     ipcDistribution,
     monthlyTrend,
