@@ -1,4 +1,6 @@
+import { memo } from "react";
 import { Search, FolderOpen, HeartOff, FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 type IconType = "search" | "folder" | "favorite" | "report";
 
@@ -17,7 +19,7 @@ const iconMap = {
   report: FileText,
 };
 
-export default function EmptyState({
+export default memo(function EmptyState({
   title = "결과가 없습니다",
   description = "조건을 변경하거나 새로운 검색을 시도해보세요.",
   icon = "search",
@@ -36,14 +38,9 @@ export default function EmptyState({
         {description && <p className="text-gray-600 mb-6">{description}</p>}
 
         {actionLabel && onAction && (
-          <button
-            onClick={onAction}
-            className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            {actionLabel}
-          </button>
+          <Button onClick={onAction}>{actionLabel}</Button>
         )}
       </div>
     </div>
   );
-}
+});

@@ -13,7 +13,15 @@ export interface FavoriteItem {
   registerStatus: string | null;
   drawingUrl: string | null;
   mainIpcCode: string | null;
+  memo: string | null;
   createdAt: string;
+}
+
+export interface FavoriteAnalysis {
+  totalCount: number;
+  statusCounts: Array<{ status: string; count: number }>;
+  ipcCounts: Array<{ ipc_code: string; count: number }>;
+  monthlyCounts: Array<{ month: string; count: number }>;
 }
 
 export interface AddFavoritePayload {
