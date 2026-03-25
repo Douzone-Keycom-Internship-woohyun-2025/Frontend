@@ -39,6 +39,12 @@ interface SummaryDashboardProps {
   presetFilters?: { applicant?: string; startDate?: string; endDate?: string };
 }
 
+// "알 수 없음"인 경우 코드 자체를 반환
+function ipcDisplayName(name: string | undefined, code: string): string {
+  if (!name || name === "알 수 없음") return code;
+  return name;
+}
+
 const IPC_COLORS = [
   "#003675", "#059669", "#F97316", "#DC2626", "#7C3AED",
   "#0891B2", "#CA8A04", "#BE185D", "#4F46E5", "#16A34A",
@@ -142,7 +148,7 @@ export default function SummaryDashboard({
       [],
       ["--- IPC 분포 ---", ""],
       ...sortedIpc.map((ipc) => [
-        `${ipc.ipcCode} (${ipc.ipcName})`,
+        `${ipc.ipcCode} (${ipcDisplayName(ipc.ipcName, ipc.ipcCode)})`,
         `${ipc.count}건 (${ipc.percentage}%)`,
       ]),
       [],
@@ -162,7 +168,7 @@ export default function SummaryDashboard({
       presetFilters?.startDate && presetFilters?.endDate
         ? `${presetFilters.startDate} ~ ${presetFilters.endDate} 기간`
         : "검색 기간";
-    const topField = sortedIpc[0]?.ipcName || sortedIpc[0]?.ipcCode;
+    const topField = sortedIpc[0] ? ipcDisplayName(sortedIpc[0].ipcName, sortedIpc[0].ipcCode) : undefined;
     const trendText =
       growthRate !== null
         ? growthRate >= 0
@@ -285,8 +291,10 @@ export default function SummaryDashboard({
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-sm text-gray-800 font-medium truncate">
-                      {item.ipcName || item.ipcCode}
-                      <span className="text-xs text-gray-400 font-normal ml-1.5">{item.ipcCode}</span>
+                      {ipcDisplayName(item.ipcName, item.ipcCode)}
+                      {item.ipcName && item.ipcName !== "알 수 없음" && (
+                        <span className="text-xs text-gray-400 font-normal ml-1.5">{item.ipcCode}</span>
+                      )}
                     </span>
                     <span className="text-xs text-gray-500 shrink-0 ml-2">{item.count}건 ({item.percentage}%)</span>
                   </div>
