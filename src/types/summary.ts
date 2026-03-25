@@ -44,29 +44,36 @@ export interface SummaryData {
     totalPatents: number;
     monthlyAverage: number;
     registrationRate: number;
+    searchPeriod: {
+      startDate: string;
+      endDate: string;
+    };
   };
 
   ipcDistribution: Array<{
     ipcCode: string;
-    ipcKorName: string;
+    ipcName: string;
     count: number;
+    percentage: number;
   }>;
 
   statusDistribution: Array<{
     status: string;
     count: number;
+    percentage: number;
   }>;
 
   monthlyTrend: Array<{
     month: string;
     count: number;
+    cumulativeCount: number;
   }>;
 
   recentPatents: Array<{
     applicationNumber: string;
     title: string;
     date: string;
-    ipcMain: string;
+    ipcMain: string | null;
     ipcKorName: string;
     status: string;
   }>;
