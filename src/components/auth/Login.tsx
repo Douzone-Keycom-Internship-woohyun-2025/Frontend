@@ -33,7 +33,7 @@ export default function Login() {
     const { accessToken, refreshToken, user } = res.data;
     localStorage.setItem("refreshToken", refreshToken);
     authStore.login(accessToken, user.email);
-    navigate("/");
+    navigate("/home");
   };
 
   const onSubmit = async (data: LoginFormData) => {
