@@ -39,6 +39,11 @@ interface SummaryDashboardProps {
   presetFilters?: { applicant?: string; startDate?: string; endDate?: string };
 }
 
+function ipcDisplayName(name: string | undefined, code: string): string {
+  if (!name || name === "알 수 없음") return code;
+  return name;
+}
+
 const IPC_COLORS = [
   "#003675", "#059669", "#F97316", "#DC2626", "#7C3AED",
   "#0891B2", "#CA8A04", "#BE185D", "#4F46E5", "#16A34A",
@@ -144,7 +149,7 @@ export default function SummaryDashboard({
         label: "기술 집중도",
         value: `${techConcentration}%`,
         desc: techConcentration > 60
-          ? `${sortedIpc[0]?.ipcName || sortedIpc[0]?.ipcCode} 편중`
+          ? `${sortedIpc[0] ? ipcDisplayName(sortedIpc[0].ipcName, sortedIpc[0].ipcCode) : ""} 편중`
           : `${sortedIpc.length}개 분야 분산`,
       });
     }
@@ -181,7 +186,7 @@ export default function SummaryDashboard({
   const interpretations = useMemo(() => {
     const lines: Array<{ icon: string; color: string; text: string }> = [];
     const applicant = presetFilters?.applicant || "해당 출원인";
-    const topField = sortedIpc[0]?.ipcName || sortedIpc[0]?.ipcCode;
+    const topField = sortedIpc[0] ? ipcDisplayName(sortedIpc[0].ipcName, sortedIpc[0].ipcCode) : undefined;
 
     lines.push({
       icon: "ri-file-text-line",
@@ -279,7 +284,7 @@ export default function SummaryDashboard({
       [],
       ["--- IPC 분포 ---", ""],
       ...sortedIpc.map((ipc) => [
-        `${ipc.ipcCode} (${ipc.ipcName})`,
+        `${ipc.ipcCode} (${ipcDisplayName(ipc.ipcName, ipc.ipcCode)})`,
         `${ipc.count}건 (${ipc.percentage}%)`,
       ]),
       [],
@@ -357,7 +362,7 @@ export default function SummaryDashboard({
       label: "기술 분야 수",
       value: String(sortedIpc.length),
       unit: "개",
-      desc: sortedIpc.length > 0 ? `주력: ${sortedIpc[0]?.ipcName || sortedIpc[0]?.ipcCode || "-"}` : "IPC 분류 없음",
+      desc: sortedIpc.length > 0 ? `주력: ${ipcDisplayName(sortedIpc[0]?.ipcName, sortedIpc[0]?.ipcCode ?? "")}` : "IPC 분류 없음",
       icon: "ri-focus-3-line",
       iconBg: "bg-blue-50",
       iconColor: "text-blue-600",
@@ -544,7 +549,7 @@ export default function SummaryDashboard({
                       <div className="flex items-center gap-1.5 min-w-0">
                         <span className="w-1.5 h-1.5 rounded-full shrink-0" style={{ backgroundColor: IPC_COLORS[index % IPC_COLORS.length] }} />
                         <span className="text-xs text-gray-800 font-medium truncate">
-                          {item.ipcName || item.ipcCode}
+                          {ipcDisplayName(item.ipcName, item.ipcCode)}
                         </span>
                         <span className="text-[9px] text-gray-400 font-mono shrink-0">{item.ipcCode}</span>
                       </div>
