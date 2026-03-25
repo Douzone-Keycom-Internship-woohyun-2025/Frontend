@@ -15,7 +15,6 @@ const FavoritesPage = lazy(() => import("@/pages/FavoritesPage"));
 const PresetManagementPage = lazy(() => import("@/pages/PresetManagementPage"));
 const HelpPage = lazy(() => import("@/pages/HelpPage"));
 const ComparisonPage = lazy(() => import("@/pages/ComparisonPage"));
-const LandingPage = lazy(() => import("@/pages/LandingPage"));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -35,7 +34,6 @@ function App() {
         <ErrorBoundary>
         <Suspense fallback={<LoadingSpinner message="페이지 로딩 중..." />}>
           <Routes>
-            <Route path="/landing" element={<LandingPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/signup" element={<SignupPage />} />
             <Route
