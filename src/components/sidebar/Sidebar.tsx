@@ -77,7 +77,7 @@ export default function Sidebar({
       {/* 로고 */}
       <div className="px-5 pt-6 pb-5">
         <Link
-          to="/"
+          to="/home"
           onClick={handleMenuClick}
           className="flex items-center gap-2"
         >
