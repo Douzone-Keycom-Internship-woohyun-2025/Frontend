@@ -58,8 +58,13 @@ export default function Login() {
     setServerError("");
     try {
       await doLogin(DEMO_EMAIL, DEMO_PASSWORD);
-    } catch {
-      setServerError("데모 계정 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+    } catch (err: unknown) {
+      if (axios.isAxiosError(err)) {
+        const msg = err.response?.data?.message;
+        setServerError(msg || "데모 계정 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      } else {
+        setServerError("데모 계정 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
+      }
     } finally {
       setIsDemoLoading(false);
     }
