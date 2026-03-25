@@ -129,9 +129,10 @@ describe("Login — API 연동", () => {
 
   it("제출 중에는 버튼이 '로그인 중...' 텍스트로 바뀌고 disabled 상태가 된다", async () => {
     const user = userEvent.setup();
-    // 응답을 지연시켜 로딩 상태 캡처
+    let settle: () => void;
+    // 명시적으로 제어 가능한 Promise — 테스트 종료 전에 직접 resolve
     vi.mocked(loginApi).mockImplementation(
-      () => new Promise((resolve) => setTimeout(resolve, 300))
+      () => new Promise((resolve) => { settle = resolve as () => void; })
     );
     renderLogin();
 
@@ -141,5 +142,8 @@ describe("Login — API 연동", () => {
 
     expect(screen.getByText("로그인 중...")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /로그인 중/ })).toBeDisabled();
+
+    // Promise 정리 — 미결 상태로 테스트 종료 방지
+    settle!();
   });
 });

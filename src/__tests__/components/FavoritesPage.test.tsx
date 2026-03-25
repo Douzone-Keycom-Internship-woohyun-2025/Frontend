@@ -1,12 +1,13 @@
 import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
+import type { ReactNode } from "react";
 import FavoritesPage from "@/pages/FavoritesPage";
 import { useFavorites } from "@/hooks/useFavorites";
 import type { FavoriteItem, FavoriteAnalysis } from "@/types/favorite";
 
 // ProtectedLayout → children만 렌더링
 vi.mock("@/layouts/ProtectedLayout", () => ({
-  default: ({ children }: { children: React.ReactNode }) => <>{children}</>,
+  default: ({ children }: { children: ReactNode }) => <>{children}</>,
 }));
 
 // PatentList → 간단한 stub (내부 의존성 차단)
