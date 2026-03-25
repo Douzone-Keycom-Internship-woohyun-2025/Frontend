@@ -18,7 +18,10 @@ api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 });
 
 let isRefreshing = false;
-let requestQueue: ((token: string) => void)[] = [];
+let requestQueue: {
+  resolve: (token: string) => void;
+  reject: (err: unknown) => void;
+}[] = [];
 
 api.interceptors.response.use(
   (res) => res,
@@ -27,6 +30,14 @@ api.interceptors.response.use(
     const original = error.config as InternalAxiosRequestConfig & {
       _retry?: boolean;
     };
+
+    if (error.response?.status === 429) {
+      const msg =
+        (error.response.data as { message?: string })?.message ||
+        "요청 한도에 도달했습니다. 잠시 후 다시 시도해주세요.";
+      window.dispatchEvent(new CustomEvent("api:rateLimit", { detail: { message: msg } }));
+      return Promise.reject(error);
+    }
 
     if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
@@ -39,10 +50,13 @@ api.interceptors.response.use(
       }
 
       if (isRefreshing) {
-        return new Promise((resolve) => {
-          requestQueue.push((newToken) => {
-            original.headers.Authorization = `Bearer ${newToken}`;
-            resolve(api(original));
+        return new Promise((resolve, reject) => {
+          requestQueue.push({
+            resolve: (newToken) => {
+              original.headers.Authorization = `Bearer ${newToken}`;
+              resolve(api(original));
+            },
+            reject,
           });
         });
       }
@@ -57,17 +71,19 @@ api.interceptors.response.use(
         localStorage.setItem("accessToken", newAccessToken);
         localStorage.setItem("refreshToken", newRefreshToken);
 
-        requestQueue.forEach((cb) => cb(newAccessToken));
+        requestQueue.forEach(({ resolve }) => resolve(newAccessToken));
         requestQueue = [];
         isRefreshing = false;
 
         original.headers.Authorization = `Bearer ${newAccessToken}`;
         return api(original);
       } catch (err) {
+        requestQueue.forEach(({ reject }) => reject(err));
+        requestQueue = [];
+        isRefreshing = false;
+
         localStorage.removeItem("accessToken");
         localStorage.removeItem("refreshToken");
-        isRefreshing = false;
-        requestQueue = [];
 
         window.location.href = "/login";
         return Promise.reject(err);

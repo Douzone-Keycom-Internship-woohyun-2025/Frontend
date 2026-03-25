@@ -4,7 +4,7 @@ import type {
   PatentDetail,
   BasicPatentSearchParams,
   AdvancedPatentSearchParams,
-} from "../types/patent";
+} from "@/types/patent";
 
 export async function searchPatentBasic(
   params: BasicPatentSearchParams
