@@ -31,15 +31,13 @@ export default function ProtectedLayout({ children }: ProtectedLayoutProps) {
     return () => window.removeEventListener("api:rateLimit", handler);
   }, [toast]);
 
-  const handleLogout = async () => {
-    try {
-      await logoutApi();
-    } catch {
-      // 서버 호출 실패해도 클라이언트 로그아웃은 진행
-    }
+  const handleLogout = () => {
+    // 클라이언트 로그아웃 즉시 처리 (서버 응답 기다리지 않음)
     queryClient.clear();
     logout();
     navigate("/login");
+    // 서버 refresh token 무효화는 백그라운드로
+    logoutApi().catch(() => {});
   };
 
   return (
